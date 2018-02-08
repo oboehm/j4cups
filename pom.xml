@@ -8,17 +8,8 @@
     <artifactId>j4cups</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     
-    <description>
-        library to support CUPS and IPP protocol
-    </description>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>RELEASE</version>
-        </dependency>
-    </dependencies>
+    <description>library to support CUPS and IPP protocol</description>
+    <url>https://github.com/oboehm/j4cups</url>
 
     <licenses>
         <license>
@@ -27,5 +18,19 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+    
+    <scm>
+        <connection>scm:git:git://github.com/oboehm/j4cups.git</connection>
+        <url>https://github.com/oboehm/j4cups</url>
+    </scm>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>RELEASE</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 </project>
