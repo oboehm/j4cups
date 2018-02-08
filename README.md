@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/oboehm/j4cups.svg?branch=master)](https://travis-ci.org/oboehm/j4cups)
+[![Coverage Status](https://coveralls.io/repos/github/oboehm/j4cups/badge.svg?branch=master)](https://coveralls.io/github/oboehm/j4cups)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 # J4Cups
