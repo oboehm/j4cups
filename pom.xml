@@ -10,6 +10,7 @@
     
     <description>library to support CUPS and IPP protocol</description>
     <url>https://github.com/oboehm/j4cups</url>
+    <inceptionYear>2018</inceptionYear>
 
     <licenses>
         <license>
@@ -24,6 +25,56 @@
         <url>https://github.com/oboehm/j4cups</url>
     </scm>
 
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+    </properties>
+
+    
+    <build>
+
+        <plugins>
+    
+            <!-- Sonar -->
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.3.0.603</version>
+            </plugin>
+        
+            <!-- Code Coverage  -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.7.9</version>
+                <executions>
+                    <execution>
+                        <id>default-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-report</id>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>4.3.0</version>
+            </plugin>
+        
+        </plugins>
+    
+    </build>
+
+    
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -33,4 +84,5 @@
         </dependency>
     </dependencies>
 
+    
 </project>
