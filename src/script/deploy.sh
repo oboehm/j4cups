@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# This script deploys the artifacts for jfachwert to https://oss.sonatype.org/
+# This script deploys the artifacts for j4cups to https://oss.sonatype.org/
 # see https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide#SonatypeOSSMavenRepositoryUsageGuide-7b.StageExistingArtifacts
 #
 # (c)reated: 09-Feb-2018 by boehm@javatux.de
@@ -30,4 +30,4 @@ deploy_jar_for() {
 }
 
 # start deployment
-deploy_jar_for jfachwert
+deploy_jar_for j4cups
