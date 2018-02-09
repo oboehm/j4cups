@@ -17,6 +17,7 @@
  */
 package j4cups.protocol;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -60,16 +61,19 @@ public final class IppRequestTest {
     private final IppRequest request = new IppRequest(data);
 
     @Test
+    @DisplayName("version-number")
     public void testGetVersion() {
         assertEquals("2.0", request.getVersion());
     }
 
     @Test
+    @DisplayName("operation-id")
     public void getOperation() {
         assertEquals(IppOperations.GET_PRINTER_ATTRIBUTES, request.getOperation());
     }
 
     @Test
+    @DisplayName("request-id")
     public void getRequestId() {
         assertEquals(1, request.getRequestId());
     }
