@@ -6,7 +6,7 @@
 
     <groupId>de.javatux</groupId>
     <artifactId>j4cups</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2-SNAPSHOT</version>
 
     <name>J4Cups</name>
     <description>library to support CUPS and IPP protocol</description>
@@ -42,21 +42,40 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.9</version>
+                <version>0.8.0</version>
                 <executions>
                     <execution>
-                        <id>default-prepare-agent</id>
+                        <id>prepare-agent</id>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
                     <execution>
-                        <id>default-report</id>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>report</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>post-unit-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Sets the path to the file which contains the execution data. -->
+                            <dataFile>target/jacoco.exec</dataFile>
+                            <!-- Sets the output directory for the code coverage report. -->
+                            <outputDirectory>target/jacoco-ut</outputDirectory>
+                        </configuration>
+                    </execution>
                 </executions>
+                <configuration>
+                    <systemPropertyVariables>
+                        <jacoco-agent.destfile>target/jacoco.exec</jacoco-agent.destfile>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.eluder.coveralls</groupId>
