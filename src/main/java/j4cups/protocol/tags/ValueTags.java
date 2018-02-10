@@ -83,7 +83,7 @@ public enum ValueTags {
     RESERVED_34(0x34),
 
     /** textWithLanguage. */
-    TEXT_WITh_LANGUAGE(0x35),
+    TEXT_WITH_LANGUAGE(0x35),
 
     /** nameWithLanguage. */
     NAME_WITH_LANGUAGE(0x36),
