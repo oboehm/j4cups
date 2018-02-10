@@ -1,5 +1,6 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.javatux.j4cups/j4cups/badge.svg)](https://maven-badges.herokuapp.com/maven-central/de.javatux.jfortune/jfortune)
 [![Build Status](https://travis-ci.org/oboehm/j4cups.svg?branch=develop)](https://travis-ci.org/oboehm/j4cups)
-[![Coverage Status](https://coveralls.io/repos/github/oboehm/j4cups/badge.svg?branch=master)](https://coveralls.io/github/oboehm/j4cups)
+[![Quality Gate](https://sonarcloud.io/api/badges/gate?key=de.javatux.j4cups:j4cups:develop)](https://sonarcloud.io/dashboard?id=de.javatux.j4cups%3Aj4cups%3Adevelop)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 # J4Cups
