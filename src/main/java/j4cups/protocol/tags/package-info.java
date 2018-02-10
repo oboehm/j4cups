@@ -30,6 +30,6 @@
  *     </li>
  * </ol>
  * 
- * @since 0.0.1 (08-Feb-2018)
+ * @since 0.0.2 (08-Feb-2018)
  */
 package j4cups.protocol.tags;

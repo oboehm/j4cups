@@ -23,7 +23,7 @@ package j4cups.protocol.tags;
  * <a href="https://tools.ietf.org/html/rfc2910#section-3.5.1">section 3.5.1</a>.
  *
  * @author oboehm
- * @since 0.0.1 (09.02.2018)
+ * @since 0.0.2 (09.02.2018)
  */
 public enum DelimiterTags {
 
