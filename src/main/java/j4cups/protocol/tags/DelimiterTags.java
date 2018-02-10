@@ -53,5 +53,29 @@ public enum DelimiterTags {
     DelimiterTags(int value) {
         this.value = (byte) value;
     }
+    
+    /**
+     * Gets the byte value of the tag.
+     *
+     * @return 2-byte code from 0x0000 to 0x7fff
+     */
+    public byte getValue() {
+        return value;
+    }
+
+    /**
+     * Allows you to map a byte value to the corresponding tag.
+     *
+     * @param id e.g. 0x04
+     * @return operation, e.g. PRINTER_ATTRIBUTES_TAG
+     */
+    public static DelimiterTags of(int id) {
+        for (DelimiterTags tag : DelimiterTags.values()) {
+            if (id == tag.getValue()) {
+                return tag;
+            }
+        }
+        throw new IllegalArgumentException("invalid id: " + id);
+    }
 
 }
