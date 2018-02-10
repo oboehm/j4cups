@@ -17,9 +17,15 @@
  */
 package j4cups.protocol;
 
+import j4cups.protocol.tags.DelimiterTags;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -76,6 +82,13 @@ public final class IppRequestTest {
     @DisplayName("request-id")
     public void getRequestId() {
         assertEquals(1, request.getRequestId());
+    }
+    
+    @Test
+    public void getAttributeGroups() {
+        List<AttributeGroup> groups = request.getAttributeGroups();
+        assertThat(groups, not(empty()));
+        assertEquals(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG, groups.get(0).getBeginTag());
     }
 
 }

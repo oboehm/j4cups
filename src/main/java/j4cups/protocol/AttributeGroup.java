@@ -43,7 +43,7 @@ import java.nio.ByteBuffer;
  */
 public class AttributeGroup {
     
-    private final ByteBuffer bytes;
+    private final DelimiterTags beginTag;
 
     /**
      * Instantiates a new attribute group from the given bytes.
@@ -60,7 +60,7 @@ public class AttributeGroup {
      * @param bytes the bytes of attribute group
      */
     public AttributeGroup(ByteBuffer bytes) {
-        this.bytes = bytes;
+        this.beginTag = DelimiterTags.of(bytes.get());
     }
 
     /**
@@ -72,7 +72,7 @@ public class AttributeGroup {
      * @return e.g. {@link DelimiterTags#OPERATIONS_ATTRIBUTES_TAG}
      */
     public DelimiterTags getBeginTag() {
-        return DelimiterTags.of(bytes.get(0));
+        return beginTag;
     }
     
 }

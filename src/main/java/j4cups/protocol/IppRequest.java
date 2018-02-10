@@ -17,8 +17,9 @@
  */
 package j4cups.protocol;
 
-import java.math.BigInteger;
-import java.util.Arrays;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The IppRequest represents an IPP request as is defined in RFC-2910.
@@ -45,7 +46,7 @@ import java.util.Arrays;
  */
 public class IppRequest {
     
-    private final byte[] bytes;
+    private final ByteBuffer bytes;
 
     /**
      * Instantiates a new IPP request from the given bytes.
@@ -53,6 +54,15 @@ public class IppRequest {
      * @param bytes the bytes of the IPP request
      */
     public IppRequest(byte[] bytes) {
+        this(ByteBuffer.wrap(bytes));
+    }
+
+    /**
+     * Instantiates a new IPP request from the given bytes.
+     *
+     * @param bytes the bytes of the IPP request
+     */
+    public IppRequest(ByteBuffer bytes) {
         this.bytes = bytes;
     }
 
@@ -63,7 +73,7 @@ public class IppRequest {
      * @return e.g. "2.0"
      */
     public String getVersion() {
-        return bytes[0] + "." + bytes[1];
+        return bytes.get(0) + "." + bytes.get(1);
     }
 
     /**
@@ -72,7 +82,7 @@ public class IppRequest {
      * @return e.g. {@link IppOperations#CREATE_JOB}
      */
     public IppOperations getOperation() {
-        return IppOperations.of(getAsInt(2, 3));
+        return IppOperations.of(getAsShort(2));
     }
 
     /**
@@ -82,12 +92,29 @@ public class IppRequest {
      * @return the request-id
      */
     public int getRequestId() {
-        return getAsInt(4, 7);
+        return getAsInt(4);
     }
 
-    private int getAsInt(int start, int end) {
-        byte[] subbytes = Arrays.copyOfRange(bytes, start, end+1);
-        return new BigInteger(subbytes).intValue();
+    /**
+     * The fourth field is the "attribute-group" field, and it occurs 0 or
+     * more times.
+     * 
+     * @return a list of attribute-groups
+     */
+    public List<AttributeGroup> getAttributeGroups() {
+        bytes.position(8);
+        AttributeGroup group = new AttributeGroup(bytes);
+        List<AttributeGroup> attributeGroups = new ArrayList<>();
+        attributeGroups.add(group);
+        return attributeGroups;
+    }
+
+    private int getAsInt(int start) {
+        return bytes.getInt(start);
+    }
+    
+    private short getAsShort(int start) {
+        return bytes.getShort(start);
     }
 
 }
