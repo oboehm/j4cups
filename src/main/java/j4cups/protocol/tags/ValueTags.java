@@ -27,6 +27,10 @@ package j4cups.protocol.tags;
  *     <li>0x40 - 0x5f: for character-string values</li>
  *     <li>0x60 - 0xff: reserved for future type definitions</li>
  * </ul>
+ * <p>
+ * For further information see RFC-2910 <a 
+ * href="https://tools.ietf.org/html/rfc2910#section-3.5.2">section 3.5.2</a>.
+ * </p>
  *
  * @author oboehm
  * @since 0.0.2 (10.02.2018)
