@@ -17,6 +17,7 @@
  */
 package j4cups.protocol;
 
+import j4cups.protocol.attr.AttributeGroup;
 import j4cups.protocol.tags.DelimiterTags;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

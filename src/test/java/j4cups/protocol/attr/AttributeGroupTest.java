@@ -15,10 +15,13 @@
  *
  * (c)reated 10.02.2018 by oboehm (boehm@javatux.de)
  */
-package j4cups.protocol;
+package j4cups.protocol.attr;
 
+import j4cups.protocol.attr.AttributeGroup;
 import j4cups.protocol.tags.DelimiterTags;
 import org.junit.jupiter.api.Test;
+
+import java.nio.ByteBuffer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -58,7 +61,7 @@ public final class AttributeGroupTest {
                     0, 21, 112, 114, 105, 110, 116, 101, 114, 45, 115, 116, 97, 116, 101, 45, 109, 101, 115, 115, 97,
                     103, 101, 68, 0, 0, 0, 21, 112, 114, 105, 110, 116, 101, 114, 45, 115, 116, 97, 116, 101, 45, 114,
                     101, 97, 115, 111, 110, 115, 3};
-    private final AttributeGroup attributeGroup = new AttributeGroup(data);
+    private final AttributeGroup attributeGroup = new AttributeGroup(ByteBuffer.wrap(data));
 
     @Test
     void getBeginTag() {

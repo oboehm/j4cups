@@ -15,7 +15,7 @@
  *
  * (c)reated 10.02.2018 by oboehm (boehm@javatux.de)
  */
-package j4cups.protocol;
+package j4cups.protocol.attr;
 
 import j4cups.protocol.tags.DelimiterTags;
 
@@ -47,17 +47,10 @@ public class AttributeGroup {
 
     /**
      * Instantiates a new attribute group from the given bytes.
+     * The given {@link ByteBuffer} must be positioned at the beginning of the
+     * attribute-group.
      *
-     * @param bytes the bytes of attribute group
-     */
-    public AttributeGroup(byte[] bytes) {
-        this(ByteBuffer.wrap(bytes));
-    }
-
-    /**
-     * Instantiates a new attribute group from the given bytes.
-     *
-     * @param bytes the bytes of attribute group
+     * @param bytes ByteBuffer positioned at the beginning
      */
     public AttributeGroup(ByteBuffer bytes) {
         this.beginTag = DelimiterTags.of(bytes.get());

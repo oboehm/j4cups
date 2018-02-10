@@ -17,6 +17,8 @@
  */
 package j4cups.protocol;
 
+import j4cups.protocol.attr.AttributeGroup;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;

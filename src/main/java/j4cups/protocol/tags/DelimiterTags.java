@@ -57,7 +57,7 @@ public enum DelimiterTags {
     /**
      * Gets the byte value of the tag.
      *
-     * @return 2-byte code from 0x0000 to 0x7fff
+     * @return byte code from 0x00 to 0x0f
      */
     public byte getValue() {
         return value;
