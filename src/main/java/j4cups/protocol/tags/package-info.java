@@ -13,24 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * (c)reated 08.02.2018 by oboehm (boehm@javatux.de)
+ * (c)reated 09.02.2018 by oboehm (boehm@javatux.de)
  */
-package j4cups.protocol;
-
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Unit-Tests for {@link IppOperations}.
- *
- * @author Oli B.
+ * This package represents the which are described in 
+ * <a href="https://tools.ietf.org/html/rfc2910#section-3.5">section 3.5</a>
+ * of RFC-2910. There are two kinds of tags:
+ * <ol>
+ *     <li>
+ *         delimiter tags: delimit major sections of the protocol, namely
+ *         attributes and data
+ *     </li>
+ *     <li>
+ *         value tags: specify the type of each attribute value
+ *     </li>
+ * </ol>
+ * 
+ * @since 0.0.2 (08-Feb-2018)
  */
-public class IppOperationsTest {
-
-    @Test
-    public void testOf() {
-        assertEquals(IppOperations.GET_JOBS, IppOperations.of(0x000a));
-    }
-
-}
+package j4cups.protocol.tags;

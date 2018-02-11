@@ -13,24 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * (c)reated 08.02.2018 by oboehm (boehm@javatux.de)
+ * (c)reated 10.02.2018 by Oli B. (boehm@javatux.de)
  */
-package j4cups.protocol;
+package j4cups.protocol.tags;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
- * Unit-Tests for {@link IppOperations}.
- *
- * @author Oli B.
+ * Unit tests for {@link ValueTags}.
  */
-public class IppOperationsTest {
+public final class ValueTagsTest {
 
     @Test
-    public void testOf() {
-        assertEquals(IppOperations.GET_JOBS, IppOperations.of(0x000a));
+    void testOf() {
+        assertEquals(ValueTags.ENUM, ValueTags.of(0x23));
     }
 
 }

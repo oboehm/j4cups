@@ -13,24 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * (c)reated 08.02.2018 by oboehm (boehm@javatux.de)
+ * (c)reated 10.02.2018 by oboehm (ob@oasd.de)
  */
-package j4cups.protocol;
+package j4cups.protocol.tags;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Unit-Tests for {@link IppOperations}.
- *
- * @author Oli B.
+ * Unit tests for {@link DelimiterTags}.
  */
-public class IppOperationsTest {
+class DelimiterTagsTest {
 
     @Test
-    public void testOf() {
-        assertEquals(IppOperations.GET_JOBS, IppOperations.of(0x000a));
+    void testOf() {
+        assertEquals(DelimiterTags.JOB_ATTRIBUTES_TAG, DelimiterTags.of(0x02));
     }
 
 }

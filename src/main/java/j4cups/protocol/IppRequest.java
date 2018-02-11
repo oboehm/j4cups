@@ -17,8 +17,13 @@
  */
 package j4cups.protocol;
 
-import java.math.BigInteger;
-import java.util.Arrays;
+import j4cups.protocol.attr.Attribute;
+import j4cups.protocol.attr.AttributeGroup;
+import j4cups.protocol.tags.DelimiterTags;
+
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The IppRequest represents an IPP request as is defined in RFC-2910.
@@ -45,7 +50,12 @@ import java.util.Arrays;
  */
 public class IppRequest {
     
-    private final byte[] bytes;
+    private final String version;
+    private final IppOperations operation;
+    private final int requestId;
+    private final List<AttributeGroup> attributeGroups;
+    private final DelimiterTags endOfAttributeTag;
+    private final byte[] data;
 
     /**
      * Instantiates a new IPP request from the given bytes.
@@ -53,7 +63,39 @@ public class IppRequest {
      * @param bytes the bytes of the IPP request
      */
     public IppRequest(byte[] bytes) {
-        this.bytes = bytes;
+        this(ByteBuffer.wrap(bytes));
+    }
+
+    /**
+     * Instantiates a new IPP request from the given bytes.
+     *
+     * @param bytes the bytes of the IPP request
+     */
+    public IppRequest(ByteBuffer bytes) {
+        this.version = bytes.get() + "." + bytes.get();
+        this.operation = IppOperations.of(bytes.getShort());
+        this.requestId = bytes.getInt();
+        this.attributeGroups = readAttributeGroups(bytes);
+        this.endOfAttributeTag = DelimiterTags.of(bytes.get());
+        this.data = readBytes(bytes);
+    }
+
+    private static List<AttributeGroup> readAttributeGroups(ByteBuffer buffer) {
+        List<AttributeGroup> values = new ArrayList<>();
+        while (buffer.remaining() > 4) {
+            int pos = buffer.position();
+            if (DelimiterTags.END_OF_ATTRIBUTES_TAG == DelimiterTags.of(buffer.get(pos))) {
+                break;
+            }
+            values.add(new AttributeGroup(buffer));
+        }
+        return values;
+    }
+
+    private static byte[] readBytes(ByteBuffer buffer) {
+        byte[] bytes = new byte[buffer.remaining()];
+        buffer.get(bytes);
+        return bytes;
     }
 
     /**
@@ -63,7 +105,7 @@ public class IppRequest {
      * @return e.g. "2.0"
      */
     public String getVersion() {
-        return bytes[0] + "." + bytes[1];
+        return version;
     }
 
     /**
@@ -72,7 +114,7 @@ public class IppRequest {
      * @return e.g. {@link IppOperations#CREATE_JOB}
      */
     public IppOperations getOperation() {
-        return IppOperations.of(getAsInt(2, 3));
+        return operation;
     }
 
     /**
@@ -82,12 +124,56 @@ public class IppRequest {
      * @return the request-id
      */
     public int getRequestId() {
-        return getAsInt(4, 7);
+        return requestId;
     }
 
-    private int getAsInt(int start, int end) {
-        byte[] subbytes = Arrays.copyOfRange(bytes, start, end+1);
-        return new BigInteger(subbytes).intValue();
+    /**
+     * The fourth field is the "attribute-group" field, and it occurs 0 or
+     * more times.
+     * 
+     * @return a list of attribute-groups
+     */
+    public List<AttributeGroup> getAttributeGroups() {
+        return attributeGroups;
+    }
+
+    /**
+     * Gets a collected list of all attributes of the attribute-groups.
+     * 
+     * @return list of all attibutes
+     */
+    public List<Attribute> getAttributes() {
+        List<Attribute> attributes = new ArrayList<>();
+        for (AttributeGroup group : attributeGroups) {
+            attributes.addAll(group.getAttributes());
+        }
+        return attributes;
+    }
+
+    /**
+     * Gets the attribute with the given name. If not attribute with the given
+     * name is found an {@link IllegalArgumentException} will be thrown.
+     * 
+     * @param name name of the attribute
+     * @return attribute with given name
+     */
+    public Attribute getAttribute(String name) {
+        for (Attribute attr : getAttributes()) {
+            if (name.equals(attr.getName())) {
+                return attr;
+            }
+        }
+        throw new IllegalArgumentException("no attribute '" + name + "' found");
+    }
+
+    /**
+     * Returns the data part of the request. If no data part is present a
+     * 0-length byte array is returned.
+     * 
+     * @return data part
+     */
+    public byte[] getData() {
+        return data;
     }
 
 }

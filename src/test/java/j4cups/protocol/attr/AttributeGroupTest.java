@@ -13,31 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * (c)reated 09.02.2018 by oboehm (boehm@javatux.de)
+ * (c)reated 10.02.2018 by oboehm (boehm@javatux.de)
  */
-package j4cups.protocol;
+package j4cups.protocol.attr;
 
-import j4cups.protocol.attr.Attribute;
-import j4cups.protocol.attr.AttributeGroup;
 import j4cups.protocol.tags.DelimiterTags;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.nio.ByteBuffer;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Unit tests for {@link IppRequest}. The used data are recorded from a
- * real request where a test page was tried to print via the HTTP interface
- * of CUPS.
+ * Unit tests for {@link AttributeGroup} class. The data for this tests are
+ * recorded during an installation of a printer in CUPS, where the header of
+ * the IPP request (the first 8 bytes) were removed.
  */
-public final class IppRequestTest {
+public final class AttributeGroupTest {
 
     private final byte[] data =
-            {2, 0, 0, 11, 0, 0, 0, 1, 1, 71, 0, 18, 97, 116, 116, 114, 105, 98, 117, 116, 101, 115, 45, 99, 104, 97,
+            {1, 71, 0, 18, 97, 116, 116, 114, 105, 98, 117, 116, 101, 115, 45, 99, 104, 97,
                     114, 115, 101, 116, 0, 5, 117, 116, 102, 45, 56, 72, 0, 27, 97, 116, 116, 114, 105, 98, 117, 116,
                     101, 115, 45, 110, 97, 116, 117, 114, 97, 108, 45, 108, 97, 110, 103, 117, 97, 103, 101, 0, 2, 100,
                     101, 69, 0, 11, 112, 114, 105, 110, 116, 101, 114, 45, 117, 114, 105, 0, 53, 104, 116, 116, 112, 58,
@@ -65,53 +65,18 @@ public final class IppRequestTest {
                     0, 21, 112, 114, 105, 110, 116, 101, 114, 45, 115, 116, 97, 116, 101, 45, 109, 101, 115, 115, 97,
                     103, 101, 68, 0, 0, 0, 21, 112, 114, 105, 110, 116, 101, 114, 45, 115, 116, 97, 116, 101, 45, 114,
                     101, 97, 115, 111, 110, 115, 3};
-    private final IppRequest request = new IppRequest(data);
+    private final AttributeGroup attributeGroup = new AttributeGroup(ByteBuffer.wrap(data));
 
     @Test
-    @DisplayName("version-number")
-    public void testGetVersion() {
-        assertEquals("2.0", request.getVersion());
-    }
-
-    @Test
-    @DisplayName("operation-id")
-    public void getOperation() {
-        assertEquals(IppOperations.GET_PRINTER_ATTRIBUTES, request.getOperation());
-    }
-
-    @Test
-    @DisplayName("request-id")
-    public void getRequestId() {
-        assertEquals(1, request.getRequestId());
+    void getBeginTag() {
+        assertEquals(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG, attributeGroup.getBeginTag());
     }
     
     @Test
-    @DisplayName("attribute-groups")
-    public void getAttributeGroups() {
-        List<AttributeGroup> groups = request.getAttributeGroups();
-        assertThat(groups, not(empty()));
-        assertEquals(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG, groups.get(0).getBeginTag());
-    }
-    
-    @Test
-    @DisplayName("attributes")
-    public void getAttributes() {
-        List<Attribute> attributes = request.getAttributes();
+    void getAttributes() {
+        List<Attribute> attributes = attributeGroup.getAttributes();
         assertThat(attributes, not(empty()));
-    }
-    
-    @Test
-    @DisplayName("attributes-natural-language=de")
-    public void getAttributeName() {
-        Attribute attribute = request.getAttribute("attributes-natural-language");
-        assertEquals("de", attribute.getStringValue());
-    }
-    
-    @Test
-    @DisplayName("data")
-    public void getData() {
-        byte[] data = request.getData();
-        assertThat(data.length, equalTo(0));
+        assertThat(attributes.size(), greaterThan(1));
     }
 
 }

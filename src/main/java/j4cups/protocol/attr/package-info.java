@@ -13,24 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * (c)reated 08.02.2018 by oboehm (boehm@javatux.de)
+ * (c)reated 10.02.2018 by Oli B. (boehm@javatux.de)
  */
-package j4cups.protocol;
-
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Unit-Tests for {@link IppOperations}.
- *
- * @author Oli B.
+ * In this package are the building blocks for attribute and attribute-groups.
+ * 
+ * @since 0.0.2
  */
-public class IppOperationsTest {
-
-    @Test
-    public void testOf() {
-        assertEquals(IppOperations.GET_JOBS, IppOperations.of(0x000a));
-    }
-
-}
+package j4cups.protocol.attr;

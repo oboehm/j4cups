@@ -165,10 +165,10 @@ public enum IppOperations {
     /* Reserved for vendor extensions (0x4000-0x7fff, see Section 7.8 of RFC-8011).  */
     RESERVED_FOR_VENDOR_EXTENSIONS(0x7fff);
 
-    private final int code;
+    private final short code;
 
     IppOperations(int value) {
-        this.code = value;
+        this.code = (short) value;
     }
 
     /**
@@ -176,7 +176,7 @@ public enum IppOperations {
      * 
      * @return 2-byte code from 0x0000 to 0x7fff
      */
-    public int getCode() {
+    public short getCode() {
         return code;
     }
 
