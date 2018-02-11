@@ -49,6 +49,9 @@ import java.util.List;
 public class IppRequest {
     
     private final ByteBuffer bytes;
+    private final String version;
+    private final IppOperations operation;
+    private final int requestId;
 
     /**
      * Instantiates a new IPP request from the given bytes.
@@ -66,6 +69,9 @@ public class IppRequest {
      */
     public IppRequest(ByteBuffer bytes) {
         this.bytes = bytes;
+        this.version = bytes.get(0) + "." + bytes.get(1);
+        this.operation = IppOperations.of(bytes.getShort(2));
+        this.requestId = bytes.getInt(4);
     }
 
     /**
@@ -75,7 +81,7 @@ public class IppRequest {
      * @return e.g. "2.0"
      */
     public String getVersion() {
-        return bytes.get(0) + "." + bytes.get(1);
+        return version;
     }
 
     /**
@@ -84,7 +90,7 @@ public class IppRequest {
      * @return e.g. {@link IppOperations#CREATE_JOB}
      */
     public IppOperations getOperation() {
-        return IppOperations.of(getAsShort(2));
+        return operation;
     }
 
     /**
@@ -94,7 +100,7 @@ public class IppRequest {
      * @return the request-id
      */
     public int getRequestId() {
-        return getAsInt(4);
+        return requestId;
     }
 
     /**
@@ -109,14 +115,6 @@ public class IppRequest {
         List<AttributeGroup> attributeGroups = new ArrayList<>();
         attributeGroups.add(group);
         return attributeGroups;
-    }
-
-    private int getAsInt(int start) {
-        return bytes.getInt(start);
-    }
-    
-    private short getAsShort(int start) {
-        return bytes.getShort(start);
     }
 
 }
