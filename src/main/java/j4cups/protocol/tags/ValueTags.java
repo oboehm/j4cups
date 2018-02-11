@@ -67,7 +67,7 @@ public enum ValueTags {
     /** 0x24-0x2F is reserved for future integer type definitions. */
     RESERVED_FOR_INTEGER_TYPE(0x2f),
 
-    /** octetString with an  unspecified format. */
+    /** octetString with an unspecified format. */
     UNSPECIFIED_OCTET_STRING(0x30),
 
     /** dateTime. */
