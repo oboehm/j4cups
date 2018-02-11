@@ -50,11 +50,12 @@ import java.util.List;
  */
 public class IppRequest {
     
-    private final ByteBuffer bytes;
     private final String version;
     private final IppOperations operation;
     private final int requestId;
     private final List<AttributeGroup> attributeGroups;
+    private final DelimiterTags endOfAttributeTag;
+    private final byte[] data;
 
     /**
      * Instantiates a new IPP request from the given bytes.
@@ -71,11 +72,12 @@ public class IppRequest {
      * @param bytes the bytes of the IPP request
      */
     public IppRequest(ByteBuffer bytes) {
-        this.bytes = bytes;
         this.version = bytes.get() + "." + bytes.get();
         this.operation = IppOperations.of(bytes.getShort());
         this.requestId = bytes.getInt();
         this.attributeGroups = readAttributeGroups(bytes);
+        this.endOfAttributeTag = DelimiterTags.of(bytes.get());
+        this.data = readBytes(bytes);
     }
 
     private static List<AttributeGroup> readAttributeGroups(ByteBuffer buffer) {
@@ -88,6 +90,12 @@ public class IppRequest {
             values.add(new AttributeGroup(buffer));
         }
         return values;
+    }
+
+    private static byte[] readBytes(ByteBuffer buffer) {
+        byte[] bytes = new byte[buffer.remaining()];
+        buffer.get(bytes);
+        return bytes;
     }
 
     /**
@@ -140,6 +148,16 @@ public class IppRequest {
             attributes.addAll(group.getAttributes());
         }
         return attributes;
+    }
+
+    /**
+     * Returns the data part of the request. If no data part is present a
+     * 0-length byte array is returned.
+     * 
+     * @return data part
+     */
+    public byte[] getData() {
+        return data;
     }
 
 }

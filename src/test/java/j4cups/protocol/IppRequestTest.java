@@ -26,8 +26,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -99,6 +98,13 @@ public final class IppRequestTest {
     public void getAttributes() {
         List<Attribute> attributes = request.getAttributes();
         assertThat(attributes, not(empty()));
+    }
+    
+    @Test
+    @DisplayName("data")
+    public void getData() {
+        byte[] data = request.getData();
+        assertThat(data.length, equalTo(0));
     }
 
 }
