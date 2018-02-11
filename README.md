@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/oboehm/j4cups.svg?branch=develop)](https://travis-ci.org/oboehm/j4cups)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=de.javatux%3Aj4cups%3Adevelop&metric=coverage)](https://sonarcloud.io/dashboard?id=de.javatux%3Aj4cups%3Adevelop)
+[![Build Status](https://travis-ci.org/oboehm/j4cups.svg?branch=master)](https://travis-ci.org/oboehm/j4cups)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=de.javatux%3Aj4cups%3Amaster&metric=coverage)](https://sonarcloud.io/dashboard?id=de.javatux%3Aj4cups%3Amaster)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.javatux/j4cups/badge.svg)](https://maven-badges.herokuapp.com/maven-central/de.javatux/j4cups)
 

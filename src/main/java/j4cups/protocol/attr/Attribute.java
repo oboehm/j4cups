@@ -144,7 +144,7 @@ public class Attribute {
     
     /**
      * An "attribute-with-one-value" field is encoded with five subfields.
-     * <pre></pre>
+     * <pre>
      * -----------------------------------------------
      * |                   value-tag                 |   1 byte
      * -----------------------------------------------
