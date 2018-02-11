@@ -22,6 +22,8 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -49,6 +51,11 @@ public final class AttributeTest {
     @Test
     void getStringValue() {
         assertEquals("utf-8", ATTRIBUTE.getStringValue());
+    }
+    
+    @Test
+    void testToString() {
+        assertThat(ATTRIBUTE.toString(), containsString(ATTRIBUTE.getName()));
     }
 
 }

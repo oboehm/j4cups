@@ -19,6 +19,7 @@ package j4cups.protocol.attr;
 
 import j4cups.protocol.tags.ValueTags;
 
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -64,6 +65,18 @@ public class Attribute {
         this.additionalValues = readAdditionalValues(bytes);
     }
 
+    private static List<AdditionalValue> readAdditionalValues(ByteBuffer buffer) {
+        List<AdditionalValue> values = new ArrayList<>();
+        while (buffer.remaining() > 4) {
+            int pos = buffer.position();
+            if (!ValueTags.isValid(buffer.get(pos)) && (buffer.getShort(pos+1) != 0)) {
+                break;
+            }
+            values.add(new AdditionalValue(buffer));
+        }
+        return values;
+    }
+
     /**
      * The "value-tag" field specifies the attribute syntax, e.g. 0x44
      * for the attribute syntax 'keyword'.
@@ -103,20 +116,23 @@ public class Attribute {
         return new String(getValue(), StandardCharsets.UTF_8);
     }
 
-    private static List<AdditionalValue> readAdditionalValues(ByteBuffer buffer) {
-        List<AdditionalValue> values = new ArrayList<>();
-        while (buffer.remaining() > 4) {
-            int pos = buffer.position();
-            if (!ValueTags.isValid(buffer.get(pos)) && (buffer.getShort(pos+1) != 0)) {
-                break;
-            }
-            values.add(new AdditionalValue(buffer));
+    @Override
+    public String toString() {
+        StringBuilder buffer = new StringBuilder(getName());
+        buffer.append("=");
+        if (getValueTag().isCharacterStringValue()) {
+            buffer.append(getStringValue());
+        } else {
+            buffer.append(new BigInteger(getValue()).toString(16));
         }
-        return values;
+        if (!additionalValues.isEmpty()) {
+            buffer.append(",...");
+        }
+        return buffer.toString();
     }
 
-
-
+    
+    
     /**
      * An "attribute-with-one-value" field is encoded with five subfields.
      * <pre></pre>
