@@ -119,7 +119,120 @@ public class Attribute {
         return values;
     }
 
-    
+
+
+    /**
+     * An "attribute-with-one-value" field is encoded with five subfields.
+     * <pre></pre>
+     * -----------------------------------------------
+     * |                   value-tag                 |   1 byte
+     * -----------------------------------------------
+     * |               name-length  (value is u)     |   2 bytes
+     * -----------------------------------------------
+     * |                     name                    |   u bytes
+     * -----------------------------------------------
+     * |              value-length  (value is v)     |   2 bytes
+     * -----------------------------------------------
+     * |                     value                   |   v bytes
+     * -----------------------------------------------
+     * </pre>
+     * <p>
+     * The "value-tag" field specifies the attribute syntax, e.g. 0x44
+     * for the attribute syntax 'keyword'.
+     * </p>
+     * <p>
+     * The "name-length" field specifies the length of the "name" field
+     * in bytes, e.g. u in the above diagram or 15 for the name "sides-
+     * supported".
+     * </p>
+     * <p>
+     * The "name" field contains the textual name of the attribute, e.g.
+     * "sides-supported".
+     * </p>
+     * <p>
+     * The "value-length" field specifies the length of the "value" field
+     * in bytes, e.g. v in the above diagram or 9 for the (keyword) value
+     * 'one-sided'.
+     * </p>
+     * <p>
+     * The "value" field contains the value of the attribute, e.g. the
+     * textual value 'one-sided'.
+     * </p>
+     */
+    public static class AttributeWithOneValue {
+
+        private final ValueTags valueTag;
+        private final String name;
+        private final byte[] value;
+
+        /**
+         * Instantiates a new attribute-with-one-value from the given bytes.
+         * The given {@link ByteBuffer} must be positioned at the beginning of the
+         * attribute-group.
+         *
+         * @param bytes ByteBuffer positioned at the beginning
+         */
+        public AttributeWithOneValue(ByteBuffer bytes) {
+            this.valueTag = ValueTags.of(bytes.get());
+            short nameLength = bytes.getShort();
+            this.name = readString(bytes, nameLength);
+            short valueLength = bytes.getShort();
+            this.value = readBytes(bytes, valueLength);
+        }
+
+        private static String readString(ByteBuffer buffer, short length) {
+            byte[] bytes = readBytes(buffer, length);
+            return new String(bytes, StandardCharsets.UTF_8);
+        }
+
+        private static byte[] readBytes(ByteBuffer buffer, short length) {
+            byte[] value = new byte[length];
+            for (int i = 0; i < length; i++) {
+                value[i] = buffer.get();
+            }
+            return value;
+        }
+
+        /**
+         * The "value-tag" field specifies the attribute syntax, e.g. 0x44
+         * for the attribute syntax 'keyword'.
+         *
+         * @return e.g. {@link ValueTags#KEYWORD}
+         */
+        public ValueTags getValueTag() {
+            return valueTag;
+        }
+
+        /**
+         * The "name" field contains the textual name of the attribute.
+         *
+         * @return e.g. "slides-supported"
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * The "value" field contains the value of the attribute.
+         *
+         * @return e.g. the textual value 'one-sided' as bytes
+         */
+        public byte[] getValue() {
+            return value;
+        }
+
+        /**
+         * The "value" field contains the value of the attribute.
+         *
+         * @return e.g. "one-sided"
+         */
+        public String getStringValue() {
+            return new String(getValue(), StandardCharsets.UTF_8);
+        }
+
+    }
+
+
 
     /**
      * An "additional-value" has four entries.
