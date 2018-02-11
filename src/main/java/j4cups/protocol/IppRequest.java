@@ -18,6 +18,7 @@
 package j4cups.protocol;
 
 import j4cups.protocol.attr.AttributeGroup;
+import j4cups.protocol.tags.DelimiterTags;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -52,6 +53,7 @@ public class IppRequest {
     private final String version;
     private final IppOperations operation;
     private final int requestId;
+    private final List<AttributeGroup> attributeGroups;
 
     /**
      * Instantiates a new IPP request from the given bytes.
@@ -69,9 +71,22 @@ public class IppRequest {
      */
     public IppRequest(ByteBuffer bytes) {
         this.bytes = bytes;
-        this.version = bytes.get(0) + "." + bytes.get(1);
-        this.operation = IppOperations.of(bytes.getShort(2));
-        this.requestId = bytes.getInt(4);
+        this.version = bytes.get() + "." + bytes.get();
+        this.operation = IppOperations.of(bytes.getShort());
+        this.requestId = bytes.getInt();
+        this.attributeGroups = readAttributeGroups(bytes);
+    }
+
+    private static List<AttributeGroup> readAttributeGroups(ByteBuffer buffer) {
+        List<AttributeGroup> values = new ArrayList<>();
+        while (buffer.remaining() > 4) {
+            int pos = buffer.position();
+            if (DelimiterTags.END_OF_ATTRIBUTES_TAG == DelimiterTags.of(buffer.get(pos))) {
+                break;
+            }
+            values.add(new AttributeGroup(buffer));
+        }
+        return values;
     }
 
     /**
@@ -110,10 +125,6 @@ public class IppRequest {
      * @return a list of attribute-groups
      */
     public List<AttributeGroup> getAttributeGroups() {
-        bytes.position(8);
-        AttributeGroup group = new AttributeGroup(bytes);
-        List<AttributeGroup> attributeGroups = new ArrayList<>();
-        attributeGroups.add(group);
         return attributeGroups;
     }
 
