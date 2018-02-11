@@ -151,6 +151,22 @@ public class IppRequest {
     }
 
     /**
+     * Gets the attribute with the given name. If not attribute with the given
+     * name is found an {@link IllegalArgumentException} will be thrown.
+     * 
+     * @param name name of the attribute
+     * @return attribute with given name
+     */
+    public Attribute getAttribute(String name) {
+        for (Attribute attr : getAttributes()) {
+            if (name.equals(attr.getName())) {
+                return attr;
+            }
+        }
+        throw new IllegalArgumentException("no attribute '" + name + "' found");
+    }
+
+    /**
      * Returns the data part of the request. If no data part is present a
      * 0-length byte array is returned.
      * 

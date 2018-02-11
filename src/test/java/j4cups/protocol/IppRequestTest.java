@@ -101,6 +101,13 @@ public final class IppRequestTest {
     }
     
     @Test
+    @DisplayName("attributes-natural-language=de")
+    public void getAttributeName() {
+        Attribute attribute = request.getAttribute("attributes-natural-language");
+        assertEquals("de", attribute.getStringValue());
+    }
+    
+    @Test
     @DisplayName("data")
     public void getData() {
         byte[] data = request.getData();
