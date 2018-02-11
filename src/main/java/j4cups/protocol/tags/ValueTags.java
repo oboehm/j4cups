@@ -156,5 +156,15 @@ public enum ValueTags {
         }
         throw new IllegalArgumentException("invalid id: " + id);
     }
-    
+
+    /**
+     * The range for a value-tag is between 0x10 and 0x0f.
+     *
+     * @param id byte value
+     * @return true or false
+     */
+    public static boolean isValid(int id) {
+        return 0x10 <= id && id <= 0xff;
+    }
+
 }

@@ -107,10 +107,7 @@ public class Attribute {
         List<AdditionalValue> values = new ArrayList<>();
         while (buffer.remaining() > 4) {
             int pos = buffer.position();
-            ValueTags valueTag = ValueTags.of(buffer.get());
-            short len = buffer.getShort();
-            buffer.position(pos);
-            if (len != 0) {
+            if (!ValueTags.isValid(buffer.get(pos)) && (buffer.getShort(pos+1) != 0)) {
                 break;
             }
             values.add(new AdditionalValue(buffer));
