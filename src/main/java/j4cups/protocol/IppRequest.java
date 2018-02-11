@@ -17,6 +17,7 @@
  */
 package j4cups.protocol;
 
+import j4cups.protocol.attr.Attribute;
 import j4cups.protocol.attr.AttributeGroup;
 import j4cups.protocol.tags.DelimiterTags;
 
@@ -126,6 +127,19 @@ public class IppRequest {
      */
     public List<AttributeGroup> getAttributeGroups() {
         return attributeGroups;
+    }
+
+    /**
+     * Gets a collected list of all attributes of the attribute-groups.
+     * 
+     * @return list of all attibutes
+     */
+    public List<Attribute> getAttributes() {
+        List<Attribute> attributes = new ArrayList<>();
+        for (AttributeGroup group : attributeGroups) {
+            attributes.addAll(group.getAttributes());
+        }
+        return attributes;
     }
 
 }

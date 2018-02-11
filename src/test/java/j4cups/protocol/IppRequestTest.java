@@ -17,6 +17,7 @@
  */
 package j4cups.protocol;
 
+import j4cups.protocol.attr.Attribute;
 import j4cups.protocol.attr.AttributeGroup;
 import j4cups.protocol.tags.DelimiterTags;
 import org.junit.jupiter.api.DisplayName;
@@ -86,10 +87,18 @@ public final class IppRequestTest {
     }
     
     @Test
+    @DisplayName("attribute-groups")
     public void getAttributeGroups() {
         List<AttributeGroup> groups = request.getAttributeGroups();
         assertThat(groups, not(empty()));
         assertEquals(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG, groups.get(0).getBeginTag());
+    }
+    
+    @Test
+    @DisplayName("attributes")
+    public void getAttributes() {
+        List<Attribute> attributes = request.getAttributes();
+        assertThat(attributes, not(empty()));
     }
 
 }
