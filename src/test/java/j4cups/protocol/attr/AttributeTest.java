@@ -24,6 +24,7 @@ import java.nio.ByteBuffer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -35,7 +36,8 @@ public final class AttributeTest {
 
     private static final byte[] DATA =
             {71, 0, 18, 97, 116, 116, 114, 105, 98, 117, 116, 101, 115, 45, 99, 104, 97, 114, 115, 101, 116, 0, 5, 117,
-                    116, 102, 45, 56, 72, 0};
+                    116, 102, 45, 56, 72, 0, 27, 97, 116, 116, 114, 105, 98, 117, 116, 101, 115, 45, 110, 97, 116, 117,
+                    114, 97, 108, 45, 108, 97, 110, 103, 117, 97, 103, 101, 0, 2, 100, 101};
     private static final Attribute ATTRIBUTE = new Attribute(ByteBuffer.wrap(DATA));
 
     @Test
@@ -56,6 +58,11 @@ public final class AttributeTest {
     @Test
     void testToString() {
         assertThat(ATTRIBUTE.toString(), containsString(ATTRIBUTE.getName()));
+    }
+    
+    @Test
+    public void testIsMultiValue() {
+        assertThat(ATTRIBUTE.isMultiValue(), is(false));
     }
 
 }

@@ -69,7 +69,7 @@ public class Attribute {
         List<AdditionalValue> values = new ArrayList<>();
         while (buffer.remaining() > 4) {
             int pos = buffer.position();
-            if (!ValueTags.isValid(buffer.get(pos)) && (buffer.getShort(pos+1) != 0)) {
+            if (!ValueTags.isValid(buffer.get(pos)) || (buffer.getShort(pos+1) != 0)) {
                 break;
             }
             values.add(new AdditionalValue(buffer));
@@ -114,6 +114,15 @@ public class Attribute {
      */
     public String getStringValue() {
         return new String(getValue(), StandardCharsets.UTF_8);
+    }
+
+    /**
+     * When the attribte value is multi-valued this method returns true.
+     * 
+     * @return true or false
+     */
+    public boolean isMultiValue() {
+        return !this.additionalValues.isEmpty();
     }
 
     @Override

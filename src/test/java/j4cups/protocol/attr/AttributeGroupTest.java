@@ -25,6 +25,7 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -75,6 +76,7 @@ public final class AttributeGroupTest {
     void getAttributes() {
         List<Attribute> attributes = attributeGroup.getAttributes();
         assertThat(attributes, not(empty()));
+        assertThat(attributes.size(), greaterThan(1));
     }
 
 }
