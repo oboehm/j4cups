@@ -20,6 +20,8 @@ package j4cups.protocol.attr;
 import j4cups.protocol.tags.DelimiterTags;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Each "attribute-group" field represents a single group of
@@ -44,6 +46,7 @@ import java.nio.ByteBuffer;
 public class AttributeGroup {
     
     private final DelimiterTags beginTag;
+    private final List<Attribute> attributes;
 
     /**
      * Instantiates a new attribute group from the given bytes.
@@ -54,6 +57,19 @@ public class AttributeGroup {
      */
     public AttributeGroup(ByteBuffer bytes) {
         this.beginTag = DelimiterTags.of(bytes.get());
+        this.attributes = readAttributes(bytes);
+    }
+
+    private static List<Attribute> readAttributes(ByteBuffer buffer) {
+        List<Attribute> values = new ArrayList<>();
+        while (buffer.remaining() > 4) {
+            int pos = buffer.position();
+            if (DelimiterTags.isValid(buffer.get(pos)) && (buffer.getShort(pos+1) != 0)) {
+                break;
+            }
+            values.add(new Attribute(buffer));
+        }
+        return values;
     }
 
     /**
@@ -66,6 +82,15 @@ public class AttributeGroup {
      */
     public DelimiterTags getBeginTag() {
         return beginTag;
+    }
+
+    /**
+     * An "attribute-group" field contains zero or more "attribute" fields.
+     * 
+     * @return list of attributes
+     */
+    public List<Attribute> getAttributes() {
+        return attributes;
     }
     
 }

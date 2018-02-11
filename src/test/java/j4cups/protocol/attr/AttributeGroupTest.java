@@ -17,12 +17,15 @@
  */
 package j4cups.protocol.attr;
 
-import j4cups.protocol.attr.AttributeGroup;
 import j4cups.protocol.tags.DelimiterTags;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -66,6 +69,12 @@ public final class AttributeGroupTest {
     @Test
     void getBeginTag() {
         assertEquals(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG, attributeGroup.getBeginTag());
+    }
+    
+    @Test
+    void getAttributes() {
+        List<Attribute> attributes = attributeGroup.getAttributes();
+        assertThat(attributes, not(empty()));
     }
 
 }

@@ -78,4 +78,14 @@ public enum DelimiterTags {
         throw new IllegalArgumentException("invalid id: " + id);
     }
 
+    /**
+     * The range for a delimiter-tag is between 0 and 0x0f.
+     * 
+     * @param id byte value
+     * @return true or false
+     */
+    public static boolean isValid(int id) {
+        return 0 <= id && id <= 0x0f;
+    }
+
 }

@@ -109,11 +109,10 @@ public class Attribute {
             int pos = buffer.position();
             ValueTags valueTag = ValueTags.of(buffer.get());
             short len = buffer.getShort();
+            buffer.position(pos);
             if (len != 0) {
                 break;
             }
-            buffer.position(pos);
-            AdditionalValue val = new AdditionalValue(buffer);
             values.add(new AdditionalValue(buffer));
         }
         return values;
