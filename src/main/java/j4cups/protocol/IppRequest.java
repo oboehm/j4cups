@@ -176,4 +176,17 @@ public class IppRequest {
         return data;
     }
 
+    /**
+     * With this toString() implementation we want to provide the most
+     * important values which are useful for logging and debugging.
+     * 
+     * @return a String with operation, request-id and other stuff
+     */
+    @Override
+    public String toString() {
+        return "|" + getVersion() + "|" + getOperation() + "|" + getRequestId() + "|...(" +
+                getAttributes().size() + " attributes)...|";
+    }
+
+
 }

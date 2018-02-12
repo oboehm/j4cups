@@ -133,5 +133,12 @@ public final class IppRequestTest {
         byte[] data = printRequest.getData();
         assertEquals(40429, data.length);
     }
+    
+    @Test
+    public void testToString() {
+        String s = request.toString();
+        LOG.info("s = \"{}\"");
+        assertThat(s, containsString(request.getOperation().toString()));
+    }
 
 }
