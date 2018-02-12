@@ -22,6 +22,8 @@ import j4cups.protocol.attr.AttributeGroup;
 import j4cups.protocol.tags.DelimiterTags;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -35,6 +37,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * of CUPS.
  */
 public final class IppRequestTest {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(IppRequestTest.class);
 
     private final byte[] data =
             {2, 0, 0, 11, 0, 0, 0, 1, 1, 71, 0, 18, 97, 116, 116, 114, 105, 98, 117, 116, 101, 115, 45, 99, 104, 97,
@@ -89,6 +93,7 @@ public final class IppRequestTest {
     @DisplayName("attribute-groups")
     public void getAttributeGroups() {
         List<AttributeGroup> groups = request.getAttributeGroups();
+        LOG.info("{} attribute-groups found.", groups.size());
         assertThat(groups, not(empty()));
         assertEquals(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG, groups.get(0).getBeginTag());
     }
