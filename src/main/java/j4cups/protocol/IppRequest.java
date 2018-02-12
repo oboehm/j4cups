@@ -176,9 +176,14 @@ public class IppRequest {
     public byte[] getData() {
         return data;
     }
-    
+
+    /**
+     * The data part of the request can be empty.
+     * 
+     * @return false if data part is empty, true otherwise
+     */
     public boolean hasData() {
-        return data.length < 0;
+        return data.length > 0;
     }
 
     /**
