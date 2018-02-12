@@ -92,6 +92,13 @@
     
     <dependencies>
         
+        <!-- Apache Commons -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>RELEASE</version>
+        </dependency>
+        
         <!-- logging -->
         <dependency>
             <groupId>org.slf4j</groupId>

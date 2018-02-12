@@ -20,8 +20,9 @@ package j4cups.protocol;
 import j4cups.protocol.attr.Attribute;
 import j4cups.protocol.attr.AttributeGroup;
 import j4cups.protocol.tags.DelimiterTags;
+import org.apache.commons.lang3.StringUtils;
 
-import java.math.BigInteger;
+import javax.xml.bind.DatatypeConverter;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -196,7 +197,7 @@ public class IppRequest {
     public String toString() {
         String hex = "";
         if (hasData()) {
-            hex = new BigInteger(this.getData()).toString(16) + "|";
+            hex = StringUtils.abbreviateMiddle(DatatypeConverter.printHexBinary(this.getData()), "...", 100) + "|";
         }
         return "|" + getVersion() + "|" + getOperation() + "|" + getRequestId() + "|...(" +
                 getAttributes().size() + " attributes)...|" + hex;
