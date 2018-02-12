@@ -137,7 +137,7 @@ public final class IppRequestTest {
     @Test
     public void testToString() {
         String s = request.toString();
-        LOG.info("s = \"{}\"");
+        LOG.info("s = \"{}\"", s);
         assertThat(s, containsString(request.getOperation().toString()));
     }
 

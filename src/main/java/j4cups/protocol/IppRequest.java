@@ -21,6 +21,7 @@ import j4cups.protocol.attr.Attribute;
 import j4cups.protocol.attr.AttributeGroup;
 import j4cups.protocol.tags.DelimiterTags;
 
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -175,6 +176,10 @@ public class IppRequest {
     public byte[] getData() {
         return data;
     }
+    
+    public boolean hasData() {
+        return data.length < 0;
+    }
 
     /**
      * With this toString() implementation we want to provide the most
@@ -184,8 +189,12 @@ public class IppRequest {
      */
     @Override
     public String toString() {
+        String hex = "";
+        if (hasData()) {
+            hex = new BigInteger(this.getData()).toString(16) + "|";
+        }
         return "|" + getVersion() + "|" + getOperation() + "|" + getRequestId() + "|...(" +
-                getAttributes().size() + " attributes)...|";
+                getAttributes().size() + " attributes)...|" + hex;
     }
 
 
