@@ -202,6 +202,5 @@ public class IppRequest {
         return "|" + getVersion() + "|" + getOperation() + "|" + getRequestId() + "|...(" +
                 getAttributes().size() + " attributes)...|" + hex;
     }
-
-
+    
 }
