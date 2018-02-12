@@ -21,6 +21,8 @@ import j4cups.protocol.attr.Attribute;
 import j4cups.protocol.attr.AttributeGroup;
 import j4cups.protocol.tags.DelimiterTags;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.DatatypeConverter;
 import java.nio.ByteBuffer;
@@ -51,12 +53,13 @@ import java.util.List;
  * @since 0.0.1 (09.02.2018)
  */
 public class IppRequest {
-    
+
+    private static final Logger LOG = LoggerFactory.getLogger(IppRequest.class);
+
     private final String version;
     private final IppOperations operation;
     private final int requestId;
     private final List<AttributeGroup> attributeGroups;
-    private final DelimiterTags endOfAttributeTag;
     private final byte[] data;
 
     /**
@@ -78,7 +81,8 @@ public class IppRequest {
         this.operation = IppOperations.of(bytes.getShort());
         this.requestId = bytes.getInt();
         this.attributeGroups = readAttributeGroups(bytes);
-        this.endOfAttributeTag = DelimiterTags.of(bytes.get());
+        DelimiterTags endOfAttributeTag = DelimiterTags.of(bytes.get());
+        LOG.debug("{} was read (and ignored).", endOfAttributeTag);
         this.data = readBytes(bytes);
     }
 

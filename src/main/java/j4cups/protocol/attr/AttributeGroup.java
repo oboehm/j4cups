@@ -92,5 +92,16 @@ public class AttributeGroup {
     public List<Attribute> getAttributes() {
         return attributes;
     }
+
+    /**
+     * With this toString() implementation we want to provide the most
+     * important values which are useful for logging and debugging.
+     *
+     * @return a String with operation, request-id and other stuff
+     */
+    @Override
+    public String toString() {
+        return "|" + getBeginTag() + "|..." + getAttributes().size() + " attributes)...|";
+    }
     
 }

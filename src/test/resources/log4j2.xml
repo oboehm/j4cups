@@ -6,7 +6,7 @@
     </Console>
   </Appenders>
   <Loggers>
-    <Logger name="j4cups" level="DEBUG" />
+    <Logger name="j4cups" level="INFO" />
     <Root level="INFO">
       <AppenderRef ref="CONSOLE" />
     </Root>
