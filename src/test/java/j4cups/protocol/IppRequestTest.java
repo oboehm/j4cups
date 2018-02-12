@@ -25,6 +25,10 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -113,10 +117,21 @@ public final class IppRequestTest {
     }
     
     @Test
-    @DisplayName("data")
-    public void getData() {
+    @DisplayName("empty-data")
+    public void getEmptyData() {
         byte[] data = request.getData();
         assertThat(data.length, equalTo(0));
+    }
+    
+    @Test
+    @DisplayName("data")
+    public void getData() throws IOException {
+        Path recordedPrintJob = Paths.get("src", "test", "resources", "j4cups", "request", "print-job.bin");
+        byte[] requestData = Files.readAllBytes(recordedPrintJob);
+        IppRequest printRequest = new IppRequest(requestData);
+        LOG.info("{} created.", printRequest);
+        byte[] data = printRequest.getData();
+        assertEquals(40429, data.length);
     }
 
 }
