@@ -64,6 +64,17 @@ public enum DelimiterTags {
     }
 
     /**
+     * This implementation generates the same representation as in the
+     * corresponding RFCs.
+     * 
+     * @return e.g. "job-attributes-tag"
+     */
+    @Override
+    public String toString() {
+        return super.toString().toLowerCase().replaceAll("_", "-");
+    }
+
+    /**
      * Allows you to map a byte value to the corresponding tag.
      *
      * @param id e.g. 0x04

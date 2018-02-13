@@ -30,5 +30,10 @@ class DelimiterTagsTest {
     void testOf() {
         assertEquals(DelimiterTags.JOB_ATTRIBUTES_TAG, DelimiterTags.of(0x02));
     }
+    
+    @Test
+    public void testToString() {
+        assertEquals("end-of-attributes-tag", DelimiterTags.END_OF_ATTRIBUTES_TAG.toString());
+    }
 
 }
