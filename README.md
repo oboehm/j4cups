@@ -14,6 +14,7 @@ One of this application is to provide a Java service which can be accessed like 
 ## More Infos
 
 * Release Notes: [src/main/doc/RELEASES](src/main/doc/RELEASES.adoc)
+* Javadoc: [http://javatux.de/j4cups/](http://javatux.de/j4cups/)
 
 ---
 February 2018,
