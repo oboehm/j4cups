@@ -33,4 +33,9 @@ public class IppOperationsTest {
         assertEquals(IppOperations.GET_JOBS, IppOperations.of(0x000a));
     }
 
+    @Test
+    public void testToString() {
+        assertEquals("Print-Job", IppOperations.PRINT_JOB.toString());
+    }
+
 }

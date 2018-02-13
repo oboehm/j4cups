@@ -17,6 +17,9 @@
  */
 package j4cups.protocol;
 
+
+import org.apache.commons.text.WordUtils;
+
 /**
  * The enum IppOperations represents the IPP operations which are described
  * in RFC-8011.
@@ -179,7 +182,19 @@ public enum IppOperations {
     public short getCode() {
         return code;
     }
-
+    
+    /**
+     * This implementation generates the same representation as described in
+     * section RFC-8011 (section 5.4.15).
+     *
+     * @return e.g. "Print-Job"
+     */
+    @Override
+    public String toString() {
+        String s = super.toString().toLowerCase().replaceAll("_", " ");
+        return WordUtils.capitalize(s).replaceAll(" ", "-");
+    }
+    
     /**
      * Allows you to map an id (or op-code) to the corresponding operation.
      * 
