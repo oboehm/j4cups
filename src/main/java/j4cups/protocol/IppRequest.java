@@ -25,7 +25,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.DatatypeConverter;
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,13 +80,31 @@ public class IppRequest {
      * @param bytes the bytes of the IPP request
      */
     public IppRequest(ByteBuffer bytes) {
+        LOG.debug("IPP request with {} received.", bytes);
         this.version = bytes.get() + "." + bytes.get();
         this.operation = IppOperations.of(bytes.getShort());
         this.requestId = bytes.getInt();
         this.attributeGroups = readAttributeGroups(bytes);
         DelimiterTags endOfAttributeTag = DelimiterTags.of(bytes.get());
-        LOG.debug("{} was read (and ignored).", endOfAttributeTag);
+        LOG.trace("{} was read (and ignored).", endOfAttributeTag);
         this.data = readBytes(bytes);
+        trace(bytes.array());
+    }
+
+    private void trace(byte[] bytes) {
+        if (LOG.isTraceEnabled()) {
+            LOG.trace(DatatypeConverter.printHexBinary(bytes));
+            try {
+                Path logFile = Files.createTempFile("IPP-" + requestId + "-", ".bin");
+                Files.write(logFile, bytes);
+                LOG.info("IPP request with {} bytes is recorded to '{}'.", bytes.length, logFile);
+            } catch (IOException ioe) {
+                LOG.debug("Cannot record {} bytes to temporary log file.", ioe);
+                LOG.trace(DatatypeConverter.printHexBinary(bytes));
+            }
+        } else {
+            LOG.debug("IPP request {} {} received (use TRACE level to dump it).", requestId, operation);
+        }
     }
 
     private static List<AttributeGroup> readAttributeGroups(ByteBuffer buffer) {
