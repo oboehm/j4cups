@@ -45,7 +45,7 @@ The CI build is started automatically after a commit and push to GitHub.
 |Version |Date |Description
 
 |0.1
-|
+|14-Feb-2018
 |successful reading of IPP requests,
 logging introduced (SLF4J) 
 
