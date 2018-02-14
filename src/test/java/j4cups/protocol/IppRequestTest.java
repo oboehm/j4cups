@@ -140,5 +140,13 @@ public final class IppRequestTest {
         LOG.info("s = \"{}\"", s);
         assertThat(s, containsString(request.getOperation().toString()));
     }
+    
+    @Test
+    public void testToLongString() {
+        String longString = request.toLongString();
+        LOG.info("longString = {}", longString);
+        assertThat(longString.length(), greaterThan(request.toString().length()));
+    }
+
 
 }

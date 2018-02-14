@@ -220,12 +220,31 @@ public class IppRequest {
      */
     @Override
     public String toString() {
+        String attrs = "|" + getRequestId() + "|...(" + getAttributes().size() + " attributes)...|";
+        return buildString(attrs);
+    }
+
+    /**
+     * Puts all attribute information into the resulting string. The data
+     * value may be abbreviated if it is too long. But you can set the log
+     * level to TRACE if you want to record the full request.
+     *
+     * @return string with all attribute values
+     */
+    public String toLongString() {
+        StringBuilder attrs = new StringBuilder();
+        for (AttributeGroup group : attributeGroups) {
+            attrs.append('|').append(group.toLongString());
+        }
+        return buildString(attrs.substring(1));
+    }
+    
+    private String buildString(String attrs) {
         String hex = "";
         if (hasData()) {
             hex = StringUtils.abbreviateMiddle(DatatypeConverter.printHexBinary(this.getData()), "...", 100) + "|";
         }
-        return "|" + getVersion() + "|" + getOperation() + "|" + getRequestId() + "|...(" +
-                getAttributes().size() + " attributes)...|" + hex;
+        return "|" + getVersion() + "|" + getOperation() + attrs + hex;
     }
-    
+
 }
