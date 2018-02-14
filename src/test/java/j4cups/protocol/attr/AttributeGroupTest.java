@@ -87,5 +87,12 @@ public final class AttributeGroupTest {
         LOG.info("s = \"{}\"", s);
         assertThat("looks like default implementation", s, not(containsString("@")));
     }
+    
+    @Test
+    public void testToLongString() {
+        String longString = attributeGroup.toLongString();
+        LOG.info("longString = {}", longString);
+        assertThat(longString.length(), greaterThan(attributeGroup.toString().length()));
+    }
 
 }

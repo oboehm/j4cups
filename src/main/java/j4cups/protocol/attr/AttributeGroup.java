@@ -103,5 +103,19 @@ public class AttributeGroup {
     public String toString() {
         return "|" + getBeginTag() + "|..." + getAttributes().size() + " attributes)...|";
     }
+
+    /**
+     * All attribute values are put into the resulting string.
+     *
+     * @return string with all attributes
+     */
+    public String toLongString() {
+        StringBuilder buffer = new StringBuilder("|");
+        buffer.append(getBeginTag()).append('|');
+        for (Attribute attr : getAttributes()) {
+            buffer.append(attr.toLongString()).append('|');
+        }
+        return buffer.toString();
+    }
     
 }
