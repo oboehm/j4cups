@@ -19,6 +19,7 @@ package j4cups.protocol.attr;
 
 import j4cups.protocol.tags.ValueTags;
 
+import javax.xml.bind.DatatypeConverter;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -125,6 +126,13 @@ public class Attribute {
         return !this.additionalValues.isEmpty();
     }
 
+    /**
+     * This method shows a short representation of an attribute. The
+     * difference to {@link #toLongString()} is, that in case of a multi-value
+     * attribute only the first value is shown.
+     * 
+     * @return e.g. "requested-attributes=copies-supported,..."
+     */
     @Override
     public String toString() {
         StringBuilder buffer = new StringBuilder(getName());
@@ -132,7 +140,7 @@ public class Attribute {
         if (getValueTag().isCharacterStringValue()) {
             buffer.append(getStringValue());
         } else {
-            buffer.append(new BigInteger(getValue()).toString(16));
+            buffer.append(DatatypeConverter.printHexBinary(getValue()));
         }
         if (!additionalValues.isEmpty()) {
             buffer.append(",...");
@@ -140,6 +148,30 @@ public class Attribute {
         return buffer.toString();
     }
 
+    /**
+     * This method shows a short representation of an attribute. I.e. in case
+     * of a multi-value attribute all values are shown.
+     *
+     * @return string with all values
+     */
+    public String toLongString() {
+        StringBuilder buffer = new StringBuilder(getName());
+        buffer.append("=");
+        if (getValueTag().isCharacterStringValue()) {
+            buffer.append(getStringValue());
+        } else {
+            buffer.append(new BigInteger(getValue()).toString(16));
+        }
+        for (AdditionalValue addValue : additionalValues) {
+            buffer.append(',');
+            if (getValueTag().isCharacterStringValue()) {
+                buffer.append(addValue.getStringValue());
+            } else {
+                buffer.append(DatatypeConverter.printHexBinary(addValue.getValue()));
+            }
+        }
+        return buffer.toString();
+    }
     
     
     /**
