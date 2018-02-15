@@ -122,7 +122,7 @@ public final class IppRequestTest extends AbstractIppTest {
     @Test
     @DisplayName("data")
     public void getData() {
-        IppRequest printRequest = PRINT_JOB;
+        IppRequest printRequest = REQUEST_PRINT_JOB;
         LOG.info("{} created.", printRequest);
         byte[] data = printRequest.getData();
         assertEquals(40429, data.length);

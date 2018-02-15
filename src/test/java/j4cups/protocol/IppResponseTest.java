@@ -17,11 +17,15 @@
  */
 package j4cups.protocol;
 
+import j4cups.protocol.attr.AttributeGroup;
 import org.junit.jupiter.api.Test;
 
 import javax.xml.bind.DatatypeConverter;
 
+import java.util.List;
+
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 
 
@@ -29,12 +33,25 @@ import static org.hamcrest.core.StringStartsWith.startsWith;
  * Unit tests for {@link IppResponse}.
  */
 public final class IppResponseTest extends AbstractIppTest {
+    
+    private final IppResponse RESPONSE_PRINT_JOB = new IppResponse(REQUEST_PRINT_JOB);
 
     @Test
     void testToByteArray() {
-        byte[] expected = { 2, 0, 0, 0, 0, 0, 0, 2, 3 };
-        IppResponse response = new IppResponse(PRINT_JOB);
+        IppResponse response = RESPONSE_PRINT_JOB;
         assertThat(DatatypeConverter.printHexBinary(response.toByteArray()), startsWith("020000000000000203"));
+    }
+
+    /**
+     * The Printer MUST return to the Client the "attributes-charset" and 
+     * "attributes-natural-language" as operation attributes. This is described in
+     * <a href="https://tools.ietf.org/html/rfc8011#section-4.2.1.2">Section 4.1.4.2.</a>
+     * of RFC-8011.
+     */
+    @Test
+    void testPrintJobResponse() {
+        List<AttributeGroup> attributeGroups = RESPONSE_PRINT_JOB.getAttributeGroups();
+        assertThat(attributeGroups.size(), greaterThan(0));
     }
 
 }

@@ -17,7 +17,12 @@
  */
 package j4cups.protocol;
 
+import j4cups.protocol.attr.AttributeGroup;
+import j4cups.protocol.tags.DelimiterTags;
+
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The IppResponse represents an IPP response as is defined in RFC-2910.
@@ -46,6 +51,7 @@ public class IppResponse {
     
     private final int requestId;
     private final StatusCode statusCode;
+    private final List<AttributeGroup> attributeGroups;
 
     /**
      * The IppResponse is the response to a IppRequest. So you need the id
@@ -55,7 +61,18 @@ public class IppResponse {
      */
     public IppResponse(IppRequest request) {
         this.requestId = request.getRequestId();
+        this.attributeGroups = fillAttributesGroupsFor(request);
         this.statusCode = StatusCode.SUCCESSFUL_OK;
+    }
+    
+    private static List<AttributeGroup> fillAttributesGroupsFor(IppRequest request) {
+        List<AttributeGroup> groups = new ArrayList<>();
+        switch (request.getOperation()) {
+            case PRINT_JOB:
+                groups.add(new AttributeGroup(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG));
+                break;
+        }
+        return groups;
     }
 
     /**
@@ -90,6 +107,16 @@ public class IppResponse {
         int length = end + 1 - start;
         byte[] subbytes = ByteBuffer.allocate(length).putInt(n).array();
         System.arraycopy(subbytes, 0, bytes, start, length);
+    }
+
+    /**
+     * The fourth field is the "attribute-group" field, and it occurs 0 or
+     * more times.
+     *
+     * @return a list of attribute-groups
+     */
+    public List<AttributeGroup> getAttributeGroups() {
+        return attributeGroups;
     }
 
 }

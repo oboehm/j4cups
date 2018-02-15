@@ -30,7 +30,7 @@ import java.nio.file.Paths;
  */
 public abstract class AbstractIppTest {
     
-    public final static IppRequest PRINT_JOB = readRequest("print-job.bin");
+    public final static IppRequest REQUEST_PRINT_JOB = readRequest("print-job.bin");
 
     private static IppRequest readRequest(String name) {
         Path recordedPrintJob = Paths.get("src", "test", "resources", "j4cups", "request", name);

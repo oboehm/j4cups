@@ -49,6 +49,16 @@ public class AttributeGroup {
     private final List<Attribute> attributes;
 
     /**
+     * Instantiates a new empty attribute group from the given bytes.
+     *
+     * @param type e.g. {@link DelimiterTags#OPERATIONS_ATTRIBUTES_TAG}
+     */
+    public AttributeGroup(DelimiterTags type) {
+        this.beginTag = type;
+        this.attributes = new ArrayList<>();
+    }
+
+    /**
      * Instantiates a new attribute group from the given bytes.
      * The given {@link ByteBuffer} must be positioned at the beginning of the
      * attribute-group.
