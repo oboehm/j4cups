@@ -25,10 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -40,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * real request where a test page was tried to print via the HTTP interface
  * of CUPS.
  */
-public final class IppRequestTest {
+public final class IppRequestTest extends AbstractIppTest {
     
     private static final Logger LOG = LoggerFactory.getLogger(IppRequestTest.class);
 
@@ -125,10 +121,8 @@ public final class IppRequestTest {
     
     @Test
     @DisplayName("data")
-    public void getData() throws IOException {
-        Path recordedPrintJob = Paths.get("src", "test", "resources", "j4cups", "request", "print-job.bin");
-        byte[] requestData = Files.readAllBytes(recordedPrintJob);
-        IppRequest printRequest = new IppRequest(requestData);
+    public void getData() {
+        IppRequest printRequest = PRINT_JOB;
         LOG.info("{} created.", printRequest);
         byte[] data = printRequest.getData();
         assertEquals(40429, data.length);
