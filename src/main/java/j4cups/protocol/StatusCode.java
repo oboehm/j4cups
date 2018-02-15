@@ -81,8 +81,62 @@ public enum StatusCode {
      * as supplied by the Client.
      */
     SUCCESSFUL_OK_CONFLICTING_ATTRIBUTES (0x0002),
+    
+    // B.1.4.  Client Error Status-Code Values
 
-    // TODO: define code B.1.3 and more...
+    /**
+     * The request could not be understood by the IPP object due to
+     * malformed syntax (such as the value of a fixed-length attribute whose
+     * length does not match the prescribed length for that attribute -- see
+     * the Implementor's Guides [RFC3196] [PWG5100.19]).  The IPP
+     * application SHOULD NOT repeat the request without modifications.
+     */
+    CLIENT_ERROR_BAD_REQUEST (0X0400),
+
+    /**
+     * The IPP object understood the request but is refusing to fulfill it.
+     * Additional authentication information or authorization credentials
+     * will not help, and the request SHOULD NOT be repeated.  This
+     * status-code is commonly used when the IPP object does not wish to
+     * reveal exactly why the request has been refused or when no other
+     * response is applicable.
+     */
+    CLIENT_ERROR_FORBIDDEN (0X0401),
+
+    /**
+     * The request requires user authentication.  The IPP Client can repeat
+     * the request with suitable authentication information.  If the request
+     * already included authentication information, then this status-code
+     * indicates that authorization has been refused for those credentials.
+     * If this response contains the same challenge as the prior response
+     * and the user agent has already attempted authentication at least
+     * once, then the response message can contain relevant diagnostic
+     * information.  This status-code reveals more information than
+     * 'client-error-forbidden'.
+     */
+    CLIENT_ERROR_NOT_AUTHENTICATED (0X0402),
+
+    /**
+     * The requester is not authorized to perform the request.  Additional
+     * authentication information or authorization credentials will not
+     * help, and the request SHOULD NOT be repeated.  This status-code is
+     * used when the IPP object wishes to reveal that the authentication
+     * information is understandable; however, the requester is explicitly
+     * not authorized to perform the request.  This status-code reveals more
+     * information than 'client-error-forbidden' and
+     * 'client-error-not-authenticated'.
+     */
+    CLIENT_ERROR_NOT_AUTHORIZED (0X0403),
+
+    /**
+     * This status-code is used when the request is for something that
+     * cannot happen.  For example, there might be a request to cancel a Job
+     * that has already been canceled or aborted by the system.  The IPP
+     * Client SHOULD NOT repeat the request.
+     */
+    CLIENT_ERROR_NOT_POSSIBLE (0X0404),
+
+    // TODO: define code B.1.4.6 and more...
 
     /**
      * The IPP object does not support multiple Documents per Job, and a
