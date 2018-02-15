@@ -40,6 +40,8 @@ package j4cups.protocol;
  */
 public enum StatusCode {
 
+    // B.1.2.  Successful Status-Code Values
+    
     /**
      * The request has succeeded, and no request attributes were substituted
      * or ignored.  In the case of a response to a Job Creation request, the
@@ -51,7 +53,36 @@ public enum StatusCode {
      */
     SUCCESSFUL_OK (0x0000),
     
-    // TODO: define it...
+    /**
+     * The request has succeeded, but some supplied (1) attributes were
+     * ignored or (2) unsupported values were substituted with supported
+     * values or were ignored in order to perform the operation without
+     * rejecting it.  Unsupported attributes, attribute syntaxes, or values
+     * MUST be returned in the Unsupported Attributes group of the response
+     * for all operations.  There is an exception to this rule for the query
+     * operations Get-Printer-Attributes, Get-Jobs, and Get-Job-Attributes
+     * for the "requested-attributes" operation attribute only.  When the
+     * supplied values of the "requested-attributes" operation attribute are
+     * requesting attributes that are not supported, the IPP object SHOULD
+     * return the "requested-attributes" operation attribute in the
+     * Unsupported Attributes group of the response (with the unsupported
+     * values only).
+     */
+    SUCCESSFUL_OK_IGNORED_OR_SUBSTITUTED_ATTRIBUTES (0x0001),
+
+    /**
+     * The request has succeeded, but some supplied attribute values
+     * conflicted with the values of other supplied attributes.  Either
+     * (1) these conflicting values were substituted with (supported) values
+     * or (2) the attributes were removed in order to process the Job
+     * without rejecting it.  Attributes or values that conflict with other
+     * attributes and have been substituted or ignored MUST be returned in
+     * the Unsupported Attributes group of the response for all operations
+     * as supplied by the Client.
+     */
+    SUCCESSFUL_OK_CONFLICTING_ATTRIBUTES (0x0002),
+
+    // TODO: define code B.1.3 and more...
 
     /**
      * The IPP object does not support multiple Documents per Job, and a
