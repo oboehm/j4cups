@@ -45,6 +45,7 @@ import java.nio.ByteBuffer;
 public class IppResponse {
     
     private final int requestId;
+    private final StatusCode statusCode;
 
     /**
      * The IppResponse is the response to a IppRequest. So you need the id
@@ -54,6 +55,7 @@ public class IppResponse {
      */
     public IppResponse(int requestId) {
         this.requestId = requestId;
+        this.statusCode = StatusCode.SUCCESSFUL_OK;
     }
 
     /**
@@ -78,7 +80,9 @@ public class IppResponse {
      */
     public byte[] toByteArray() {
         byte[] bytes = { 2, 0, 0, 0, 0, 0, 0, 0, 3 };
-        setInt(requestId, 4, 7, bytes);
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        buffer.putShort(2, statusCode.getCode());
+        buffer.putInt(4, requestId);
         return bytes;
     }
 
