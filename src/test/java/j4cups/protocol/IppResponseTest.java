@@ -18,18 +18,23 @@
 package j4cups.protocol;
 
 import org.junit.jupiter.api.Test;
-import patterntesting.runtime.junit.ArrayTester;
+
+import javax.xml.bind.DatatypeConverter;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.StringStartsWith.startsWith;
 
 
 /**
  * Unit tests for {@link IppResponse}.
  */
-public final class IppResponseTest {
+public final class IppResponseTest extends AbstractIppTest {
 
     @Test
     void testToByteArray() {
-        byte[] expected = { 2, 0, 0, 0, 0, 0, 0, 1, 3 };
-        ArrayTester.assertEquals(expected, new IppResponse(1).toByteArray());
+        byte[] expected = { 2, 0, 0, 0, 0, 0, 0, 2, 3 };
+        IppResponse response = new IppResponse(PRINT_JOB);
+        assertThat(DatatypeConverter.printHexBinary(response.toByteArray()), startsWith("020000000000000203"));
     }
 
 }

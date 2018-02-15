@@ -51,10 +51,10 @@ public class IppResponse {
      * The IppResponse is the response to a IppRequest. So you need the id
      * of the IppRequest to create a response.
      * 
-     * @param requestId the id of the corresponding {@link IppRequest}
+     * @param request the request for this response
      */
-    public IppResponse(int requestId) {
-        this.requestId = requestId;
+    public IppResponse(IppRequest request) {
+        this.requestId = request.getRequestId();
         this.statusCode = StatusCode.SUCCESSFUL_OK;
     }
 
