@@ -74,7 +74,7 @@ public final class IppRequestTest extends AbstractIppTest {
     @Test
     @DisplayName("version-number")
     public void testGetVersion() {
-        assertEquals("2.0", request.getVersion());
+        assertEquals(IppRequest.DEFAULT_VERSION, request.getVersion());
     }
 
     @Test

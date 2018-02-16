@@ -47,12 +47,8 @@ import java.util.List;
  * @author oboehm
  * @since 0.0.1 (09.02.2018)
  */
-public class IppResponse {
+public class IppResponse extends AbstractIpp {
     
-    private final int requestId;
-    private final StatusCode statusCode;
-    private final List<AttributeGroup> attributeGroups;
-
     /**
      * The IppResponse is the response to a IppRequest. So you need the id
      * of the IppRequest to create a response.
@@ -60,9 +56,7 @@ public class IppResponse {
      * @param request the request for this response
      */
     public IppResponse(IppRequest request) {
-        this.requestId = request.getRequestId();
-        this.attributeGroups = fillAttributesGroupsFor(request);
-        this.statusCode = StatusCode.SUCCESSFUL_OK;
+        super(DEFAULT_VERSION, StatusCode.SUCCESSFUL_OK.getCode(), request.getRequestId(), fillAttributesGroupsFor(request));
     }
     
     private static List<AttributeGroup> fillAttributesGroupsFor(IppRequest request) {
@@ -98,25 +92,28 @@ public class IppResponse {
     public byte[] toByteArray() {
         byte[] bytes = { 2, 0, 0, 0, 0, 0, 0, 0, 3 };
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        buffer.putShort(2, statusCode.getCode());
-        buffer.putInt(4, requestId);
+        buffer.putShort(2, getOpCode());
+        buffer.putInt(4, getRequestId());
         return bytes;
     }
 
-    private static void setInt(int n, int start, int end, byte[] bytes) {
-        int length = end + 1 - start;
-        byte[] subbytes = ByteBuffer.allocate(length).putInt(n).array();
-        System.arraycopy(subbytes, 0, bytes, start, length);
-    }
-
     /**
-     * The fourth field is the "attribute-group" field, and it occurs 0 or
-     * more times.
+     * Returns the 2nd part (byte 2-3) with the status-code.
      *
-     * @return a list of attribute-groups
+     * @return e.g. {@link StatusCode#SUCCESSFUL_OK}
      */
-    public List<AttributeGroup> getAttributeGroups() {
-        return attributeGroups;
+    public StatusCode getStatusCode() {
+        return StatusCode.of(super.getOpCode());
+    }
+    
+    /**
+     * Returns the 2nd part (byte 2-3) with the status-code as string.
+     *
+     * @return e.g. "successful-ok"
+     */
+    @Override
+    protected String getOpCodeAsString() {
+        return getStatusCode().toString();
     }
 
 }

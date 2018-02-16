@@ -31,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The class AbstractIpp is the common super class of {@link IppRequest} and
@@ -60,8 +61,11 @@ import java.util.List;
 public abstract class AbstractIpp {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractIpp.class);
+    
+    /** The actual supported version is 2. **/
+    protected static final Version DEFAULT_VERSION = new Version((byte) 2, (byte) 0);
 
-    private final String version;
+    private final Version version;
     private final short opCode;
     private final List<AttributeGroup> attributeGroups;
     private final int requestId;
@@ -77,20 +81,44 @@ public abstract class AbstractIpp {
     }
 
     /**
-     * Instantiates a new IPP request from the given bytes.
+     * Instantiates a new IPP request or response from the given bytes.
      *
      * @param bytes the bytes of the IPP request
      */
     public AbstractIpp(ByteBuffer bytes) {
+        this(new Version(bytes.get(), bytes.get()), bytes.getShort(), bytes.getInt(), readAttributeGroups(bytes), 
+                readData(bytes));
         LOG.debug("IPP package with {} received.", bytes);
-        this.version = bytes.get() + "." + bytes.get();
-        this.opCode = bytes.getShort();
-        this.requestId = bytes.getInt();
-        this.attributeGroups = readAttributeGroups(bytes);
-        DelimiterTags endOfAttributeTag = DelimiterTags.of(bytes.get());
-        LOG.trace("{} was read (and ignored).", endOfAttributeTag);
-        this.data = readBytes(bytes);
         trace(bytes.array());
+    }
+
+    /**
+     * Instantiates a new IPP request or response with no data.
+     *
+     * @param version   the version
+     * @param opCode    the code for operation-id or status-code
+     * @param requestId the request id
+     * @param groups    the attribute groups
+     */
+    public AbstractIpp(Version version, short opCode, int requestId, List<AttributeGroup> groups) {
+        this(version, opCode, requestId, groups, new byte[0]);
+    }
+
+    /**
+     * Instantiates a new IPP request or response.
+     *
+     * @param version   the version
+     * @param opCode    the code for operation-id or status-code
+     * @param requestId the request id
+     * @param groups    the attribute groups
+     * @param data      the data
+     */
+    public AbstractIpp(Version version, short opCode, int requestId, List<AttributeGroup> groups, byte[] data) {
+        this.version = version;
+        this.opCode = opCode;
+        this.requestId = requestId;
+        this.attributeGroups = groups;
+        this.data = data;
     }
 
     private void trace(byte[] bytes) {
@@ -99,7 +127,7 @@ public abstract class AbstractIpp {
             try {
                 Path logFile = Files.createTempFile("IPP-" + requestId + "-", ".bin");
                 Files.write(logFile, bytes);
-                LOG.info("IPP request with {} bytes is recorded to '{}'.", bytes.length, logFile);
+                LOG.info("IPP package with {} bytes is recorded to '{}'.", bytes.length, logFile);
             } catch (IOException ioe) {
                 LOG.debug("Cannot record {} bytes to temporary log file.", ioe);
                 LOG.trace(DatatypeConverter.printHexBinary(bytes));
@@ -121,7 +149,9 @@ public abstract class AbstractIpp {
         return values;
     }
 
-    private static byte[] readBytes(ByteBuffer buffer) {
+    private static byte[] readData(ByteBuffer buffer) {
+        DelimiterTags endOfAttributeTag = DelimiterTags.of(buffer.get());
+        LOG.trace("{} was read (and ignored).", endOfAttributeTag);
         byte[] bytes = new byte[buffer.remaining()];
         buffer.get(bytes);
         return bytes;
@@ -133,7 +163,7 @@ public abstract class AbstractIpp {
      *
      * @return e.g. "2.0"
      */
-    public String getVersion() {
+    public Version getVersion() {
         return version;
     }
 
@@ -257,4 +287,50 @@ public abstract class AbstractIpp {
         return "|" + getVersion() + "|" + getOpCodeAsString() + attrs + hex;
     }
 
+
+    
+    /**
+     * Container for the version information.
+     */
+    public static class Version {
+        
+        private final byte major;
+        private final byte minor;
+
+        /**
+         * Expects the first two bytes of an IPP request or response.
+         * 
+         * @param major first byte
+         * @param minor 2nd byte
+         */
+        public Version(byte major, byte minor) {
+            this.major = major;
+            this.minor = minor;
+        }
+
+        /**
+         * Prints the two bytes as string.
+         * 
+         * @return normally "2.0"
+         */
+        @Override
+        public String toString() {
+            return major + "." + minor;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof Version)) {
+                return false;
+            }
+            Version other = (Version) obj;
+            return major == other.major && minor == other.minor;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(major, minor);
+        }
+    }
+    
 }

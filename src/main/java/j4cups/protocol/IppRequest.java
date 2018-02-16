@@ -74,6 +74,11 @@ public class IppRequest extends AbstractIpp {
         return IppOperations.of(super.getOpCode());
     }
 
+    /**
+     * Returns the 2nd part (byte 2-3) with the operation-id as string.
+     *
+     * @return e.g. "Create-Job"
+     */
     @Override
     protected String getOpCodeAsString() {
         return getOperation().toString();
