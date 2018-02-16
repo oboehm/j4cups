@@ -17,12 +17,15 @@
  */
 package j4cups.protocol;
 
+import j4cups.protocol.attr.Attribute;
 import j4cups.protocol.attr.AttributeGroup;
 import j4cups.protocol.tags.DelimiterTags;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * The IppResponse represents an IPP response as is defined in RFC-2910.
@@ -63,10 +66,17 @@ public class IppResponse extends AbstractIpp {
         List<AttributeGroup> groups = new ArrayList<>();
         switch (request.getOperation()) {
             case PRINT_JOB:
-                groups.add(new AttributeGroup(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG));
+                groups.add(createPrintJobOperations());
                 break;
         }
         return groups;
+    }
+
+    private static AttributeGroup createPrintJobOperations() {
+        AttributeGroup group = new AttributeGroup(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG);
+        group.addAttribute(Attribute.of("attributes-charset", StandardCharsets.UTF_8));
+        group.addAttribute(Attribute.of("attributes-natural-language", Locale.getDefault()));
+        return group;
     }
 
     /**

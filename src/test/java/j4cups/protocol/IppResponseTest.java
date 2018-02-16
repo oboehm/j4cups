@@ -17,14 +17,16 @@
  */
 package j4cups.protocol;
 
-import j4cups.protocol.attr.AttributeGroup;
+import j4cups.protocol.attr.Attribute;
+import j4cups.protocol.tags.DelimiterTags;
 import org.junit.jupiter.api.Test;
 
 import javax.xml.bind.DatatypeConverter;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 
 
@@ -49,10 +51,8 @@ public final class IppResponseTest extends AbstractIppTest {
      */
     @Test
     void testPrintJobResponse() {
-        List<AttributeGroup> attributeGroups = RESPONSE_PRINT_JOB.getAttributeGroups();
-        assertThat(attributeGroups.size(), greaterThan(0));
-        //List<Attribute> attributes = RESPONSE_PRINT_JOB.getAttributeGroups(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG);
-        //assertThat(attributes, not(empty()));
+        List<Attribute> attributes = RESPONSE_PRINT_JOB.getAttributeGroups(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG);
+        assertThat(attributes, not(empty()));
     }
 
 }

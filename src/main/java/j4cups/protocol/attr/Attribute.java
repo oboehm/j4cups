@@ -22,9 +22,11 @@ import j4cups.protocol.tags.ValueTags;
 import javax.xml.bind.DatatypeConverter;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * An "attribute" field is encoded as attribute-with-one-value and (optional)
@@ -49,7 +51,7 @@ import java.util.List;
  * @author Oli B.
  * @since 0.0.2 (11.02.2018)
  */
-public class Attribute {
+public final class Attribute {
     
     private final AttributeWithOneValue value;
     private final List<AdditionalValue> additionalValues;
@@ -62,8 +64,16 @@ public class Attribute {
      * @param bytes ByteBuffer positioned at the beginning
      */
     public Attribute(ByteBuffer bytes) {
-        value = new AttributeWithOneValue(bytes);
-        this.additionalValues = readAdditionalValues(bytes);
+        this(new AttributeWithOneValue(bytes), readAdditionalValues(bytes));
+    }
+    
+    private Attribute(AttributeWithOneValue value) {
+        this(value, new ArrayList<AdditionalValue>());
+    }
+
+    private Attribute(AttributeWithOneValue value, List<AdditionalValue> additionalValues) {
+        this.value = value;
+        this.additionalValues = additionalValues;
     }
 
     private static List<AdditionalValue> readAdditionalValues(ByteBuffer buffer) {
@@ -76,6 +86,53 @@ public class Attribute {
             values.add(new AdditionalValue(buffer));
         }
         return values;
+    }
+
+    /**
+     * Creates a singe-value attribute for charset values.
+     *
+     * @param name e.g. "attributes-charset"
+     * @param value e.g. {@link StandardCharsets#UTF_8}
+     * @return
+     */
+    public static Attribute of(String name, Charset value) {
+        return of(ValueTags.CHARSET, name, value.name());
+    }
+
+    /**
+     * Creates a singe-value attribute for the given language.
+     *
+     * @param name e.g. "attributes-natural-language"
+     * @param value e.g. the English {@link Locale}
+     * @return
+     */
+    public static Attribute of(String name, Locale value) {
+        return of(ValueTags.NATURAL_LANGUAGE, name, value.getLanguage());
+    }
+
+    /**
+     * Creates a singe-value attribute for character-string values.
+     *
+     * @param tag   the value-tag
+     * @param name  the name of the attribute
+     * @param value the string value of the attribute
+     * @return the attribute
+     */
+    public static Attribute of(ValueTags tag, String name, String value) {
+        return of(ValueTags.CHARSET, name, value.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * Creates a singe-value attribute.
+     *
+     * @param tag   the value-tag
+     * @param name  the name of the attribute
+     * @param value the binary value of the attribute
+     * @return the attribute
+     */
+    public static Attribute of(ValueTags tag, String name , byte[] value) {
+        AttributeWithOneValue attr = new AttributeWithOneValue(tag, name, value);
+        return new Attribute(attr);
     }
 
     /**
@@ -231,6 +288,19 @@ public class Attribute {
             this.name = readString(bytes, nameLength);
             short valueLength = bytes.getShort();
             this.value = readBytes(bytes, valueLength);
+        }
+
+        /**
+         * Instantiates a new attribute-with-one-value.
+         * 
+         * @param valueTag the value-tag
+         * @param name     name of the attribute
+         * @param value    binary value of the attribute
+         */
+        public AttributeWithOneValue(ValueTags valueTag, String name, byte[] value) {
+            this.valueTag = valueTag;
+            this.name = name;
+            this.value = value;
         }
 
         private static String readString(ByteBuffer buffer, short length) {

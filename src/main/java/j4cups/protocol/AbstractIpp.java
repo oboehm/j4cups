@@ -205,6 +205,22 @@ public abstract class AbstractIpp {
     }
 
     /**
+     * Returns all attributes of the given delimiter-tag.
+     * 
+     * @param tag the delimiter-tag
+     * @return list of attributes
+     */
+    public List<Attribute> getAttributeGroups(DelimiterTags tag) {
+        for (AttributeGroup group : getAttributeGroups()) {
+            if (group.getBeginTag() == tag) {
+                return group.getAttributes();
+            }
+        }
+        LOG.debug("Attribute-Group '{}' not found.", tag);
+        return new ArrayList<>();
+    }
+    
+    /**
      * Gets a collected list of all attributes of the attribute-groups.
      *
      * @return list of all attibutes
@@ -287,8 +303,6 @@ public abstract class AbstractIpp {
         return "|" + getVersion() + "|" + getOpCodeAsString() + attrs + hex;
     }
 
-
-    
     /**
      * Container for the version information.
      */

@@ -104,6 +104,15 @@ public class AttributeGroup {
     }
 
     /**
+     * Adds an attribute to the given attributes.
+     *
+     * @param attr the new attribute
+     */
+    public void addAttribute(Attribute attr) {
+        attributes.add(attr);
+    }
+
+    /**
      * With this toString() implementation we want to provide the most
      * important values which are useful for logging and debugging.
      *
