@@ -21,7 +21,6 @@ import j4cups.protocol.attr.AttributeGroup;
 import org.junit.jupiter.api.Test;
 
 import javax.xml.bind.DatatypeConverter;
-
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -52,6 +51,8 @@ public final class IppResponseTest extends AbstractIppTest {
     void testPrintJobResponse() {
         List<AttributeGroup> attributeGroups = RESPONSE_PRINT_JOB.getAttributeGroups();
         assertThat(attributeGroups.size(), greaterThan(0));
+        //List<Attribute> attributes = RESPONSE_PRINT_JOB.getAttributeGroups(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG);
+        //assertThat(attributes, not(empty()));
     }
 
 }
