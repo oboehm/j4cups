@@ -23,11 +23,13 @@ import org.junit.jupiter.api.Test;
 
 import javax.xml.bind.DatatypeConverter;
 import java.util.List;
+import java.util.Locale;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.StringStartsWith.startsWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -58,6 +60,14 @@ public final class IppResponseTest extends AbstractIppTest {
     void testPrintJobResponse() {
         List<Attribute> attributes = RESPONSE_PRINT_JOB.getAttributeGroups(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG);
         assertThat(attributes, not(empty()));
+        checkAttribute(RESPONSE_PRINT_JOB,"attributes-charset", "utf-8");
+        checkAttribute(RESPONSE_PRINT_JOB, "attributes-natural-language",
+                Locale.getDefault().getLanguage().toLowerCase());
+    }
+    
+    private static void checkAttribute(IppResponse response, String name, String expected) {
+        Attribute attribute = response.getAttribute(name);
+        assertEquals(expected, attribute.getStringValue());
     }
 
 }

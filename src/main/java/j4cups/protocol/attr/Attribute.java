@@ -96,7 +96,7 @@ public final class Attribute {
      * @return
      */
     public static Attribute of(String name, Charset value) {
-        return of(ValueTags.CHARSET, name, value.name());
+        return of(ValueTags.CHARSET, name, value.name().toLowerCase());
     }
 
     /**
