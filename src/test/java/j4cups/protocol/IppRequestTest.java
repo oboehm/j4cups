@@ -71,6 +71,11 @@ public final class IppRequestTest extends AbstractIppTest {
                     101, 97, 115, 111, 110, 115, 3};
     private final IppRequest request = new IppRequest(data);
 
+    @Override
+    protected IppRequest getIppPackage() {
+        return request;
+    }
+
     @Test
     @DisplayName("version-number")
     public void testGetVersion() {
@@ -127,20 +132,5 @@ public final class IppRequestTest extends AbstractIppTest {
         byte[] data = printRequest.getData();
         assertEquals(40429, data.length);
     }
-    
-    @Test
-    public void testToString() {
-        String s = request.toString();
-        LOG.info("s = \"{}\"", s);
-        assertThat(s, containsString(request.getOperation().toString()));
-    }
-    
-    @Test
-    public void testToLongString() {
-        String longString = request.toLongString();
-        LOG.info("longString = {}", longString);
-        assertThat(longString.length(), greaterThan(request.toString().length()));
-    }
-
 
 }

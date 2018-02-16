@@ -17,10 +17,18 @@
  */
 package j4cups.protocol;
 
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThan;
 
 /**
  * The class AbstractIppTest provides some prepared IPP requests for testing.
@@ -29,7 +37,9 @@ import java.nio.file.Paths;
  * @since 0.1 (15.02.2018)
  */
 public abstract class AbstractIppTest {
-    
+
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractIppTest.class);
+
     public final static IppRequest REQUEST_PRINT_JOB = readRequest("print-job.bin");
 
     private static IppRequest readRequest(String name) {
@@ -42,4 +52,27 @@ public abstract class AbstractIppTest {
         }
     }
 
+    /**
+     * Should return an IPP request or response for testing.
+     * 
+     * @return IPP request or response
+     */
+    protected abstract AbstractIpp getIppPackage();
+
+    @Test
+    public void testToString() {
+        AbstractIpp ippPackage = getIppPackage();
+        String s = ippPackage.toString();
+        LOG.info("s = \"{}\"", s);
+        assertThat(s, containsString(ippPackage.getOpCodeAsString()));
+    }
+
+    @Test
+    public void testToLongString() {
+        AbstractIpp ippPackage = getIppPackage();
+        String longString = ippPackage.toLongString();
+        LOG.info("longString = {}", longString);
+        assertThat(longString.length(), greaterThan(ippPackage.toString().length()));
+    }
+    
 }

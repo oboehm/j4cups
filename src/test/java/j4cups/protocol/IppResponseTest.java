@@ -37,6 +37,11 @@ public final class IppResponseTest extends AbstractIppTest {
     
     private final IppResponse RESPONSE_PRINT_JOB = new IppResponse(REQUEST_PRINT_JOB);
 
+    @Override
+    protected IppResponse getIppPackage() {
+        return RESPONSE_PRINT_JOB;
+    }
+
     @Test
     void testToByteArray() {
         IppResponse response = RESPONSE_PRINT_JOB;
