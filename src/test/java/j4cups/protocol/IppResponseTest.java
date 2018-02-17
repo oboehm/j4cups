@@ -27,6 +27,7 @@ import java.util.Locale;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,7 +48,10 @@ public final class IppResponseTest extends AbstractIppTest {
     @Test
     void testToByteArray() {
         IppResponse response = RESPONSE_PRINT_JOB;
-        assertThat(DatatypeConverter.printHexBinary(response.toByteArray()), startsWith("020000000000000203"));
+        byte[] bytes = response.toByteArray();
+        assertThat(bytes.length, greaterThan(9));
+        assertThat(DatatypeConverter.printHexBinary(bytes), startsWith("02000000000000020"));
+        assertEquals(0x03, bytes[bytes.length-1]);
     }
 
     /**

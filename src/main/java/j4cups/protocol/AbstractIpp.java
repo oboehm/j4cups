@@ -25,11 +25,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.DatatypeConverter;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -304,12 +308,53 @@ public abstract class AbstractIpp {
     }
 
     /**
+     * Converts the IppResponse to a byte array as described in RFC-2910.
+     * <pre>
+     *  -----------------------------------------------
+     *  |                  version-number             |   2 bytes  - required
+     *  -----------------------------------------------
+     *  |          operation-id or status-code        |   2 bytes  - required
+     *  -----------------------------------------------
+     *  |                   request-id                |   4 bytes  - required
+     *  -----------------------------------------------
+     *  |                 attribute-group             |   n bytes - 0 or more
+     *  -----------------------------------------------
+     *  |              end-of-attributes-tag          |   1 byte   - required
+     *  -----------------------------------------------
+     *  |                     data                    |   q bytes  - optional
+     *  -----------------------------------------------
+     * </pre>
+     *
+     * @return at least 9 bytes
+     */
+    public byte[] toByteArray() {
+        try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream()) {
+            writeTo(byteStream);
+            byteStream.flush();
+            return byteStream.toByteArray();
+        } catch (IOException ioe) {
+            throw new IllegalStateException("cannot dump package", ioe);
+        }
+    }
+    
+    private void writeTo(OutputStream ostream) throws IOException {
+        DataOutputStream dos = new DataOutputStream(ostream);
+        dos.write(version.toByteArray());
+        dos.writeShort(getOpCode());
+        dos.writeInt(getRequestId());
+        for (AttributeGroup group : getAttributeGroups()) {
+            dos.write(group.toByteArray());
+        }
+        dos.writeByte(DelimiterTags.END_OF_ATTRIBUTES_TAG.getValue());
+        dos.write(getData());
+    }
+
+    /**
      * Container for the version information.
      */
     public static class Version {
         
-        private final byte major;
-        private final byte minor;
+        private final byte[] bytes = new byte[2];
 
         /**
          * Expects the first two bytes of an IPP request or response.
@@ -318,8 +363,8 @@ public abstract class AbstractIpp {
          * @param minor 2nd byte
          */
         public Version(byte major, byte minor) {
-            this.major = major;
-            this.minor = minor;
+            bytes[0] = major;
+            bytes[1] = minor;
         }
 
         /**
@@ -329,7 +374,11 @@ public abstract class AbstractIpp {
          */
         @Override
         public String toString() {
-            return major + "." + minor;
+            return bytes[0] + "." + bytes[1];
+        }
+        
+        public byte[] toByteArray() {
+            return bytes;
         }
 
         @Override
@@ -338,12 +387,12 @@ public abstract class AbstractIpp {
                 return false;
             }
             Version other = (Version) obj;
-            return major == other.major && minor == other.minor;
+            return Arrays.equals(this.bytes, other.bytes);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(major, minor);
+            return Objects.hash(bytes);
         }
     }
     

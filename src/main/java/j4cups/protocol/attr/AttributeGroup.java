@@ -19,6 +19,10 @@ package j4cups.protocol.attr;
 
 import j4cups.protocol.tags.DelimiterTags;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -136,5 +140,31 @@ public class AttributeGroup {
         }
         return buffer.toString();
     }
-    
+
+    /**
+     * Converts the attribute-group to a byte array as described in RFC-2910.
+     * <pre>
+     * -----------------------------------------------
+     * |           begin-attribute-group-tag         |  1 byte
+     * ----------------------------------------------------------
+     * |                   attribute                 |  p bytes |- 0 or more
+     * ----------------------------------------------------------
+     * </pre> 
+     * @return
+     */
+    public byte[] toByteArray() {
+        try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream()) {
+            writeTo(byteStream);
+            byteStream.flush();
+            return byteStream.toByteArray();
+        } catch (IOException ioe) {
+            throw new IllegalStateException("cannot dump attribute-group", ioe);
+        }
+    }
+
+    private void writeTo(OutputStream ostream) throws IOException {
+        DataOutputStream dos = new DataOutputStream(ostream);
+        dos.writeByte(getBeginTag().getValue());
+    }
+
 }

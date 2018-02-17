@@ -80,34 +80,6 @@ public class IppResponse extends AbstractIpp {
     }
 
     /**
-     * Converts the IppResponse to a byte array as described in RFC-2910.
-     * <pre>
-     *  -----------------------------------------------
-     *  |                  version-number             |   2 bytes  - required
-     *  -----------------------------------------------
-     *  |               status-code (response)        |   2 bytes  - required
-     *  -----------------------------------------------
-     *  |                   request-id                |   4 bytes  - required
-     *  -----------------------------------------------
-     *  |                 attribute-group             |   n bytes - 0 or more
-     *  -----------------------------------------------
-     *  |              end-of-attributes-tag          |   1 byte   - required
-     *  -----------------------------------------------
-     *  |                     data                    |   q bytes  - optional
-     *  -----------------------------------------------
-     * </pre>
-     * 
-     * @return at least 9 bytes
-     */
-    public byte[] toByteArray() {
-        byte[] bytes = { 2, 0, 0, 0, 0, 0, 0, 0, 3 };
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        buffer.putShort(2, getOpCode());
-        buffer.putInt(4, getRequestId());
-        return bytes;
-    }
-
-    /**
      * Returns the 2nd part (byte 2-3) with the status-code.
      *
      * @return e.g. {@link StatusCode#SUCCESSFUL_OK}
