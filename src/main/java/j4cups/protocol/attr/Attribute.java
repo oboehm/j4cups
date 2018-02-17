@@ -413,7 +413,7 @@ public final class Attribute {
             DataOutputStream dos = new DataOutputStream(ostream);
             dos.writeByte(getValueTag().getValue());
             dos.writeShort(getName().length());
-            dos.writeChars(getName());
+            dos.write(getName().getBytes(StandardCharsets.UTF_8));
             dos.writeShort(getValue().length);
             dos.write(getValue());
         }

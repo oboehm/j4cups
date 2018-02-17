@@ -21,6 +21,7 @@ import j4cups.protocol.tags.ValueTags;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import patterntesting.runtime.junit.ArrayTester;
 
 import java.nio.ByteBuffer;
 
@@ -40,8 +41,7 @@ public final class AttributeTest {
     private static final Logger LOG = LoggerFactory.getLogger(AttributeTest.class);
     private static final byte[] DATA =
             {71, 0, 18, 97, 116, 116, 114, 105, 98, 117, 116, 101, 115, 45, 99, 104, 97, 114, 115, 101, 116, 0, 5, 117,
-                    116, 102, 45, 56, 72, 0, 27, 97, 116, 116, 114, 105, 98, 117, 116, 101, 115, 45, 110, 97, 116, 117,
-                    114, 97, 108, 45, 108, 97, 110, 103, 117, 97, 103, 101, 0, 2, 100, 101};
+                    116, 102, 45, 56};
     private static final Attribute ATTRIBUTE = new Attribute(ByteBuffer.wrap(DATA));
 
     @Test
@@ -97,6 +97,12 @@ public final class AttributeTest {
         LOG.info("requestedAttributes = {}", requestedAttributes.toLongString());
         assertThat(requestedAttributes.isMultiValue(), is(true));
         assertThat(requestedAttributes.toLongString().length(), greaterThan(requestedAttributes.toString().length()));
+    }
+    
+    @Test
+    public void testToByteArray() {
+        byte[] bytes = ATTRIBUTE.toByteArray();
+        ArrayTester.assertEquals(DATA, bytes);
     }
 
 }
