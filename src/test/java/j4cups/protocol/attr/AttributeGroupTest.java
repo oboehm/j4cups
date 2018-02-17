@@ -94,5 +94,11 @@ public final class AttributeGroupTest {
         LOG.info("longString = {}", longString);
         assertThat(longString.length(), greaterThan(attributeGroup.toString().length()));
     }
+    
+    @Test
+    public void testToByteArray() {
+        byte[] bytes = attributeGroup.toByteArray();
+        assertThat(bytes.length, greaterThan(1));
+    }
 
 }

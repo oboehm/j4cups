@@ -150,7 +150,7 @@ public class AttributeGroup {
      * |                   attribute                 |  p bytes |- 0 or more
      * ----------------------------------------------------------
      * </pre> 
-     * @return
+     * @return byte array
      */
     public byte[] toByteArray() {
         try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream()) {
@@ -165,6 +165,9 @@ public class AttributeGroup {
     private void writeTo(OutputStream ostream) throws IOException {
         DataOutputStream dos = new DataOutputStream(ostream);
         dos.writeByte(getBeginTag().getValue());
+        for (Attribute attr : getAttributes()) {
+            dos.write(attr.toByteArray());
+        }
     }
 
 }

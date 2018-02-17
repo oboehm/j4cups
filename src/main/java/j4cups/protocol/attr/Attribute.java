@@ -20,6 +20,10 @@ package j4cups.protocol.attr;
 import j4cups.protocol.tags.ValueTags;
 
 import javax.xml.bind.DatatypeConverter;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -229,8 +233,32 @@ public final class Attribute {
         }
         return buffer.toString();
     }
-    
-    
+
+    /**
+     * Converts the attribute to a byte array as described in RFC-2910.
+     * 
+     * @return byte array
+     */
+    public byte[] toByteArray() {
+        try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream()) {
+            writeTo(byteStream);
+            byteStream.flush();
+            return byteStream.toByteArray();
+        } catch (IOException ioe) {
+            throw new IllegalStateException("cannot dump attribute", ioe);
+        }
+    }
+
+    private void writeTo(OutputStream ostream) throws IOException {
+        DataOutputStream dos = new DataOutputStream(ostream);
+        dos.write(this.value.toByteArray());
+        for (AdditionalValue av : additionalValues) {
+            dos.write(av.toByteArray());
+        }
+    }
+
+
+
     /**
      * An "attribute-with-one-value" field is encoded with five subfields.
      * <pre>
@@ -351,6 +379,43 @@ public final class Attribute {
          */
         public String getStringValue() {
             return new String(getValue(), StandardCharsets.UTF_8);
+        }
+
+        /**
+         * Converts an attribute-with-one-value to a byte array.
+         * <pre>
+         * -----------------------------------------------
+         * |                   value-tag                 |   1 byte
+         * -----------------------------------------------
+         * |               name-length  (value is u)     |   2 bytes
+         * -----------------------------------------------
+         * |                     name                    |   u bytes
+         * -----------------------------------------------
+         * |              value-length  (value is v)     |   2 bytes
+         * -----------------------------------------------
+         * |                     value                   |   v bytes
+         * -----------------------------------------------
+         * </pre>
+         * 
+         * @return byte array
+         */
+        public byte[] toByteArray() {
+            try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream()) {
+                writeTo(byteStream);
+                byteStream.flush();
+                return byteStream.toByteArray();
+            } catch (IOException ioe) {
+                throw new IllegalStateException("cannot dump attribute", ioe);
+            }
+        }
+
+        private void writeTo(OutputStream ostream) throws IOException {
+            DataOutputStream dos = new DataOutputStream(ostream);
+            dos.writeByte(getValueTag().getValue());
+            dos.writeShort(getName().length());
+            dos.writeChars(getName());
+            dos.writeShort(getValue().length);
+            dos.write(getValue());
         }
 
     }
