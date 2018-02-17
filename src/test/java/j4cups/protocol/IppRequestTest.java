@@ -24,6 +24,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import patterntesting.runtime.junit.ArrayTester;
 
 import java.util.List;
 
@@ -131,6 +132,12 @@ public final class IppRequestTest extends AbstractIppTest {
         LOG.info("{} created.", printRequest);
         byte[] data = printRequest.getData();
         assertEquals(40429, data.length);
+    }
+    
+    @Test
+    public void testToByteArray() {
+        byte[] bytes = request.toByteArray();
+        ArrayTester.assertEquals(data, bytes);
     }
 
 }

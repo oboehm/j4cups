@@ -21,8 +21,10 @@ import j4cups.protocol.tags.DelimiterTags;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import patterntesting.runtime.junit.ArrayTester;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -98,7 +100,8 @@ public final class AttributeGroupTest {
     @Test
     public void testToByteArray() {
         byte[] bytes = attributeGroup.toByteArray();
-        assertThat(bytes.length, greaterThan(1));
+        byte[] expected = Arrays.copyOf(data, bytes.length);
+        ArrayTester.assertEquals(expected, bytes);
     }
 
 }
