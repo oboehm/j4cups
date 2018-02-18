@@ -99,7 +99,7 @@ public final class Attribute implements Binary {
      *
      * @param name e.g. "job-id"
      * @param value e.g. 42
-     * @return
+     * @return the attribute
      */
     public static Attribute of(String name, int value) {
         return of(ValueTags.INTEGER, name, value);
@@ -110,7 +110,7 @@ public final class Attribute implements Binary {
      *
      * @param name e.g. "job-uri"
      * @param value an URI
-     * @return
+     * @return the attribute
      */
     public static Attribute of(String name, URI value) {
         return of(ValueTags.URI, name, value.toString().getBytes(StandardCharsets.UTF_8));
@@ -121,7 +121,7 @@ public final class Attribute implements Binary {
      *
      * @param name e.g. "attributes-charset"
      * @param value e.g. {@link StandardCharsets#UTF_8}
-     * @return
+     * @return the attribute
      */
     public static Attribute of(String name, Charset value) {
         return of(ValueTags.CHARSET, name, value.name().toLowerCase());
@@ -132,7 +132,7 @@ public final class Attribute implements Binary {
      *
      * @param name e.g. "attributes-natural-language"
      * @param value e.g. the English {@link Locale}
-     * @return
+     * @return the attribute
      */
     public static Attribute of(String name, Locale value) {
         return of(ValueTags.NATURAL_LANGUAGE, name, value.getLanguage());

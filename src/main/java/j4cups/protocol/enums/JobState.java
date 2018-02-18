@@ -24,13 +24,13 @@ package j4cups.protocol.enums;
  * 'canceled' state from the 'pending', 'pending-held', and
  * 'processing-stopped' states.
  * <pre>
- * +----> canceled
+ * +----&gt; canceled
  * /
- * +----> pending  -------> processing ---------+------> completed
+ * +----&gt; pending  -------&gt; processing ---------+------&gt; completed
  * |         ^                   ^               \
- * --->+     |                   |                +----> aborted
+ * ---&gt;+     |                   |                +----&gt; aborted
  * |         v                   v               /
- * +----> pending-held    processing-stopped ---+
+ * +----&gt; pending-held    processing-stopped ---+
  * </pre>
  *
  * @author oboehm
@@ -99,7 +99,7 @@ public enum JobState {
     PROCESSING_STOPPED(6),
 
     /**
-     * 'canceled':  The Job has been canceled by a Cancel-Job
+     * The Job has been canceled by a Cancel-Job
      * operation, and the Printer has completed canceling the
      * Job.  All Job Status attributes have reached their final
      * values for the Job.  While the Printer is canceling the

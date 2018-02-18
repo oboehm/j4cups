@@ -48,11 +48,11 @@ The CI build is started automatically after a commit and push to GitHub.
 |===
 |Version |Date |Description
 
-|0.2
-|Feb-2018
-|focus on IPP response
+|0.2.0
+|18-Feb-2018
+|IPP response to Print-Job request implemented
 
-|0.1
+|0.1.0
 |14-Feb-2018
 |successful reading of IPP requests,
 logging introduced (SLF4J)
