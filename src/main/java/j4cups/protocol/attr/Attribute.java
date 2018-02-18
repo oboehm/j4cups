@@ -25,6 +25,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -93,6 +94,28 @@ public final class Attribute {
     }
 
     /**
+     * Creates a singe-value attribute for integer values.
+     *
+     * @param name e.g. "job-id"
+     * @param value e.g. 42
+     * @return
+     */
+    public static Attribute of(String name, int value) {
+        return of(ValueTags.INTEGER, name, value);
+    }
+
+    /**
+     * Creates a singe-value attribute for URI values.
+     *
+     * @param name e.g. "job-uri"
+     * @param value an URI
+     * @return
+     */
+    public static Attribute of(String name, URI value) {
+        return of(ValueTags.URI, name, value.toString().getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
      * Creates a singe-value attribute for charset values.
      *
      * @param name e.g. "attributes-charset"
@@ -115,6 +138,20 @@ public final class Attribute {
     }
 
     /**
+     * Creates a singe-value attribute for integer based values.
+     *
+     * @param tag   the value-tag
+     * @param name  the name of the attribute
+     * @param value the string value of the attribute
+     * @return the attribute
+     */
+    public static Attribute of(ValueTags tag, String name, int value) {
+        byte[] bytes = new byte[4];
+        ByteBuffer.wrap(bytes).putInt(value);
+        return of(ValueTags.INTEGER, name, bytes);
+    }
+
+    /**
      * Creates a singe-value attribute for character-string values.
      *
      * @param tag   the value-tag
@@ -134,7 +171,7 @@ public final class Attribute {
      * @param value the binary value of the attribute
      * @return the attribute
      */
-    public static Attribute of(ValueTags tag, String name , byte[] value) {
+    public static Attribute of(ValueTags tag, String name, byte[] value) {
         AttributeWithOneValue attr = new AttributeWithOneValue(tag, name, value);
         return new Attribute(attr);
     }
@@ -170,12 +207,21 @@ public final class Attribute {
     }
 
     /**
-     * The "value" field contains the value of the attribute.
+     * The "value" field contains the value of a charset attribute.
      *
      * @return e.g. "one-sided"
      */
     public String getStringValue() {
         return new String(getValue(), StandardCharsets.UTF_8);
+    }
+
+    /**
+     * The "value" field contains the value of a URI attribute.
+     *
+     * @return an URI
+     */
+    public URI getUriValue() {
+        return URI.create(getStringValue());
     }
 
     /**

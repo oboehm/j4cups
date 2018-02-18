@@ -61,9 +61,9 @@ public final class IppResponseTest extends AbstractIppTest {
      * of RFC-8011.
      */
     @Test
-    void testPrintJobResponse() {
-        List<Attribute> attributes = RESPONSE_PRINT_JOB.getAttributeGroups(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG);
-        assertThat(attributes, not(empty()));
+    void testPrintJobResponseOperationAttributes() {
+        List<Attribute> opAttributes = RESPONSE_PRINT_JOB.getAttributeGroups(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG);
+        assertThat(opAttributes, not(empty()));
         checkAttribute(RESPONSE_PRINT_JOB,"attributes-charset", "utf-8");
         checkAttribute(RESPONSE_PRINT_JOB, "attributes-natural-language",
                 Locale.getDefault().getLanguage().toLowerCase());
@@ -74,4 +74,15 @@ public final class IppResponseTest extends AbstractIppTest {
         assertEquals(expected, attribute.getStringValue());
     }
 
+    /**
+     * The Printer MUST return "job-id" and other  job attributes. This is described in
+     * <a href="https://tools.ietf.org/html/rfc8011#section-4.2.1.2">Section 4.1.4.2.</a>
+     * of RFC-8011.
+     */
+    @Test
+    void testPrintJobResponseJobAttributes() {
+        List<Attribute> jobAttributes = RESPONSE_PRINT_JOB.getAttributeGroups(DelimiterTags.JOB_ATTRIBUTES_TAG);
+        assertThat(jobAttributes, not(empty()));
+    }
+    
 }

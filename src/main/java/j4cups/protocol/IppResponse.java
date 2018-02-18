@@ -19,9 +19,14 @@ package j4cups.protocol;
 
 import j4cups.protocol.attr.Attribute;
 import j4cups.protocol.attr.AttributeGroup;
+import j4cups.protocol.enums.JobState;
 import j4cups.protocol.tags.DelimiterTags;
+import j4cups.protocol.tags.ValueTags;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.nio.ByteBuffer;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +57,8 @@ import java.util.Locale;
  */
 public class IppResponse extends AbstractIpp {
     
+    private static final Logger LOG = LoggerFactory.getLogger(IppResponse.class);
+
     /**
      * The IppResponse is the response to a IppRequest. So you need the id
      * of the IppRequest to create a response.
@@ -66,17 +73,38 @@ public class IppResponse extends AbstractIpp {
         List<AttributeGroup> groups = new ArrayList<>();
         switch (request.getOperation()) {
             case PRINT_JOB:
-                groups.add(createPrintJobOperations());
+                groups.add(createPrintJobOperationAttributes());
+                groups.add(createPrintJobJobAttributes(request));
                 break;
         }
         return groups;
     }
 
-    private static AttributeGroup createPrintJobOperations() {
+    private static AttributeGroup createPrintJobOperationAttributes() {
         AttributeGroup group = new AttributeGroup(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG);
         group.addAttribute(Attribute.of("attributes-charset", StandardCharsets.UTF_8));
         group.addAttribute(Attribute.of("attributes-natural-language", Locale.getDefault()));
         return group;
+    }
+
+    private static AttributeGroup createPrintJobJobAttributes(IppRequest request) {
+        AttributeGroup group = new AttributeGroup(DelimiterTags.JOB_ATTRIBUTES_TAG);
+        int jobId = parseInt(request.getAttribute("job-name").getStringValue());
+        URI jobUri = URI.create(request.getAttribute("printer-uri").getUriValue() + "/" + jobId);
+        group.addAttribute(Attribute.of("job-id", jobId));
+        group.addAttribute(Attribute.of("job-uri", jobUri));
+        group.addAttribute(Attribute.of(ValueTags.ENUM, "job-state", JobState.COMPLETED.getState()));
+        return group;
+    }
+    
+    private static int parseInt(String value) {
+        String number = StringUtils.substringBefore(value, " ");
+        try {
+            return Integer.parseInt(number);
+        } catch (NumberFormatException ex) {
+            LOG.warn("No number in '{}' detected - will return 0:", ex);
+            return 0;
+        }
     }
 
     /**
