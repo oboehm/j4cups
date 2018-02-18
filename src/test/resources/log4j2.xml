@@ -7,7 +7,7 @@
   </Appenders>
   <Loggers>
     <Logger name="j4cups" level="INFO" />
-    <Logger name="j4cups.protocol.IppRequest" level="DEBUG" />
+    <Logger name="j4cups.protocol.AbstractIpp" level="DEBUG" />
     <Root level="INFO">
       <AppenderRef ref="CONSOLE" />
     </Root>

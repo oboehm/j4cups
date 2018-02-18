@@ -21,6 +21,7 @@ import j4cups.protocol.attr.Attribute;
 import j4cups.protocol.attr.AttributeGroup;
 import j4cups.protocol.tags.DelimiterTags;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,7 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -129,7 +131,12 @@ public abstract class AbstractIpp {
         if (LOG.isTraceEnabled()) {
             LOG.trace(DatatypeConverter.printHexBinary(bytes));
             try {
-                Path logFile = Files.createTempFile("IPP-" + requestId + "-", ".bin");
+                Path logDir = Paths.get(SystemUtils.getJavaIoTmpDir().toString(), "IPP");
+                Files.createDirectories(logDir);
+                Path logFile = Paths.get(logDir.toString(),
+                        Long.toString(System.currentTimeMillis(), Character.MAX_RADIX) + "-" +
+                                this.getClass().getSimpleName() + this.getRequestId() + this.getOpCodeAsString() +
+                                ".bin");
                 Files.write(logFile, bytes);
                 LOG.info("IPP package with {} bytes is recorded to '{}'.", bytes.length, logFile);
             } catch (IOException ioe) {
@@ -137,7 +144,8 @@ public abstract class AbstractIpp {
                 LOG.trace(DatatypeConverter.printHexBinary(bytes));
             }
         } else {
-            LOG.debug("IPP package-{} {} received (use TRACE level to dump it).", opCode, requestId);
+            LOG.debug("{}-{} {} received (use TRACE level to dump it).", getClass().getSimpleName(), requestId,
+                    getOpCodeAsString());
         }
     }
 
