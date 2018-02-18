@@ -17,9 +17,9 @@
  */
 package j4cups.protocol.attr;
 
+import j4cups.protocol.Binary;
 import j4cups.protocol.tags.DelimiterTags;
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -47,7 +47,7 @@ import java.util.List;
  * @author oboehm
  * @since 0.0.2 (10.02.2018)
  */
-public class AttributeGroup {
+public class AttributeGroup implements Binary {
     
     private final DelimiterTags beginTag;
     private final List<Attribute> attributes;
@@ -142,7 +142,8 @@ public class AttributeGroup {
     }
 
     /**
-     * Converts the attribute-group to a byte array as described in RFC-2910.
+     * Converts the attribute-group to a byte array as described in RFC-2910 and
+     * writes it to the given output-stream.
      * <pre>
      * -----------------------------------------------
      * |           begin-attribute-group-tag         |  1 byte
@@ -150,19 +151,12 @@ public class AttributeGroup {
      * |                   attribute                 |  p bytes |- 0 or more
      * ----------------------------------------------------------
      * </pre> 
-     * @return byte array
+     *
+     * @param ostream an output stream
+     * @throws IOException in case of I/O problems
      */
-    public byte[] toByteArray() {
-        try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream()) {
-            writeTo(byteStream);
-            byteStream.flush();
-            return byteStream.toByteArray();
-        } catch (IOException ioe) {
-            throw new IllegalStateException("cannot dump attribute-group", ioe);
-        }
-    }
-
-    private void writeTo(OutputStream ostream) throws IOException {
+    @Override
+    public void writeBinaryTo(OutputStream ostream) throws IOException {
         DataOutputStream dos = new DataOutputStream(ostream);
         dos.writeByte(getBeginTag().getValue());
         for (Attribute attr : getAttributes()) {

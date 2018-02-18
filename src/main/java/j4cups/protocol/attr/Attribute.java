@@ -17,6 +17,7 @@
  */
 package j4cups.protocol.attr;
 
+import j4cups.protocol.Binary;
 import j4cups.protocol.tags.ValueTags;
 
 import javax.xml.bind.DatatypeConverter;
@@ -56,7 +57,7 @@ import java.util.Locale;
  * @author Oli B.
  * @since 0.0.2 (11.02.2018)
  */
-public final class Attribute {
+public final class Attribute implements Binary {
     
     private final AttributeWithOneValue value;
     private final List<AdditionalValue> additionalValues;
@@ -281,21 +282,14 @@ public final class Attribute {
     }
 
     /**
-     * Converts the attribute to a byte array as described in RFC-2910.
-     * 
-     * @return byte array
+     * Converts the attribute to a byte array as described in RFC-2910 and
+     * writes it to the given output-stream.
+     *
+     * @param ostream an output stream
+     * @throws IOException in case of I/O problems
      */
-    public byte[] toByteArray() {
-        try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream()) {
-            writeTo(byteStream);
-            byteStream.flush();
-            return byteStream.toByteArray();
-        } catch (IOException ioe) {
-            throw new IllegalStateException("cannot dump attribute", ioe);
-        }
-    }
-
-    private void writeTo(OutputStream ostream) throws IOException {
+    @Override
+    public void writeBinaryTo(OutputStream ostream) throws IOException {
         DataOutputStream dos = new DataOutputStream(ostream);
         dos.write(this.value.toByteArray());
         for (AdditionalValue av : additionalValues) {
