@@ -93,7 +93,7 @@ public class IppResponse extends AbstractIpp {
         URI jobUri = URI.create(request.getAttribute("printer-uri").getUriValue() + "/" + jobId);
         group.addAttribute(Attribute.of("job-id", jobId));
         group.addAttribute(Attribute.of("job-uri", jobUri));
-        group.addAttribute(Attribute.of(ValueTags.ENUM, "job-state", JobState.COMPLETED.getState()));
+        group.addAttribute(Attribute.of(ValueTags.ENUM, "job-state", JobState.COMPLETED.getValue()));
         return group;
     }
     

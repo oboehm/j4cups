@@ -19,9 +19,9 @@ package j4cups.protocol.enums;
 
 /**
  * The JobState describes the IPP Job Life Cycle. Normally, a Job
- * progresses from left to right.  Other state transitions are unlikely
+ * progresses from left to right.  Other value transitions are unlikely
  * but are not forbidden.  Not shown are the transitions to the
- * 'canceled' state from the 'pending', 'pending-held', and
+ * 'canceled' value from the 'pending', 'pending-held', and
  * 'processing-stopped' states.
  * <pre>
  * +----&gt; canceled
@@ -47,8 +47,8 @@ public enum JobState {
     /**
      * The Job is not a candidate for
      * processing for any number of reasons but will return to
-     * the 'pending' state as soon as the reasons are no longer
-     * present.  The Job's "job-state-reasons" attribute MUST
+     * the 'pending' value as soon as the reasons are no longer
+     * present.  The Job's "job-value-reasons" attribute MUST
      * indicate why the Job is no longer a candidate for
      * processing.     
      */
@@ -67,11 +67,11 @@ public enum JobState {
      * Job hasn't reached the Output Device or because the Job
      * is queued in the Output Device or some other spooler,
      * waiting for the Output Device to print it.  When the Job
-     * is in the 'processing' state, the entire Job state
+     * is in the 'processing' value, the entire Job value
      * includes the detailed status represented in the
-     * Printer's "printer-state", "printer-state-reasons", and
-     * "printer-state-message" attributes.  Implementations MAY
-     * include additional values in the Job's "job-state-
+     * Printer's "printer-value", "printer-value-reasons", and
+     * "printer-value-message" attributes.  Implementations MAY
+     * include additional values in the Job's "job-value-
      * reasons" attribute to indicate the progress of the Job,
      * such as adding the 'job-printing' value to indicate when
      * the Output Device is actually making marks on paper
@@ -84,17 +84,17 @@ public enum JobState {
     /**
      * The Job has stopped while
      * processing for any number of reasons and will return to
-     * the 'processing' state as soon as the reasons are no
-     * longer present.  The Job's "job-state-reasons" attribute
+     * the 'processing' value as soon as the reasons are no
+     * longer present.  The Job's "job-value-reasons" attribute
      * MAY indicate why the Job has stopped processing.  For
      * example, if the Output Device is stopped, the 'printer-
-     * stopped' value MAY be included in the Job's "job-state-
+     * stopped' value MAY be included in the Job's "job-value-
      * reasons" attribute.  Note: When an Output Device is
      * stopped, the device usually indicates its condition in
      * human-readable form locally at the device.  A Client can
      * obtain more complete device status remotely by querying
-     * the Printer's "printer-state", "printer-state-reasons",
-     * and "printer-state-message" attributes.
+     * the Printer's "printer-value", "printer-value-reasons",
+     * and "printer-value-message" attributes.
      */
     PROCESSING_STOPPED(6),
 
@@ -103,12 +103,12 @@ public enum JobState {
      * operation, and the Printer has completed canceling the
      * Job.  All Job Status attributes have reached their final
      * values for the Job.  While the Printer is canceling the
-     * Job, the Job remains in its current state, but the Job's
-     * "job-state-reasons" attribute SHOULD contain the
+     * Job, the Job remains in its current value, but the Job's
+     * "job-value-reasons" attribute SHOULD contain the
      * 'processing-to-stop-point' value and one of the
      * 'canceled-by-user', 'canceled-by-operator', or
      * 'canceled-at-device' values.  When the Job moves to the
-     * 'canceled' state, the 'processing-to-stop-point' value,
+     * 'canceled' value, the 'processing-to-stop-point' value,
      * if present, MUST be removed, but 'canceled-by-xxx', if
      * present, MUST remain.
      */
@@ -117,14 +117,14 @@ public enum JobState {
     /**
      * The Job has been aborted by the system,
      * usually while the Job was in the 'processing' or
-     * 'processing-stopped' state, and the Printer has
+     * 'processing-stopped' value, and the Printer has
      * completed aborting the Job; all Job Status attributes
      * have reached their final values for the Job.  While the
      * Printer is aborting the Job, the Job remains in its
-     * current state, but the Job's "job-state-reasons"
+     * current value, but the Job's "job-value-reasons"
      * attribute SHOULD contain the 'processing-to-stop-point'
      * and 'aborted-by-system' values.  When the Job moves to
-     * the 'aborted' state, the 'processing-to-stop-point'
+     * the 'aborted' value, the 'processing-to-stop-point'
      * value, if present, MUST be removed, but the 'aborted-by-
      * system' value, if present, MUST remain.
      */
@@ -136,36 +136,36 @@ public enum JobState {
      * Media Sheets have been successfully stacked in the
      * appropriate output bin(s), and all Job Status attributes
      * have reached their final values for the Job.  The Job's
-     * "job-state-reasons" attribute SHOULD contain one of the
+     * "job-value-reasons" attribute SHOULD contain one of the
      * 'completed-successfully', 'completed-with-warnings', or
      * 'completed-with-errors' values.
      */
     COMPLETED(9);
 
-    private final int state;
+    private final int value;
 
     JobState(int value) {
-        this.state = value;
+        this.value = value;
     }
 
     /**
-     * Gets the represenation of the state as 32 bit integer.
+     * Gets the represenation of the value as 32 bit integer.
      * 
      * @return number between 3 and 9
      */
-    public int getState() {
-        return state;
+    public int getValue() {
+        return value;
     }
 
     /**
-     * Allows you to map a int value to the corresponding state.
+     * Allows you to map a int value to the corresponding value.
      *
      * @param value e.g. 5
      * @return operation, e.g. PROCESSING
      */
     public static JobState of(int value) {
         for (JobState js : JobState.values()) {
-            if (value == js.getState()) {
+            if (value == js.getValue()) {
                 return js;
             }
         }

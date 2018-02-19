@@ -18,6 +18,7 @@
 package j4cups.protocol;
 
 import j4cups.protocol.attr.Attribute;
+import j4cups.protocol.enums.JobState;
 import j4cups.protocol.tags.DelimiterTags;
 import org.junit.jupiter.api.Test;
 
@@ -69,11 +70,6 @@ public final class IppResponseTest extends AbstractIppTest {
                 Locale.getDefault().getLanguage().toLowerCase());
     }
     
-    private static void checkAttribute(IppResponse response, String name, String expected) {
-        Attribute attribute = response.getAttribute(name);
-        assertEquals(expected, attribute.getStringValue());
-    }
-
     /**
      * The Printer MUST return "job-id" and other  job attributes. This is described in
      * <a href="https://tools.ietf.org/html/rfc8011#section-4.2.1.2">Section 4.1.4.2.</a>
@@ -83,6 +79,17 @@ public final class IppResponseTest extends AbstractIppTest {
     void testPrintJobResponseJobAttributes() {
         List<Attribute> jobAttributes = RESPONSE_PRINT_JOB.getAttributeGroups(DelimiterTags.JOB_ATTRIBUTES_TAG);
         assertThat(jobAttributes, not(empty()));
+        checkAttribute(RESPONSE_PRINT_JOB,"job-state", JobState.COMPLETED.getValue());
     }
-    
+
+    private static void checkAttribute(IppResponse response, String name, String expected) {
+        Attribute attribute = response.getAttribute(name);
+        assertEquals(expected, attribute.getStringValue());
+    }
+
+    private static void checkAttribute(IppResponse response, String name, int expected) {
+        Attribute attribute = response.getAttribute(name);
+        assertEquals(expected, attribute.getIntValue());
+    }
+
 }

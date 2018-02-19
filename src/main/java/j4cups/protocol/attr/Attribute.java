@@ -208,6 +208,15 @@ public final class Attribute implements Binary {
     }
 
     /**
+     * The "value" field contains the value of a integer attribute.
+     *
+     * @return a 32-bit number
+     */
+    public int getIntValue() {
+        return new BigInteger(getValue()).intValue();
+    }
+
+    /**
      * The "value" field contains the value of a charset attribute.
      *
      * @return e.g. "one-sided"
