@@ -63,11 +63,7 @@ public final class IppResponseTest extends AbstractIppTest {
      */
     @Test
     void testPrintJobResponseOperationAttributes() {
-        List<Attribute> opAttributes = RESPONSE_PRINT_JOB.getAttributeGroups(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG);
-        assertThat(opAttributes, not(empty()));
-        checkAttribute(RESPONSE_PRINT_JOB,"attributes-charset", "utf-8");
-        checkAttribute(RESPONSE_PRINT_JOB, "attributes-natural-language",
-                Locale.getDefault().getLanguage().toLowerCase());
+        checkOperationAttributesOf(RESPONSE_PRINT_JOB);
     }
     
     /**
@@ -80,6 +76,26 @@ public final class IppResponseTest extends AbstractIppTest {
         List<Attribute> jobAttributes = RESPONSE_PRINT_JOB.getAttributeGroups(DelimiterTags.JOB_ATTRIBUTES_TAG);
         assertThat(jobAttributes, not(empty()));
         checkAttribute(RESPONSE_PRINT_JOB,"job-state", JobState.COMPLETED.getValue());
+    }
+
+    /**
+     * The Printer MUST return to the Client the "attributes-charset" and 
+     * "attributes-natural-language" as operation attributes. This is described in
+     * <a href="https://tools.ietf.org/html/rfc8011#section-4.2.5.2">Section 4.2.5.2.</a>
+     * of RFC-8011.
+     */
+    @Test
+    void testGetPrinterAttributes() {
+        IppResponse responseGetPrinterAttributes = new IppResponse(REQUEST_GET_PRINTER_ATTRIBUTES);
+        checkOperationAttributesOf(responseGetPrinterAttributes);
+    }
+
+    void checkOperationAttributesOf(IppResponse response) {
+        List<Attribute> opAttributes = response.getAttributeGroups(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG);
+        assertThat(opAttributes, not(empty()));
+        checkAttribute(response,"attributes-charset", "utf-8");
+        checkAttribute(response, "attributes-natural-language",
+                Locale.getDefault().getLanguage().toLowerCase());
     }
 
     private static void checkAttribute(IppResponse response, String name, String expected) {

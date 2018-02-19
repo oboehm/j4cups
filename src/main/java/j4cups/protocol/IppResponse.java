@@ -73,14 +73,17 @@ public class IppResponse extends AbstractIpp {
         List<AttributeGroup> groups = new ArrayList<>();
         switch (request.getOperation()) {
             case PRINT_JOB:
-                groups.add(createPrintJobOperationAttributes());
+                groups.add(createNaturalLanguageAndCharacterSetAttributes());
                 groups.add(createPrintJobJobAttributes(request));
+                break;
+            case GET_PRINTER_ATTRIBUTES:
+                groups.add(createNaturalLanguageAndCharacterSetAttributes());
                 break;
         }
         return groups;
     }
 
-    private static AttributeGroup createPrintJobOperationAttributes() {
+    private static AttributeGroup createNaturalLanguageAndCharacterSetAttributes() {
         AttributeGroup group = new AttributeGroup(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG);
         group.addAttribute(Attribute.of("attributes-charset", StandardCharsets.UTF_8));
         group.addAttribute(Attribute.of("attributes-natural-language", Locale.getDefault()));

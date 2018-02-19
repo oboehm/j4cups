@@ -40,7 +40,8 @@ public abstract class AbstractIppTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractIppTest.class);
 
-    public final static IppRequest REQUEST_PRINT_JOB = readRequest("print-job.bin");
+    public final static IppRequest REQUEST_PRINT_JOB = readRequest("Print-Job.bin");
+    public final static IppRequest REQUEST_GET_PRINTER_ATTRIBUTES = readRequest("Get-Printer-Attributes.bin");
 
     private static IppRequest readRequest(String name) {
         Path recordedPrintJob = Paths.get("src", "test", "resources", "j4cups", "request", name);
