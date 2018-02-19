@@ -75,7 +75,7 @@ public abstract class AbstractIpp {
     private final short opCode;
     private final List<AttributeGroup> attributeGroups;
     private final int requestId;
-    private final byte[] data;
+    private byte[] data;
 
     /**
      * Instantiates a new IPP request or responsel from the given bytes.
@@ -244,6 +244,10 @@ public abstract class AbstractIpp {
         }
         return attributes;
     }
+    
+    public void setAttribute(String name, byte[] value) {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
 
     /**
      * Gets the attribute with the given name. If not attribute with the given
@@ -259,6 +263,16 @@ public abstract class AbstractIpp {
             }
         }
         throw new IllegalArgumentException("no attribute '" + name + "' found");
+    }
+
+    /**
+     * Sets the data part of the request or response.
+     * 
+     * @param data new data
+     * @since 0.3
+     */
+    public void setData(byte[] data) {
+        this.data = data;
     }
 
     /**

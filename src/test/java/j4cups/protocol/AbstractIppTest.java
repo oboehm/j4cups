@@ -17,11 +17,13 @@
  */
 package j4cups.protocol;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,6 +31,7 @@ import java.nio.file.Paths;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * The class AbstractIppTest provides some prepared IPP requests for testing.
@@ -43,6 +46,8 @@ public abstract class AbstractIppTest {
     public final static IppRequest REQUEST_PRINT_JOB = readRequest("Print-Job.bin");
     public final static IppRequest REQUEST_GET_PRINTER_ATTRIBUTES = readRequest("Get-Printer-Attributes.bin");
 
+    private AbstractIpp ippPackage;
+    
     private static IppRequest readRequest(String name) {
         Path recordedPrintJob = Paths.get("src", "test", "resources", "j4cups", "request", name);
         try {
@@ -59,10 +64,14 @@ public abstract class AbstractIppTest {
      * @return IPP request or response
      */
     protected abstract AbstractIpp getIppPackage();
+    
+    @BeforeEach
+    public void setUpIppPackage() {
+        ippPackage = getIppPackage();
+    }
 
     @Test
     public void testToString() {
-        AbstractIpp ippPackage = getIppPackage();
         String s = ippPackage.toString();
         LOG.info("s = \"{}\"", s);
         assertThat(s, containsString(ippPackage.getOpCodeAsString()));
@@ -70,10 +79,23 @@ public abstract class AbstractIppTest {
 
     @Test
     public void testToLongString() {
-        AbstractIpp ippPackage = getIppPackage();
         String longString = ippPackage.toLongString();
         LOG.info("longString = {}", longString);
         assertThat(longString.length(), greaterThan(ippPackage.toString().length()));
     }
-    
+
+    @Test
+    public void testSetData() {
+        byte[] bytes = "hello".getBytes(StandardCharsets.UTF_8);
+        ippPackage.setData(bytes);
+        assertEquals("hello", new String(ippPackage.getData(), StandardCharsets.UTF_8));
+    }
+
+    //@Test
+    public void testSetAttribute() {
+        byte[] world = "world".getBytes(StandardCharsets.UTF_8);
+        ippPackage.setAttribute("hello", world);
+        assertEquals("world", ippPackage.getAttribute("hello").getStringValue());
+    }
+
 }
