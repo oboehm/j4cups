@@ -27,9 +27,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -73,7 +71,8 @@ public final class IppResponseTest extends AbstractIppTest {
      */
     @Test
     void testPrintJobResponseJobAttributes() {
-        List<Attribute> jobAttributes = RESPONSE_PRINT_JOB.getAttributeGroups(DelimiterTags.JOB_ATTRIBUTES_TAG);
+        List<Attribute> jobAttributes =
+                RESPONSE_PRINT_JOB.getAttributeGroup(DelimiterTags.JOB_ATTRIBUTES_TAG).getAttributes();
         assertThat(jobAttributes, not(empty()));
         checkAttribute(RESPONSE_PRINT_JOB,"job-state", JobState.COMPLETED.getValue());
     }
@@ -91,7 +90,7 @@ public final class IppResponseTest extends AbstractIppTest {
     }
 
     void checkOperationAttributesOf(IppResponse response) {
-        List<Attribute> opAttributes = response.getAttributeGroups(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG);
+        List<Attribute> opAttributes = response.getAttributeGroup(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG).getAttributes();
         assertThat(opAttributes, not(empty()));
         checkAttribute(response,"attributes-charset", "utf-8");
         checkAttribute(response, "attributes-natural-language",

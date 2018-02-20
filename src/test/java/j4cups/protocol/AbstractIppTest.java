@@ -91,7 +91,7 @@ public abstract class AbstractIppTest {
         assertEquals("hello", new String(ippPackage.getData(), StandardCharsets.UTF_8));
     }
 
-    //@Test
+    @Test
     public void testSetAttribute() {
         byte[] world = "world".getBytes(StandardCharsets.UTF_8);
         ippPackage.setAttribute("hello", world);

@@ -20,6 +20,7 @@ package j4cups.protocol;
 import j4cups.protocol.attr.Attribute;
 import j4cups.protocol.attr.AttributeGroup;
 import j4cups.protocol.tags.DelimiterTags;
+import j4cups.protocol.tags.ValueTags;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
@@ -125,6 +126,22 @@ public abstract class AbstractIpp {
         this.requestId = requestId;
         this.attributeGroups = groups;
         this.data = data;
+        fillAttributeGroups(groups);
+    }
+
+    private static void fillAttributeGroups(List<AttributeGroup> values) {
+        List<DelimiterTags> requiredTags =
+                new ArrayList(Arrays.asList(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG, DelimiterTags.JOB_ATTRIBUTES_TAG,
+                        DelimiterTags.PRINTER_ATTRIBUTES_TAG, DelimiterTags.UNSUPPORTED_ATTRIBUTES_TAG));
+        for (AttributeGroup group : values) {
+            DelimiterTags tag = group.getBeginTag();
+            requiredTags.remove(tag);
+        }
+        for (DelimiterTags tag : requiredTags) {
+            AttributeGroup group = new AttributeGroup(tag);
+            values.add(group);
+            LOG.debug("Empty {} added.", group);
+        }
     }
 
     private void trace(byte[] bytes) {
@@ -222,14 +239,13 @@ public abstract class AbstractIpp {
      * @param tag the delimiter-tag
      * @return list of attributes
      */
-    public List<Attribute> getAttributeGroups(DelimiterTags tag) {
+    public AttributeGroup getAttributeGroup(DelimiterTags tag) {
         for (AttributeGroup group : getAttributeGroups()) {
             if (group.getBeginTag() == tag) {
-                return group.getAttributes();
+                return group;
             }
         }
-        LOG.debug("Attribute-Group '{}' not found.", tag);
-        return new ArrayList<>();
+        throw new IllegalArgumentException("attribute-group " + tag + " not found");
     }
     
     /**
@@ -244,9 +260,36 @@ public abstract class AbstractIpp {
         }
         return attributes;
     }
-    
+
+    /**
+     * Sets the attribute with the given name. If it exits the old value will
+     * be overridden. If it does not exist it will be inserted in the
+     * unsupported attribute-groups section with "unknown" as value tag.
+     * 
+     * @param name name of the attribute
+     * @param value byte values of the attribute
+     * @see #setAttribute(String, byte[], DelimiterTags, ValueTags) 
+     */
     public void setAttribute(String name, byte[] value) {
-        throw new UnsupportedOperationException("not yet implemented");
+        try {
+            Attribute attr = getAttribute(name);
+            attr.setValue(value);
+        } catch (IllegalArgumentException iae) {
+            LOG.debug("Attribute '{}' will be inserted as 'unsupported/unknown', because not found in existing attributes.", name);
+            LOG.trace("Details:", iae);
+            setAttribute(Attribute.of(ValueTags.UNKNOWN, name, value), DelimiterTags.UNSUPPORTED_ATTRIBUTES_TAG);
+        }
+    }
+
+    /**
+     * Sets the attribute into the group defined by the groupTag.
+     *
+     * @param attr the attribute
+     * @param groupTag defines the attribute-group where the attribute is inserted
+     */
+    public void setAttribute(Attribute attr, DelimiterTags groupTag) {
+        AttributeGroup group = getAttributeGroup(groupTag);
+        group.addAttribute(attr);
     }
 
     /**
@@ -365,7 +408,9 @@ public abstract class AbstractIpp {
         dos.writeShort(getOpCode());
         dos.writeInt(getRequestId());
         for (AttributeGroup group : getAttributeGroups()) {
-            dos.write(group.toByteArray());
+            if (!group.getAttributes().isEmpty()) {
+                dos.write(group.toByteArray());
+            }
         }
         dos.writeByte(DelimiterTags.END_OF_ATTRIBUTES_TAG.getValue());
         dos.write(getData());

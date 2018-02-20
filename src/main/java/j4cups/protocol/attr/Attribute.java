@@ -197,6 +197,15 @@ public final class Attribute implements Binary {
     }
 
     /**
+     * Sets the value of the attribute.
+     * 
+     * @param value value as byte array
+     */
+    public void setValue(byte[] value) {
+        this.value.setValue(value);
+    }
+
+    /**
      * The "value" field contains the value of the attribute.
      * If the attribute is a multi-value attribute this returns only the
      * fist value.
@@ -305,9 +314,9 @@ public final class Attribute implements Binary {
             dos.write(av.toByteArray());
         }
     }
+    
 
-
-
+    
     /**
      * An "attribute-with-one-value" field is encoded with five subfields.
      * <pre>
@@ -350,7 +359,7 @@ public final class Attribute implements Binary {
 
         private final ValueTags valueTag;
         private final String name;
-        private final byte[] value;
+        private byte[] value;
 
         /**
          * Instantiates a new attribute-with-one-value from the given bytes.
@@ -410,6 +419,15 @@ public final class Attribute implements Binary {
          */
         public String getName() {
             return name;
+        }
+
+        /**
+         * Sets the value of the attribute.
+         * 
+         * @param value as byte array
+         */
+        public void setValue(byte[] value) {
+            this.value = value;
         }
 
         /**
