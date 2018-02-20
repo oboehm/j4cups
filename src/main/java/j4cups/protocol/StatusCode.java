@@ -161,6 +161,17 @@ public enum StatusCode {
     }
 
     /**
+     * This implementation generates the same representation as described in
+     * section RFC-8011 (section 5.4.15).
+     *
+     * @return e.g. "successful-ok"
+     */
+    @Override
+    public String toString() {
+        return super.toString().toLowerCase().replaceAll("_", "-");
+    }
+
+    /**
      * Allows you to map a value to the corresponding statuscode
      *
      * @param id e.g. 0x0000

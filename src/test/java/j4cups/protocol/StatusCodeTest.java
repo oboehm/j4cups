@@ -30,5 +30,10 @@ class StatusCodeTest {
     public void testOf() {
         assertEquals(StatusCode.SUCCESSFUL_OK, StatusCode.of(0x0000));
     }
+    
+    @Test
+    public void testToString() {
+        assertEquals("client-error-forbidden", StatusCode.CLIENT_ERROR_FORBIDDEN.toString());
+    }
 
 }
