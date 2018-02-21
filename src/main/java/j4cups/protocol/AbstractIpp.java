@@ -268,7 +268,7 @@ public abstract class AbstractIpp {
      * 
      * @param name name of the attribute
      * @param value byte values of the attribute
-     * @see #setAttribute(String, byte[], DelimiterTags, ValueTags) 
+     * @see #setAttribute(Attribute, DelimiterTags) 
      */
     public void setAttribute(String name, byte[] value) {
         try {
@@ -403,17 +403,19 @@ public abstract class AbstractIpp {
     }
     
     private void writeTo(OutputStream ostream) throws IOException {
-        DataOutputStream dos = new DataOutputStream(ostream);
-        dos.write(version.toByteArray());
-        dos.writeShort(getOpCode());
-        dos.writeInt(getRequestId());
-        for (AttributeGroup group : getAttributeGroups()) {
-            if (!group.getAttributes().isEmpty()) {
-                dos.write(group.toByteArray());
+        try (DataOutputStream dos = new DataOutputStream(ostream)) {
+            dos.write(version.toByteArray());
+            dos.writeShort(getOpCode());
+            dos.writeInt(getRequestId());
+            for (AttributeGroup group : getAttributeGroups()) {
+                if (!group.getAttributes().isEmpty()) {
+                    dos.write(group.toByteArray());
+                }
             }
+            dos.writeByte(DelimiterTags.END_OF_ATTRIBUTES_TAG.getValue());
+            dos.write(getData());
+            dos.flush();
         }
-        dos.writeByte(DelimiterTags.END_OF_ATTRIBUTES_TAG.getValue());
-        dos.write(getData());
     }
 
     /**

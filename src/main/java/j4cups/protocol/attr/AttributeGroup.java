@@ -108,6 +108,23 @@ public class AttributeGroup implements Binary {
     }
 
     /**
+     * Looks for the attribute with the given name and returns it. If the 
+     * attribute does not exist an {@link IllegalArgumentException} will be
+     * thrown.
+     * 
+     * @param name of the attribute
+     * @return found attribute
+     */
+    public Attribute getAttribute(String name) {
+        for (Attribute attr : attributes) {
+            if (name.equals(attr.getName())) {
+                return attr;
+            }
+        }
+        throw new IllegalArgumentException("attribute '" + name + "' not found in " + attributes);
+    }
+
+    /**
      * Adds an attribute to the given attributes.
      *
      * @param attr the new attribute

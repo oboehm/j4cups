@@ -18,9 +18,12 @@
 package j4cups.protocol;
 
 import j4cups.protocol.attr.Attribute;
+import j4cups.protocol.attr.AttributeGroup;
 import j4cups.protocol.enums.JobState;
 import j4cups.protocol.tags.DelimiterTags;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.DatatypeConverter;
 import java.util.List;
@@ -30,23 +33,29 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 /**
  * Unit tests for {@link IppResponse}.
  */
 public final class IppResponseTest extends AbstractIppTest {
-    
-    private final IppResponse RESPONSE_PRINT_JOB = new IppResponse(REQUEST_PRINT_JOB);
+
+    private static final Logger LOG = LoggerFactory.getLogger(IppResponseTest.class);
+    private static final IppResponse RESPONSE_PRINT_JOB = new IppResponse(REQUEST_PRINT_JOB);
+    private static final IppResponse RESPONSE_GET_JOBS = new IppResponse(REQUEST_GET_JOBS);
 
     @Override
     protected IppResponse getIppPackage() {
-        return RESPONSE_PRINT_JOB;
+        return new IppResponse(REQUEST_PRINT_JOB);
     }
 
+    /**
+     * A very basic test to check the toByteArray functionality.
+     */
     @Test
     void testToByteArray() {
-        IppResponse response = RESPONSE_PRINT_JOB;
+        IppResponse response = new IppResponse(REQUEST_PRINT_JOB);
         byte[] bytes = response.toByteArray();
         assertThat(bytes.length, greaterThan(9));
         assertThat(DatatypeConverter.printHexBinary(bytes), startsWith("02000000000000020"));
@@ -85,8 +94,25 @@ public final class IppResponseTest extends AbstractIppTest {
      */
     @Test
     void testGetJobsAttributes() {
-        IppResponse responseGetPrinterAttributes = new IppResponse(REQUEST_GET_JOBS);
-        checkOperationAttributesOf(responseGetPrinterAttributes);
+        checkOperationAttributesOf(RESPONSE_GET_JOBS);
+    }
+
+    /**
+     * There are no more attributes defined as MUST in RFC-8011.
+     */
+    @Test
+    void testGetJobsOperationAttributes() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            checkOperationAttributes(RESPONSE_GET_JOBS, "requesting-user-name");
+        });
+    }
+
+    private void checkOperationAttributes(IppResponse response, String... attributeNames) {
+        AttributeGroup group = response.getAttributeGroup(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG);
+        for (String name : attributeNames) {
+            Attribute attr = group.getAttribute(name);
+            LOG.info("found: {}", attr);
+        }
     }
 
     /**
