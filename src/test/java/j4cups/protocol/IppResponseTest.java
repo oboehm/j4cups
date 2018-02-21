@@ -78,6 +78,18 @@ public final class IppResponseTest extends AbstractIppTest {
     }
 
     /**
+     * The Printer returns to the Client the "attributes-charset" and 
+     * "attributes-natural-language" as operation attributes. This is described in
+     * <a href="https://tools.ietf.org/html/rfc8011#section-4.2.6.1">Section 4.2.6.1.</a>
+     * of RFC-8011.
+     */
+    @Test
+    void testGetJobsAttributes() {
+        IppResponse responseGetPrinterAttributes = new IppResponse(REQUEST_GET_JOBS);
+        checkOperationAttributesOf(responseGetPrinterAttributes);
+    }
+
+    /**
      * The Printer MUST return to the Client the "attributes-charset" and 
      * "attributes-natural-language" as operation attributes. This is described in
      * <a href="https://tools.ietf.org/html/rfc8011#section-4.2.5.2">Section 4.2.5.2.</a>

@@ -71,13 +71,10 @@ public class IppResponse extends AbstractIpp {
     
     private static List<AttributeGroup> fillAttributesGroupsFor(IppRequest request) {
         List<AttributeGroup> groups = new ArrayList<>();
+        groups.add(createNaturalLanguageAndCharacterSetAttributes());
         switch (request.getOperation()) {
             case PRINT_JOB:
-                groups.add(createNaturalLanguageAndCharacterSetAttributes());
                 groups.add(createPrintJobJobAttributes(request));
-                break;
-            case GET_PRINTER_ATTRIBUTES:
-                groups.add(createNaturalLanguageAndCharacterSetAttributes());
                 break;
         }
         return groups;

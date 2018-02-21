@@ -44,6 +44,7 @@ public abstract class AbstractIppTest {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractIppTest.class);
 
     public final static IppRequest REQUEST_PRINT_JOB = readRequest("Print-Job.bin");
+    public final static IppRequest REQUEST_GET_JOBS = readRequest("Get-Jobs.bin");
     public final static IppRequest REQUEST_GET_PRINTER_ATTRIBUTES = readRequest("Get-Printer-Attributes.bin");
 
     private AbstractIpp ippPackage;
