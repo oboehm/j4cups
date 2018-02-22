@@ -52,6 +52,10 @@ The CI build is started automatically after a commit and push to GitHub.
 |Mar-2018
 |IPP response to Get-Jobs Get-Printer-Attributes request implemented
 
+|0.2.1
+|22-Feb-2018
+|IPP response are pre-filled with attributes from IPP request
+
 |0.2.0
 |18-Feb-2018
 |IPP response to Print-Job request implemented
