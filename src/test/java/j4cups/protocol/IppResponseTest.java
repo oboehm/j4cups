@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.DatatypeConverter;
 import java.util.List;
-import java.util.Locale;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -98,12 +97,21 @@ public final class IppResponseTest extends AbstractIppTest {
     }
 
     /**
+     * The attributes like 'requesting-user-name' should be filled in the
+     * prepared response.
+     */
+    @Test
+    void testPreFilledAttributes() {
+        checkOperationAttributes(RESPONSE_PRINT_JOB, "requesting-user-name");
+    }
+
+    /**
      * There are no more attributes defined as MUST in RFC-8011.
      */
     @Test
-    void testGetJobsOperationAttributes() {
+    void testGetIllegalAttributes() {
         assertThrows(IllegalArgumentException.class, () -> {
-            checkOperationAttributes(RESPONSE_GET_JOBS, "requesting-user-name");
+            checkOperationAttributes(RESPONSE_GET_JOBS, "no-name");
         });
     }
 
@@ -131,8 +139,14 @@ public final class IppResponseTest extends AbstractIppTest {
         List<Attribute> opAttributes = response.getAttributeGroup(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG).getAttributes();
         assertThat(opAttributes, not(empty()));
         checkAttribute(response,"attributes-charset", "utf-8");
-        checkAttribute(response, "attributes-natural-language",
-                Locale.getDefault().getLanguage().toLowerCase());
+        checkAttribute(response, "attributes-natural-language");
+    }
+
+    private void checkAttribute(IppResponse response, String name) {
+        Attribute attribute = response.getAttribute(name);
+        String value = attribute.getStringValue();
+        assertThat(value, not(isEmptyString()));
+        LOG.info("Attribute {} checked.", attribute);
     }
 
     private static void checkAttribute(IppResponse response, String name, String expected) {

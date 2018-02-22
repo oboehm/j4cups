@@ -53,6 +53,15 @@ public class AttributeGroup implements Binary {
     private final List<Attribute> attributes;
 
     /**
+     * This is the copy construtor.
+     * 
+     * @param other AttributeGroup which is copied
+     */
+    public AttributeGroup(AttributeGroup other) {
+        this(ByteBuffer.wrap(other.toByteArray()));
+    }
+
+    /**
      * Instantiates a new empty attribute group from the given bytes.
      *
      * @param type e.g. {@link DelimiterTags#OPERATIONS_ATTRIBUTES_TAG}
