@@ -60,6 +60,15 @@ public class IppResponse extends AbstractIpp {
     private static final Logger LOG = LoggerFactory.getLogger(IppResponse.class);
 
     /**
+     * Instantiates a new IPP response from the given bytes.
+     *
+     * @param bytes the bytes of the IPP request
+     */
+    public IppResponse(byte[] bytes) {
+        super(bytes);
+    }
+
+    /**
      * The IppResponse is the response to a IppRequest. So you need the id
      * of the IppRequest to create a response.
      * 
