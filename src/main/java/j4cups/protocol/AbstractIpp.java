@@ -73,7 +73,7 @@ public abstract class AbstractIpp {
     protected static final Version DEFAULT_VERSION = new Version((byte) 2, (byte) 0);
 
     private final Version version;
-    private final short opCode;
+    private short opCode;
     private final List<AttributeGroup> attributeGroups;
     private final int requestId;
     private byte[] data;
@@ -194,6 +194,15 @@ public abstract class AbstractIpp {
      */
     public Version getVersion() {
         return version;
+    }
+
+    /**
+     * Sets the 2nd part (byte 2-3) with the new operation-id or status-code.
+     * 
+     * @param opCode e.g.0x0000 for status-code 'successful_ok'
+     */
+    public void setOpCode(short opCode) {
+        this.opCode = opCode;
     }
 
     /**

@@ -113,12 +113,21 @@ public class IppResponse extends AbstractIpp {
     }
 
     /**
+     * Set the 2nd part (byte 2-3) with the new status-code.
+     * 
+     * @param code the new status code
+     */
+    public void setStatusCode(StatusCode code) {
+        setOpCode(code.getCode());
+    }
+
+    /**
      * Returns the 2nd part (byte 2-3) with the status-code.
      *
      * @return e.g. {@link StatusCode#SUCCESSFUL_OK}
      */
     public StatusCode getStatusCode() {
-        return StatusCode.of(super.getOpCode());
+        return StatusCode.of(getOpCode());
     }
     
     /**

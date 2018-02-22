@@ -145,4 +145,14 @@ public final class IppResponseTest extends AbstractIppTest {
         assertEquals(expected, attribute.getIntValue());
     }
 
+    /**
+     * Testmethod for {@link IppResponse#setStatusCode(StatusCode)}.
+     */
+    @Test
+    public void setStatusCode() {
+        IppResponse response = new IppResponse(REQUEST_GET_JOBS);
+        response.setStatusCode(StatusCode.CLIENT_ERROR_BAD_REQUEST);
+        assertEquals(StatusCode.CLIENT_ERROR_BAD_REQUEST, response.getStatusCode());
+    }
+
 }
