@@ -27,10 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * The IppResponse represents an IPP response as is defined in RFC-2910.
@@ -83,7 +81,6 @@ public class IppResponse extends AbstractIpp {
         for (AttributeGroup g : request.getAttributeGroups()) {
             groups.add(new AttributeGroup(g));
         }
-        groups.add(createNaturalLanguageAndCharacterSetAttributes());
         switch (request.getOperation()) {
             case PRINT_JOB:
                 groups.add(createPrintJobJobAttributes(request));
@@ -93,14 +90,6 @@ public class IppResponse extends AbstractIpp {
                 break;
         }
         return groups;
-    }
-
-    private static AttributeGroup createNaturalLanguageAndCharacterSetAttributes() {
-        AttributeGroup group = new AttributeGroup(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG);
-        group.addAttribute(Attribute.of("attributes-charset", StandardCharsets.UTF_8));
-        group.addAttribute(Attribute.of("attributes-natural-language", Locale.getDefault()));
-        LOG.debug("Language and charset attributes added to {}.", group);
-        return group;
     }
 
     private static AttributeGroup createPrintJobJobAttributes(IppRequest request) {
