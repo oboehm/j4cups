@@ -76,6 +76,9 @@ public class IppResponse extends AbstractIpp {
             case PRINT_JOB:
                 groups.add(createPrintJobJobAttributes(request));
                 break;
+            default:
+                LOG.debug("No additional attributes added for {}.", request);
+                break;
         }
         return groups;
     }
@@ -84,6 +87,7 @@ public class IppResponse extends AbstractIpp {
         AttributeGroup group = new AttributeGroup(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG);
         group.addAttribute(Attribute.of("attributes-charset", StandardCharsets.UTF_8));
         group.addAttribute(Attribute.of("attributes-natural-language", Locale.getDefault()));
+        LOG.debug("Language and charset attributes added to {}.", group);
         return group;
     }
 
@@ -94,6 +98,7 @@ public class IppResponse extends AbstractIpp {
         group.addAttribute(Attribute.of("job-id", jobId));
         group.addAttribute(Attribute.of("job-uri", jobUri));
         group.addAttribute(Attribute.of(ValueTags.ENUM, "job-state", JobState.COMPLETED.getValue()));
+        LOG.debug("Print-job attributes added to {} as answer to {}.", group, request);
         return group;
     }
     

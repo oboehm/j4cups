@@ -140,7 +140,7 @@ public abstract class AbstractIpp {
         for (DelimiterTags tag : requiredTags) {
             AttributeGroup group = new AttributeGroup(tag);
             values.add(group);
-            LOG.debug("Empty {} added.", group);
+            LOG.trace("Empty {} added.", group);
         }
     }
 
