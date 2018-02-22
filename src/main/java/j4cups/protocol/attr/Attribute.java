@@ -149,7 +149,7 @@ public final class Attribute implements Binary {
     public static Attribute of(ValueTags tag, String name, int value) {
         byte[] bytes = new byte[4];
         ByteBuffer.wrap(bytes).putInt(value);
-        return of(ValueTags.INTEGER, name, bytes);
+        return of(tag, name, bytes);
     }
 
     /**
@@ -161,7 +161,7 @@ public final class Attribute implements Binary {
      * @return the attribute
      */
     public static Attribute of(ValueTags tag, String name, String value) {
-        return of(ValueTags.CHARSET, name, value.getBytes(StandardCharsets.UTF_8));
+        return of(tag, name, value.getBytes(StandardCharsets.UTF_8));
     }
 
     /**

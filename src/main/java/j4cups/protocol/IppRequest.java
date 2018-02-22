@@ -17,9 +17,6 @@
  */
 package j4cups.protocol;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.nio.ByteBuffer;
 
 /**
@@ -44,8 +41,6 @@ import java.nio.ByteBuffer;
  * @since 0.0.1 (09.02.2018)
  */
 public class IppRequest extends AbstractIpp {
-
-    private static final Logger LOG = LoggerFactory.getLogger(IppRequest.class);
 
     /**
      * Instantiates a new IPP request from the given bytes.
