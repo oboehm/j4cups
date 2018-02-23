@@ -135,8 +135,210 @@ public enum StatusCode {
      * Client SHOULD NOT repeat the request.
      */
     CLIENT_ERROR_NOT_POSSIBLE (0X0404),
+    
+    /**
+     * The Client did not produce a request within the time that the IPP
+     * object was prepared to wait.  For example, a Client issued a
+     * Create-Job operation and then, after a long period of time, issued a
+     * Send-Document operation; this error status-code was returned in
+     * response to the Send-Document request (see Section 4.3.1).  The IPP
+     * object might have been forced to clean up resources that had been
+     * held for the waiting additional Documents.  The IPP object was forced
+     * to close the Job, since the Client took too long.  The Client
+     * SHOULD NOT repeat the request without modifications.
+     */
+    CLIENT_ERROR_TIMEOUT (0x0405),
 
-    // TODO: define code B.1.4.6 and more...
+    /**
+     * The IPP object has not found anything matching the request URI.  No
+     * indication is given of whether the condition is temporary or
+     * permanent.  For example, a Client with an old reference to a Job
+     * (a URI) tries to cancel the Job; however, in the meantime the Job
+     * might have been completed and all record of it at the Printer has
+     * been deleted.  This status-code, 'client-error-not-found', is
+     * returned indicating that the referenced Job cannot be found.  This
+     * error status-code is also used when a Client supplies a URI as a
+     * reference to the Document data in either a Print-URI or Send-URI
+     * operation but the Document cannot be found.
+     * <p>
+     * In practice, an IPP application should avoid a "not found" situation
+     * by first querying and presenting a list of valid Printer URIs and Job
+     * URIs to the End User.
+     * </p>
+     */
+    CLIENT_ERROR_NOT_FOUND (0x0406),
+
+    /**
+     * The requested object is no longer available, and no forwarding
+     * address is known.  This condition should be considered permanent.
+     * Clients with link-editing capabilities should delete references to
+     * the request URI after user approval.  If the IPP object does not know
+     * or has no facility to determine whether or not the condition is
+     * permanent, the status-code 'client-error-not-found' should be used
+     * instead.
+     * <p>
+     * This response is primarily intended to assist the task of maintenance
+     * by notifying the recipient that the resource is intentionally
+     * unavailable and that the IPP object Administrator desires that remote
+     * links to that resource be removed.  It is not necessary to mark all
+     * permanently unavailable resources as "gone" or to keep the mark for
+     * any length of time -- that is left to the discretion of the IPP
+     * object Administrator and/or Printer implementation.
+     * </p>
+     */
+    CLIENT_ERRROR_GONE (0x0407),
+
+    /**
+     * The IPP object is refusing to process a request because the request
+     * entity is larger than the IPP object is willing or able to process.
+     * An IPP Printer returns this status-code when it limits the size of
+     * Print Jobs and it receives a Print Job that exceeds that limit or
+     * when the attributes are so many that their encoding causes the
+     * request entity to exceed IPP object capacity.
+     */
+    CLIENT_ERROR_REQUEST_ENTITY_TOO_LARGE (0x0408),
+
+    /**
+     * The IPP object is refusing to service the request because one or more
+     * of the Client-supplied attributes have a variable-length value that
+     * is longer than the maximum length specified for that attribute.  The
+     * IPP object might not have sufficient resources (memory, buffers,
+     * etc.) to process (even temporarily), interpret, and/or ignore a value
+     * larger than the maximum length.  Another use of this error code is
+     * when the IPP object supports the processing of a large value that is
+     * less than the maximum length, but during the processing of the
+     * request as a whole, the object can pass the value onto some other
+     * system component that is not able to accept the large value.  For
+     * more details, see the Implementor's Guides [RFC3196] [PWG5100.19].
+     * <p>
+     * Note: For attribute values that are URIs, this rare condition is only
+     * likely to occur when a Client has improperly submitted a request with
+     * long query information (e.g., an IPP application allows an End User
+     * to enter an invalid URI), when the Client has descended into a URI
+     * "black hole" of redirection (e.g., a redirected URI prefix that
+     * points to a suffix of itself), or when the IPP object is under attack
+     * by a Client attempting to exploit security holes present in some IPP
+     * objects using fixed-length buffers for reading or manipulating the
+     * request URI.
+     * </p>
+     */
+    CLIENT_ERROR_REQUEST_VALUE_TOO_LONG (0x0409),
+
+    /**
+     * The IPP object is refusing to service the request because the
+     * Document data is in a format, as specified in the "document-format"
+     * operation attribute, that is not supported by the Printer.  This
+     * error is returned independent of the Client-supplied
+     * "ipp-attribute-fidelity" attribute.  The Printer MUST return this
+     * status-code, even if there are other Job Template attributes that are
+     * not supported as well, since this error is a bigger problem than with
+     * Job Template attributes.  See Sections 4.1.6.1, 4.1.7, and 4.2.1.1.
+     */
+    CLIENT_ERROR_DOCUMENT_FORMAT_NOT_SUPPORTED (0x040a),
+        
+    /**
+     * 
+     * In a Job Creation request, if the Printer does not support one or
+     * more attributes, attribute syntaxes, or attribute values supplied in
+     * the request and the Client supplied the "ipp-attribute-fidelity"
+     * operation attribute with the 'true' value, the Printer MUST return
+     * this status-code.  The Printer MUST also return in the Unsupported
+     * Attributes group all the attributes and/or values supplied by the
+     * Client that are not supported.  See Section 4.1.7.  Examples would be
+     * if the request indicates 'iso-a4' media but that media type is not
+     * supported by the Printer, or if the Client supplies a Job Template
+     * attribute and the attribute itself is not even supported by the
+     * Printer.  If the "ipp-attribute-fidelity" attribute is 'false', the
+     * Printer MUST ignore or substitute values for unsupported Job Template
+     * attributes and values rather than reject the request and return this
+     * status-code.
+     * <p>
+     * For any operation where a Client requests attributes (such as a
+     * Get-Jobs, Get-Printer-Attributes, or Get-Job-Attributes operation),
+     * if the IPP object does not support one or more of the requested
+     * attributes, the IPP object simply ignores the unsupported requested
+     * attributes and processes the request as if they had not been
+     * supplied, rather than returning this status-code.  In this case,
+     * the IPP object MUST return the
+     * 'successful-ok-ignored-or-substituted-attributes' status-code and
+     * SHOULD return the unsupported attributes as values of the
+     * "requested-attributes" operation attribute in the Unsupported
+     * Attributes group (see Appendix B.1.2.2).
+     * </p>
+     */
+    CLIENT_ERROR_ATTRIBUTES_OR_VALUES_NOT_SUPPORTED (0x040b),
+        
+    /**
+     * The scheme of the Client-supplied URI in a Print-URI or a Send-URI
+     * operation is not supported.  See Sections 4.1.6.1 and 4.1.7.
+     */
+    CLIENT_ERROR_URI_SCHEME_NOT_SUPPORTED (0x040c),
+    
+    /**
+     * 
+     * For any operation, if the IPP Printer does not support the charset
+     * supplied by the Client in the "attributes-charset" operation
+     * attribute, the Printer MUST reject the operation and return this
+     * status-code, and any 'text' or 'name' attributes using the 'utf-8'
+     * charset (Section 4.1.4.1).  See Sections 4.1.6.1 and 4.1.7.
+     */
+    CLIENT_ERROR_CHARSET_NOT_SUPPORTED (0x040d),
+    /**
+     * The request is rejected because some attribute values conflicted with
+     * the values of other attributes that this document does not permit to
+     * be substituted or ignored.  The Printer MUST also return in the
+     * Unsupported Attributes group the conflicting attributes supplied by
+     * the Client.  See Sections 4.1.7 and 4.2.1.2.
+     */
+    CLIENT_ERROR_CONFLICTING_ATTRIBUTES (0x040e),
+    
+    /**
+     * The IPP object is refusing to service the request because the
+     * Document data, as specified in the "compression" operation attribute,
+     * is compressed in a way that is not supported by the Printer.  This
+     * error is returned independent of the Client-supplied
+     * "ipp-attribute-fidelity" attribute.  The Printer MUST return this
+     * status-code, even if there are other Job Template attributes that are
+     * not supported as well, since this error is a bigger problem than with
+     * Job Template attributes.  See Sections 4.1.6.1, 4.1.7, and 4.2.1.1.
+     */
+    CLIENT_ERROR_COMPRESSION_NOT_SUPPORTED (0x040f),
+
+    /**
+     * The IPP object is refusing to service the request because the
+     * Document data cannot be decompressed when using the algorithm
+     * specified by the "compression" operation attribute.  This error is
+     * returned independent of the Client-supplied "ipp-attribute-fidelity"
+     * attribute.  The Printer MUST return this status-code, even if there
+     * are Job Template attributes that are not supported as well, since
+     * this error is a bigger problem than with Job Template attributes.
+     * See Sections 4.1.7 and 4.2.1.1.
+     */
+    CLIENT_ERROR_COMPRESSION_ERROR (0x0410),
+   
+    /**
+     * The IPP object is refusing to service the request because the Printer
+     * encountered an error in the Document data while interpreting it.
+     * This error is returned independent of the Client-supplied
+     * "ipp-attribute-fidelity" attribute.  The Printer MUST return this
+     * status-code, even if there are Job Template attributes that are not
+     * supported as well, since this error is a bigger problem than with Job
+     * Template attributes.  See Sections 4.1.7 and 4.2.1.1.
+     */
+    CLIENT_ERROR_DOCUMENT_FORMAT_ERROR (0x0411),
+    
+    /**
+     * 
+     * The IPP object is refusing to service the Print-URI or Send-URI
+     * request because the Printer encountered an access error while
+     * attempting to validate the accessibility of, or access to, the
+     * Document data specified in the "document-uri" operation attribute.
+     * The Printer MAY also return a specific Document access error code
+     * using the "document-access-error" operation attribute (see
+     */
+    CLIENT_ERROR_DOCUMENT_ACCESS_ERROR (0x0412),
+    
+    // TODO: define code B.1.5 and more...
 
     /**
      * The IPP object does not support multiple Documents per Job, and a
