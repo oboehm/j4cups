@@ -103,6 +103,11 @@
             <artifactId>commons-text</artifactId>
             <version>RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>RELEASE</version>
+        </dependency>
         
         <!-- logging -->
         <dependency>

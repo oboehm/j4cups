@@ -43,6 +43,14 @@ import java.nio.ByteBuffer;
 public class IppRequest extends AbstractIpp {
 
     /**
+     * This constructor is needed for the {@link java.io.Externalizable} 
+     * interface.
+     */
+    public IppRequest() {
+        super();
+    }
+
+    /**
      * Instantiates a new IPP request from the given bytes.
      *
      * @param bytes the bytes of the IPP request

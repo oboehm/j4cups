@@ -21,8 +21,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import patterntesting.runtime.junit.SerializableTester;
 
 import java.io.IOException;
+import java.io.NotSerializableException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -97,6 +99,11 @@ public abstract class AbstractIppTest {
         byte[] world = "world".getBytes(StandardCharsets.UTF_8);
         ippPackage.setAttribute("hello", world);
         assertEquals("world", ippPackage.getAttribute("hello").getStringValue());
+    }
+    
+    @Test
+    public void testSerializable() throws NotSerializableException {
+        SerializableTester.assertSerialization(ippPackage);
     }
 
 }

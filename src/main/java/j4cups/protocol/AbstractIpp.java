@@ -27,10 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.DatatypeConverter;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -65,18 +62,25 @@ import java.util.Objects;
  * @author oboehm
  * @since 0.2 (16.02.2018)
  */
-public abstract class AbstractIpp {
+public abstract class AbstractIpp implements Externalizable {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractIpp.class);
     
     /** The actual supported version is 2. **/
     protected static final Version DEFAULT_VERSION = new Version((byte) 2, (byte) 0);
 
-    private final Version version;
+    private Version version;
     private short opCode;
     private final List<AttributeGroup> attributeGroups;
-    private final int requestId;
+    private int requestId;
     private byte[] data;
+
+    /**
+     * This constructor is needed for the {@link Externalizable} interface.
+     */
+    protected AbstractIpp() {
+        this(new Version((byte) 2, (byte) 0), (short) 0, 0, new ArrayList<>(), new byte[0]);
+    }
 
     /**
      * Instantiates a new IPP request or responsel from the given bytes.
@@ -424,6 +428,48 @@ public abstract class AbstractIpp {
             dos.writeByte(DelimiterTags.END_OF_ATTRIBUTES_TAG.getValue());
             dos.write(getData());
             dos.flush();
+        }
+    }
+
+    /**
+     * The object implements the writeExternal method to save its contents
+     * by storing it as byte array.
+     *
+     * @param out the stream to write the object to
+     * @throws IOException Includes any I/O exceptions that may occur
+     */
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.write(toByteArray());
+    }
+
+    /**
+     * The object implements the readExternal method to restore its
+     * contents by reading the byte array and use this array to build up
+     * an IPP request or response.
+     *
+     * @param in the stream to read data from in order to restore the object
+     * @throws IOException            if I/O errors occur
+     * @throws ClassNotFoundException If the class for an object being
+     *                                restored cannot be found.
+     */
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        this.version = new Version(in.readByte(), in.readByte());
+        this.opCode = in.readShort();
+        this.requestId = in.readInt();
+        try (ByteArrayOutputStream ostream = new ByteArrayOutputStream()) {
+            while (true) {
+                int x = in.read();
+                if (x < 0) {
+                    break;
+                }
+                ostream.write(x);
+            }
+            ostream.flush();
+            ByteBuffer buffer = ByteBuffer.wrap(ostream.toByteArray());
+            this.attributeGroups.addAll(readAttributeGroups(buffer));
+            this.data = readData(buffer);
         }
     }
 

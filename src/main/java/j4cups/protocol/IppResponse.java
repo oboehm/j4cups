@@ -58,6 +58,14 @@ public class IppResponse extends AbstractIpp {
     private static final Logger LOG = LoggerFactory.getLogger(IppResponse.class);
 
     /**
+     * This constructor is needed for the {@link java.io.Externalizable}
+     * interface.
+     */
+    public IppResponse() {
+        super();
+    }
+
+    /**
      * Instantiates a new IPP response from the given bytes.
      *
      * @param bytes the bytes of the IPP request
