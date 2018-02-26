@@ -26,13 +26,26 @@
         <url>https://github.com/oboehm/j4cups</url>
     </scm>
 
+    
+    
     <properties>
+        
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+
+        <!-- Sonar 4.x Violations Filter -->
+        <!-- ignore violations -->
+        <sonar.issue.ignore.multicriteria>S00120</sonar.issue.ignore.multicriteria>
+
+        <!-- Package names should comply with a naming convention -->
+        <sonar.issue.ignore.multicriteria.S00120.ruleKey>squid:S00120</sonar.issue.ignore.multicriteria.S00120.ruleKey>
+        <sonar.issue.ignore.multicriteria.S00120.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.S00120.resourceKey>
+
     </properties>
 
+    
     
     <build>
 
