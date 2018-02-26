@@ -69,9 +69,9 @@ public abstract class AbstractIpp implements Externalizable {
     /** The actual supported version is 2. **/
     protected static final Version DEFAULT_VERSION = new Version((byte) 2, (byte) 0);
 
-    private Version version;
+    private transient Version version;
     private short opCode;
-    private final List<AttributeGroup> attributeGroups;
+    private transient List<AttributeGroup> attributeGroups;
     private int requestId;
     private byte[] data;
 
