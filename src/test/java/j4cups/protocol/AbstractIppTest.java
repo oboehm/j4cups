@@ -21,6 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import patterntesting.runtime.junit.ObjectTester;
 import patterntesting.runtime.junit.SerializableTester;
 
 import java.io.IOException;
@@ -104,6 +105,13 @@ public abstract class AbstractIppTest {
     @Test
     public void testSerializable() throws NotSerializableException {
         SerializableTester.assertSerialization(ippPackage);
+    }
+    
+    @Test
+    public void testEquals() {
+        AbstractIpp one = getIppPackage();
+        AbstractIpp anotherOne = getIppPackage();
+        ObjectTester.assertEquals(one, anotherOne);
     }
 
 }

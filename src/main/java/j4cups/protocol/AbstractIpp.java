@@ -474,6 +474,28 @@ public abstract class AbstractIpp implements Externalizable {
     }
 
     /**
+     * The binary representation of this class is used to compare to request
+     * or respone objects. I.e. for two objects the attributes must be defined
+     * not only with same values but also in the same order to be equal.
+     * 
+     * @param obj the other response or request
+     * @return true if they are equals
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof AbstractIpp)) {
+            return false;
+        }
+        AbstractIpp other = (AbstractIpp) obj;
+        return Arrays.equals(this.toByteArray(), other.toByteArray());
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(getData()) + this.requestId + this.opCode;
+    }
+
+    /**
      * Container for the version information.
      */
     public static class Version {
