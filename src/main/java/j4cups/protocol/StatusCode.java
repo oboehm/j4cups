@@ -338,7 +338,124 @@ public enum StatusCode {
      */
     CLIENT_ERROR_DOCUMENT_ACCESS_ERROR (0x0412),
     
-    // TODO: define code B.1.5 and more...
+    // B.1.5.  Server Error Status-Code Values
+
+    /**
+     * The IPP object encountered an unexpected condition that prevented it
+     * from fulfilling the request.  This error status-code differs from
+     * 'server-error-temporary-error' in that it implies a more permanent
+     * type of internal error.  It also differs from
+     * 'server-error-device-error' in that it implies an unexpected
+     * condition (unlike a paper-jam or out-of-toner problem, which is
+     * undesirable but expected).  This error status-code indicates that
+     * intervention by a knowledgeable human is probably required.
+     */
+    SERVER_ERROR_INTERNAL_ERROR (0x0500),
+    
+    /**
+     * The IPP object does not support the functionality required to fulfill
+     * the request.  This is the appropriate response when the IPP object
+     * does not recognize an operation or is not capable of supporting it.
+     * See Sections 4.1.6.1 and 4.1.7.
+     */
+    SERVER_ERROR_OPERATION_NOT_SUPPORTED (0x0501),
+
+    /**
+     * The IPP object is currently unable to handle the request due to
+     * temporary overloading or due to maintenance of the IPP object.  The
+     * implication is that this is a temporary condition that will be
+     * alleviated after some delay.  If known, the length of the delay can
+     * be indicated in the message.  If no delay is given, the IPP
+     * application should handle the response as it would for a
+     * 'server-error-temporary-error' response.  If the condition is more
+     * permanent, the 'client-error-gone' or 'client-error-not-found' error
+     * status-code could be used.
+     */
+    SERVER_ERROR_SERVICE_UNAVAILABLE (0x0502),
+
+    /**
+     * The IPP object does not support or refuses to support the IPP version
+     * that was supplied as the value of the "version-number" operation
+     * parameter in the request.  The IPP object is indicating that it is
+     * unable or unwilling to complete the request using the same major and
+     * minor version number as supplied in the request, other than with this
+     * error message.  The error response SHOULD contain a "status-message"
+     * attribute (see Section 4.1.6.2) describing why that version is not
+     * supported and what other versions are supported by that IPP object.
+     * See Sections 4.1.6.1, 4.1.7, and 4.1.8.
+     * <p>
+     * The error response MUST identify in the "version-number" operation
+     * parameter the closest version number that the IPP object does
+     * support.  For example, if a Client supplies version '1.0' and an
+     * IPP/1.1 object supports version '1.0', then it responds with
+     * version '1.0' in all responses to such a request.  If the IPP/1.1
+     * object does not support version '1.0', then it should accept the
+     * request and respond with version '1.1' or can reject the request and
+     * respond with this error code and version '1.1'.  If a Client supplies
+     * version '1.2', the IPP/1.1 object should accept the request and
+     * return version '1.1' or can reject the request and respond with this
+     * error code and version '1.1'.  See Sections 4.1.8 and 5.3.14.
+     * </p>
+     */
+    SERVER_ERROR_VERSION_NOT_SUPPORTED (0x0503),
+
+    /**
+     * A Printer error, such as a paper jam, occurs while the IPP object
+     * processes a Print or send operation.  The response contains the true
+     * Job status (the values of the "job-state" and "job-state-reasons"
+     * attributes).  Additional information can be returned in the OPTIONAL
+     * "job-state-message" attribute value or in the OPTIONAL status message
+     * that describes the error in more detail.  This error status-code is
+     * only returned in situations where the Printer is unable to accept the
+     * Job Creation request because of such a device error.  For example, if
+     * the Printer is unable to spool and can only accept one Job at a time,
+     * the reason it might reject a Job Creation request is that the Printer
+     * currently has a paper jam.  In many cases, however, where the Printer
+     * can accept the request even though the Printer has some error
+     * condition, the 'successful-ok' status-code will be returned.  In such
+     * a case, the Client would look at the returned Job object attributes
+     * or later query the Printer to determine its state and state reasons.
+     */
+    SERVER_ERROR_DEVICE_ERROR (0x0504),
+
+
+    /**
+     * A temporary error such as a buffer-full write error, a memory
+     * overflow (i.e., the Document data exceeds the memory of the Printer),
+     * or a disk-full condition, occurs while the IPP Printer processes an
+     * operation.  The Client MAY try the unmodified request again at some
+     * later point in time with an expectation that the temporary internal
+     * error condition has been cleared.  Alternatively, as an
+     * implementation option, a Printer MAY delay the response until the
+     * temporary condition is cleared so that no error is returned.
+     */
+   SERVER_ERROR_TEMPORARY_ERROR (0x0505),
+
+    /**
+     * This is a temporary error indicating that the Printer is not
+     * currently accepting Jobs because the Administrator has set the value
+     * of the Printer's "printer-is-accepting-jobs" attribute to 'false' (by
+     * means outside the scope of this IPP/1.1 document).
+     */
+    SERVER_ERROR_NOT_ACCEPTING_JOBS (0x0506),
+
+    /**
+     * This is a temporary error indicating that the Printer is too busy
+     * processing Jobs and/or other requests.  The Client SHOULD try the
+     * unmodified request again at some later point in time with an
+     * expectation that the temporary busy condition will have been cleared.
+     */
+    SERVER_ERROR_BUSY (0x0507),
+
+    /**
+     * This is an error indicating that the Job has been canceled by an
+     * Operator or the system while the Client was transmitting the data to
+     * the IPP Printer.  If a "job-id" attribute and a "job-uri" attribute
+     * had been created, then they are returned in the Print-Job,
+     * Send-Document, or Send-URI response as usual; otherwise, no "job-id"
+     * and "job-uri" attributes are returned in the response.
+     */
+    SERVER_ERROR_JOB_CANCELED (0x0508),
 
     /**
      * The IPP object does not support multiple Documents per Job, and a
