@@ -143,9 +143,19 @@ public enum ValueTags {
     }
 
     /**
+     * One kind of value tags are integer values, which are the
+     * values from 0x20 - 0x2f.
+     *
+     * @return true or false
+     */
+    public boolean isIntegerValue() {
+        return 0x20 <= value && value <= 0x2f;
+    }
+
+    /**
      * One kind of value tags are character-string values, which are the
      * values from 0x40 - 0x4f.
-     * 
+     *
      * @return true or false
      */
     public boolean isCharacterStringValue() {

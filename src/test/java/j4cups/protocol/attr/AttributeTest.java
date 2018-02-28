@@ -26,9 +26,7 @@ import patterntesting.runtime.junit.ArrayTester;
 import java.nio.ByteBuffer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -58,10 +56,25 @@ public final class AttributeTest {
     void getStringValue() {
         assertEquals("utf-8", ATTRIBUTE.getStringValue());
     }
-    
+
     @Test
     void testToString() {
+        LOG.info("ATTRIBUTE = {}", ATTRIBUTE);
         assertThat(ATTRIBUTE.toString(), containsString(ATTRIBUTE.getName()));
+    }
+
+    @Test
+    void testToLongString() {
+        String s = ATTRIBUTE.toLongString();
+        LOG.info("ATTRIBUTE = {}", s);
+        assertThat(ATTRIBUTE.toString(), not(containsString("...")));
+    }
+
+    @Test
+    public void testToStringNumberAttribute() {
+        Attribute numberAttribute = Attribute.of(ValueTags.INTEGER, "number", 4711);
+        LOG.info("numberAttribute = {}", numberAttribute);
+        assertThat(numberAttribute.toString(), containsString("4711"));
     }
     
     @Test

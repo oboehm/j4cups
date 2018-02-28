@@ -263,11 +263,7 @@ public final class Attribute implements Binary {
     public String toString() {
         StringBuilder buffer = new StringBuilder(getName());
         buffer.append("=");
-        if (getValueTag().isCharacterStringValue()) {
-            buffer.append(getStringValue());
-        } else {
-            buffer.append(DatatypeConverter.printHexBinary(getValue()));
-        }
+        getValueAsString(buffer);
         if (!additionalValues.isEmpty()) {
             buffer.append(",...");
         }
@@ -283,11 +279,7 @@ public final class Attribute implements Binary {
     public String toLongString() {
         StringBuilder buffer = new StringBuilder(getName());
         buffer.append("=");
-        if (getValueTag().isCharacterStringValue()) {
-            buffer.append(getStringValue());
-        } else {
-            buffer.append(new BigInteger(getValue()).toString(16));
-        }
+        getValueAsString(buffer);
         for (AdditionalValue addValue : additionalValues) {
             buffer.append(',');
             if (getValueTag().isCharacterStringValue()) {
@@ -297,6 +289,17 @@ public final class Attribute implements Binary {
             }
         }
         return buffer.toString();
+    }
+
+    private void getValueAsString(StringBuilder buffer) {
+        ValueTags tag = getValueTag();
+        if (tag.isIntegerValue()) {
+            buffer.append(getIntValue());
+        } else if (tag.isCharacterStringValue()) {
+            buffer.append(getStringValue());
+        } else {
+            buffer.append(DatatypeConverter.printHexBinary(getValue()));
+        }
     }
 
     /**
