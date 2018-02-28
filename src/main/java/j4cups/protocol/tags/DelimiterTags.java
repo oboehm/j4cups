@@ -31,7 +31,7 @@ public enum DelimiterTags {
     RESERVED(0x00),
     
     /** operation-attributes-tag. */
-    OPERATIONS_ATTRIBUTES_TAG(0x01),
+    OPERATION_ATTRIBUTES_TAG(0x01),
     
     /** job-attributes-tag. */
     JOB_ATTRIBUTES_TAG(0x02),

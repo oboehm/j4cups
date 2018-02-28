@@ -135,7 +135,7 @@ public abstract class AbstractIpp implements Externalizable {
 
     private static void fillAttributeGroups(List<AttributeGroup> values) {
         List<DelimiterTags> requiredTags =
-                new ArrayList(Arrays.asList(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG, DelimiterTags.JOB_ATTRIBUTES_TAG,
+                new ArrayList(Arrays.asList(DelimiterTags.OPERATION_ATTRIBUTES_TAG, DelimiterTags.JOB_ATTRIBUTES_TAG,
                         DelimiterTags.PRINTER_ATTRIBUTES_TAG, DelimiterTags.UNSUPPORTED_ATTRIBUTES_TAG));
         for (AttributeGroup group : values) {
             DelimiterTags tag = group.getBeginTag();
@@ -224,7 +224,7 @@ public abstract class AbstractIpp implements Externalizable {
      * 
      * @return e.g. "Create-Job"
      */
-    abstract protected String getOpCodeAsString();
+    protected abstract String getOpCodeAsString();
 
     /**
      * Retunns the 3rd part (byte 4-7) of the request which
@@ -358,8 +358,14 @@ public abstract class AbstractIpp implements Externalizable {
      */
     @Override
     public String toString() {
-        String attrs = "|" + getRequestId() + "|...(" + getAttributes().size() + " attributes)...|";
-        return buildString(attrs);
+        StringBuilder buffer = new StringBuilder("|");
+        buffer.append(getRequestId());
+        for (Attribute attr : getAttributes()) {
+            buffer.append("|");
+            buffer.append(attr);
+        }
+        buffer.append("|");
+        return buildString(buffer.toString());
     }
 
     /**
@@ -372,7 +378,9 @@ public abstract class AbstractIpp implements Externalizable {
     public String toLongString() {
         StringBuilder attrs = new StringBuilder();
         for (AttributeGroup group : attributeGroups) {
-            attrs.append('|').append(group.toLongString());
+            if (!group.getAttributes().isEmpty()) {
+                attrs.append('|').append(group.toLongString());
+            }
         }
         return buildString(attrs.substring(1));
     }

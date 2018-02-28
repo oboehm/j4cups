@@ -64,7 +64,7 @@ public class AttributeGroup implements Binary {
     /**
      * Instantiates a new empty attribute group from the given bytes.
      *
-     * @param type e.g. {@link DelimiterTags#OPERATIONS_ATTRIBUTES_TAG}
+     * @param type e.g. {@link DelimiterTags#OPERATION_ATTRIBUTES_TAG}
      */
     public AttributeGroup(DelimiterTags type) {
         this.beginTag = type;
@@ -101,7 +101,7 @@ public class AttributeGroup implements Binary {
      * attribute group, e.g. Operations Attributes group versus a Job
      * Attributes group.
      * 
-     * @return e.g. {@link DelimiterTags#OPERATIONS_ATTRIBUTES_TAG}
+     * @return e.g. {@link DelimiterTags#OPERATION_ATTRIBUTES_TAG}
      */
     public DelimiterTags getBeginTag() {
         return beginTag;
@@ -160,7 +160,7 @@ public class AttributeGroup implements Binary {
      */
     public String toLongString() {
         StringBuilder buffer = new StringBuilder("|");
-        buffer.append(getBeginTag()).append('|');
+        buffer.append(String.format("%02x", getBeginTag().getValue())).append('|');
         for (Attribute attr : getAttributes()) {
             buffer.append(attr.toLongString()).append('|');
         }

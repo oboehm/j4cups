@@ -73,7 +73,7 @@ public final class AttributeGroupTest {
 
     @Test
     void getBeginTag() {
-        assertEquals(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG, attributeGroup.getBeginTag());
+        assertEquals(DelimiterTags.OPERATION_ATTRIBUTES_TAG, attributeGroup.getBeginTag());
     }
     
     @Test

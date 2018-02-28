@@ -116,7 +116,7 @@ public final class IppResponseTest extends AbstractIppTest {
     }
 
     private void checkOperationAttributes(IppResponse response, String... attributeNames) {
-        AttributeGroup group = response.getAttributeGroup(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG);
+        AttributeGroup group = response.getAttributeGroup(DelimiterTags.OPERATION_ATTRIBUTES_TAG);
         for (String name : attributeNames) {
             Attribute attr = group.getAttribute(name);
             LOG.info("found: {}", attr);
@@ -136,7 +136,7 @@ public final class IppResponseTest extends AbstractIppTest {
     }
 
     void checkOperationAttributesOf(IppResponse response) {
-        List<Attribute> opAttributes = response.getAttributeGroup(DelimiterTags.OPERATIONS_ATTRIBUTES_TAG).getAttributes();
+        List<Attribute> opAttributes = response.getAttributeGroup(DelimiterTags.OPERATION_ATTRIBUTES_TAG).getAttributes();
         assertThat(opAttributes, not(empty()));
         checkAttribute(response,"attributes-charset", "utf-8");
         checkAttribute(response, "attributes-natural-language");

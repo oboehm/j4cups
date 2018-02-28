@@ -107,7 +107,8 @@ public final class AttributeTest {
                         103, 101, 68, 0, 0, 0, 21, 112, 114, 105, 110, 116, 101, 114, 45, 115, 116, 97, 116, 101, 45, 114,
                         101, 97, 115, 111, 110, 115, 3};
         Attribute requestedAttributes = new Attribute(ByteBuffer.wrap(multiData));
-        LOG.info("requestedAttributes = {}", requestedAttributes.toLongString());
+        LOG.info("toString = {}", requestedAttributes);
+        LOG.info("toLongString = {}", requestedAttributes.toLongString());
         assertThat(requestedAttributes.isMultiValue(), is(true));
         assertThat(requestedAttributes.toLongString().length(), greaterThan(requestedAttributes.toString().length()));
     }
