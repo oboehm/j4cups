@@ -150,7 +150,11 @@ public class AttributeGroup implements Binary {
      */
     @Override
     public String toString() {
-        return "|" + getBeginTag() + "|..." + getAttributes().size() + " attributes)...|";
+        StringBuilder buffer = new StringBuilder("|");
+        for (Attribute attr : getAttributes()) {
+            buffer.append(attr.toString()).append('|');
+        }
+        return buffer.toString();
     }
 
     /**

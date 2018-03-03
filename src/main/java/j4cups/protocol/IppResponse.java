@@ -89,13 +89,8 @@ public class IppResponse extends AbstractIpp {
         for (AttributeGroup g : request.getAttributeGroups()) {
             groups.add(new AttributeGroup(g));
         }
-        switch (request.getOperation()) {
-            case PRINT_JOB:
-                groups.add(createPrintJobJobAttributes(request));
-                break;
-            default:
-                LOG.debug("No additional attributes added for {}.", request);
-                break;
+        if (request.getOperation() == IppOperations.PRINT_JOB) {
+            groups.add(createPrintJobJobAttributes(request));
         }
         return groups;
     }
