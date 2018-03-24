@@ -49,7 +49,7 @@ The CI build is started automatically after a commit and push to GitHub.
 |Version |Date |Description
 
 |0.3.0
-|Mar-2018
+|24-hiMar-2018
 |IPP response to Get-Jobs and Get-Printer-Attributes request implemented;
 request and response are now Serializable.
 
