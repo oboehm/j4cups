@@ -48,8 +48,12 @@ The CI build is started automatically after a commit and push to GitHub.
 |===
 |Version |Date |Description
 
+|0.5.0
+|May-2018
+|a server part will be provided
+
 |0.3.0
-|24-hiMar-2018
+|24-Mar-2018
 |IPP response to Get-Jobs and Get-Printer-Attributes request implemented;
 request and response are now Serializable.
 
