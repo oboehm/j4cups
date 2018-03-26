@@ -50,7 +50,8 @@ The CI build is started automatically after a commit and push to GitHub.
 
 |0.5.0
 |May-2018
-|a server part will be provided
+|op package with IPP operations added;
+maybe a server part will be provided
 
 |0.3.0
 |24-Mar-2018

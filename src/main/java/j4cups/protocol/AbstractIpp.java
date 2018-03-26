@@ -307,7 +307,7 @@ public abstract class AbstractIpp implements Externalizable {
 
     /**
      * Gets the attribute with the given name. If not attribute with the given
-     * name is found an {@link IllegalArgumentException} will be thrown.
+     * name is not found an {@link IllegalArgumentException} will be thrown.
      *
      * @param name name of the attribute
      * @return attribute with given name
@@ -319,6 +319,22 @@ public abstract class AbstractIpp implements Externalizable {
             }
         }
         throw new IllegalArgumentException("no attribute '" + name + "' found");
+    }
+
+    /**
+     * Checks the attribute with the given name.
+     *
+     * @param name name of the attribute
+     * @return true or false
+     * @since 0.5
+     */
+    public boolean hasAttribute(String name) {
+        for (Attribute attr : getAttributes()) {
+            if (name.equals(attr.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
