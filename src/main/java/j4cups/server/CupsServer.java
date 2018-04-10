@@ -50,6 +50,7 @@ public class CupsServer implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(CupsServer.class);
     private final int port;
+    private final HttpServer server;
 
     /**
      * Instantiates a CUPS server with the IPP standard port (631).
@@ -65,6 +66,7 @@ public class CupsServer implements Runnable {
      */
     public CupsServer(int port) {
         this.port = port;
+        this.server = createServer(getPort());
     }
 
     public static void main(String[] args) {
@@ -95,9 +97,18 @@ public class CupsServer implements Runnable {
      */
     public Thread start() {
         String name = "CupSrv-" + getPort();
-        Thread t = new Thread(this, name);
+        Thread t = new Thread(this, this.toString());
         t.start();
         return t;
+    }
+
+    /**
+     * This is the command to shut down the server.
+     */
+    public void shutdown() {
+        LOG.info("Shutting down {} on port {} ...", server, port);
+        server.shutdown(5, TimeUnit.SECONDS);
+        LOG.info("Shutting down {} on port {} was successful.", server, port);
     }
     
     /**
@@ -105,19 +116,8 @@ public class CupsServer implements Runnable {
      * end until you kill it.
      */
     public void run() {
-        SocketConfig socketConfig = SocketConfig.custom()
-                                                .setSoTimeout(15000)
-                                                .setTcpNoDelay(true)
-                                                .build();
-        final HttpServer server = ServerBootstrap.bootstrap()
-                                                 .setListenerPort(port)
-                                                 .setServerInfo("Test/1.1")
-                                                 .setSocketConfig(socketConfig)
-                                                 .setExceptionLogger(new StdErrorExceptionLogger())
-                                                 .registerHandler("*", new HttpFileHandler("."))
-                                                 .create();
         try {
-            LOG.info("Starting {}...", server);
+            LOG.info("Starting {} on port {}...", server, port);
             server.start();
             server.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
             Runtime.getRuntime().addShutdownHook(new Thread(() -> server.shutdown(5, TimeUnit.SECONDS)));
@@ -127,6 +127,20 @@ public class CupsServer implements Runnable {
             LOG.warn("{} was interrupted and will be shutdown:", server, ie);
             server.shutdown(5, TimeUnit.SECONDS);
         }
+    }
+
+    private static HttpServer createServer(int serverPort) {
+        SocketConfig socketConfig = SocketConfig.custom()
+                                                .setSoTimeout(15000)
+                                                .setTcpNoDelay(true)
+                                                .build();
+        return ServerBootstrap.bootstrap()
+                              .setListenerPort(serverPort)
+                              .setServerInfo("Test/1.1")
+                              .setSocketConfig(socketConfig)
+                              .setExceptionLogger(new StdErrorExceptionLogger())
+                              .registerHandler("*", new HttpFileHandler("."))
+                              .create();
     }
 
     static class StdErrorExceptionLogger implements ExceptionLogger {
@@ -199,7 +213,16 @@ public class CupsServer implements Runnable {
                 System.out.println(conn + ": serving file " + file.getPath());
             }
         }
+    }
 
+    /**
+     * For a useful toString implementation we put the port into it.
+     * 
+     * @return string representation with port value
+     */
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + ":" + this.getPort();
     }
 
 }

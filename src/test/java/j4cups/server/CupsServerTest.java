@@ -26,7 +26,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.Socket;
 
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link CupsServer}.
@@ -37,6 +38,9 @@ public class CupsServerTest {
     private static final CupsServer SERVER = new CupsServer(6310);
     private static Thread serverThread;
 
+    /**
+     * For the unit tests we start the server here.
+     */
     @BeforeAll
     public static void startServer() {
         serverThread = SERVER.start();
@@ -53,11 +57,31 @@ public class CupsServerTest {
         Socket socket = new Socket("localhost", SERVER.getPort());
         assertTrue("not connected to " + SERVER, socket.isConnected());
     }
-    
+
+    /**
+     * We want to see a useful toString implementation.
+     */
+    @Test
+    public void testToString() {
+        String s = SERVER.toString();
+        assertThat(s, containsString(Integer.toString(SERVER.getPort())));
+    }
+
+    /**
+     * At the end of the tests we shut down the server. And we test if it is
+     * really down.
+     */
     @AfterAll
     public static void shutdownServer() {
-        serverThread.interrupt();
+        SERVER.shutdown();
         LOG.info("{} is shut down.", SERVER);
+        try {
+            Socket socket = new Socket("localhost", SERVER.getPort());
+            assertFalse("yet connected to " + SERVER, socket.isConnected());
+        } catch(IOException expected)  {
+            LOG.info("{} is down (as expected).", SERVER);
+            LOG.debug("Details:", expected);
+        }
     }
 
 }
