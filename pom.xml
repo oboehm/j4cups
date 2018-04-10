@@ -121,6 +121,11 @@
             <artifactId>commons-io</artifactId>
             <version>RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>RELEASE</version>
+        </dependency>
         
         <!-- logging -->
         <dependency>
