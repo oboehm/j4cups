@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
-import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -79,7 +78,7 @@ public class CupsServer implements Runnable {
         if (args.length >= 2) {
             port = Integer.parseInt(args[1]);
         }
-        new CupsServer(port).run();
+        new CupsServer(port).start();
     }
 
     /**
@@ -95,7 +94,7 @@ public class CupsServer implements Runnable {
      * This is the method to start the server in the background.
      */
     public Thread start() {
-        String name = "CupSrv-" + LocalDateTime.now();
+        String name = "CupSrv-" + getPort();
         Thread t = new Thread(this, name);
         t.start();
         return t;
