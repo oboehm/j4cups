@@ -36,14 +36,13 @@ public class CupsServerTest {
 
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(CupsServerTest.class);
     private static final CupsServer SERVER = new CupsServer(6310);
-    private static Thread serverThread;
 
     /**
      * For the unit tests we start the server here.
      */
     @BeforeAll
     public static void startServer() {
-        serverThread = SERVER.start();
+        SERVER.start();
         LOG.info("{} is started.", SERVER);
     }
     
