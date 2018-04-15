@@ -17,26 +17,16 @@
  */
 package j4cups.server;
 
-import org.apache.http.*;
+import org.apache.http.ConnectionClosedException;
+import org.apache.http.ExceptionLogger;
 import org.apache.http.config.SocketConfig;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.FileEntity;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.bootstrap.HttpServer;
 import org.apache.http.impl.bootstrap.ServerBootstrap;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.protocol.HttpCoreContext;
-import org.apache.http.protocol.HttpRequestHandler;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-import java.net.URLDecoder;
-import java.nio.charset.Charset;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -139,9 +129,21 @@ public class CupsServer implements Runnable {
                               .setServerInfo("Test/1.1")
                               .setSocketConfig(socketConfig)
                               .setExceptionLogger(new StdErrorExceptionLogger())
-                              .registerHandler("*", new HttpFileHandler("."))
+                              .registerHandler("*", new IppRequestHandler())
                               .create();
     }
+
+    /**
+     * For a useful toString implementation we put the port into it.
+     *
+     * @return string representation with port value
+     */
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + ":" + this.getPort();
+    }
+
+
 
     static class StdErrorExceptionLogger implements ExceptionLogger {
 
@@ -156,73 +158,6 @@ public class CupsServer implements Runnable {
             }
         }
 
-    }
-
-    static class HttpFileHandler implements HttpRequestHandler  {
-
-        private final String docRoot;
-
-        public HttpFileHandler(final String docRoot) {
-            super();
-            this.docRoot = docRoot;
-        }
-
-        public void handle(
-                final HttpRequest request,
-                final HttpResponse response,
-                final HttpContext context) throws HttpException, IOException {
-
-            String method = request.getRequestLine().getMethod().toUpperCase(Locale.ROOT);
-            if (!method.equals("GET") && !method.equals("HEAD") && !method.equals("POST")) {
-                throw new MethodNotSupportedException(method + " method not supported");
-            }
-            String target = request.getRequestLine().getUri();
-
-            if (request instanceof HttpEntityEnclosingRequest) {
-                HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();
-                byte[] entityContent = EntityUtils.toByteArray(entity);
-                System.out.println("Incoming entity content (bytes): " + entityContent.length);
-            }
-
-            final File file = new File(this.docRoot, URLDecoder.decode(target, "UTF-8"));
-            if (!file.exists()) {
-
-                response.setStatusCode(HttpStatus.SC_NOT_FOUND);
-                StringEntity entity = new StringEntity(
-                        "<html><body><h1>File" + file.getPath() +
-                                " not found</h1></body></html>",
-                        ContentType.create("text/html", "UTF-8"));
-                response.setEntity(entity);
-                System.out.println("File " + file.getPath() + " not found");
-
-            } else if (!file.canRead() || file.isDirectory()) {
-
-                response.setStatusCode(HttpStatus.SC_FORBIDDEN);
-                StringEntity entity = new StringEntity(
-                        "<html><body><h1>Access denied</h1></body></html>",
-                        ContentType.create("text/html", "UTF-8"));
-                response.setEntity(entity);
-                System.out.println("Cannot read file " + file.getPath());
-
-            } else {
-                HttpCoreContext coreContext = HttpCoreContext.adapt(context);
-                HttpConnection conn = coreContext.getConnection(HttpConnection.class);
-                response.setStatusCode(HttpStatus.SC_OK);
-                FileEntity body = new FileEntity(file, ContentType.create("text/html", (Charset) null));
-                response.setEntity(body);
-                System.out.println(conn + ": serving file " + file.getPath());
-            }
-        }
-    }
-
-    /**
-     * For a useful toString implementation we put the port into it.
-     * 
-     * @return string representation with port value
-     */
-    @Override
-    public String toString() {
-        return this.getClass().getSimpleName() + ":" + this.getPort();
     }
 
 }

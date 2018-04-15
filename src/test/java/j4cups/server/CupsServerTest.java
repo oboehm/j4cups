@@ -18,6 +18,11 @@
 package j4cups.server;
 
 
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -55,6 +60,16 @@ public class CupsServerTest {
     public void testIsStarted() throws IOException {
         Socket socket = new Socket("localhost", SERVER.getPort());
         assertTrue("not connected to " + SERVER, socket.isConnected());
+    }
+
+    @Test
+    public void testSendRequest() throws IOException {
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost("http://localhost:" + SERVER.getPort());
+        httpPost.setEntity(new StringEntity("hello"));
+        CloseableHttpResponse response = client.execute(httpPost);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+        client.close();
     }
 
     /**
