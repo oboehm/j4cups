@@ -47,6 +47,7 @@ public class CupsServerTest {
      */
     @BeforeAll
     public static void startServer() {
+        assertFalse(SERVER.isStarted());
         SERVER.start();
         LOG.info("{} is started.", SERVER);
     }
@@ -58,6 +59,7 @@ public class CupsServerTest {
      */
     @Test
     public void testIsStarted() throws IOException {
+        assertTrue(SERVER.isStarted());
         Socket socket = new Socket("localhost", SERVER.getPort());
         assertTrue("not connected to " + SERVER, socket.isConnected());
     }

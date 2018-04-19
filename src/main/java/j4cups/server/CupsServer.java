@@ -41,6 +41,7 @@ public class CupsServer implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(CupsServer.class);
     private final int port;
     private final HttpServer server;
+    private Thread serverThread;
 
     /**
      * Instantiates a CUPS server with the IPP standard port (631).
@@ -56,21 +57,22 @@ public class CupsServer implements Runnable {
      */
     public CupsServer(int port) {
         this.port = port;
-        this.server = createServer(getPort());
+        this.server = createServer(port);
     }
 
+    /**
+     * This is the CLI interface to start the CupsServer. If you want to set
+     * the port use it as first argument.
+     * 
+     * @param args e.g. "631" as port parameter
+     */
     public static void main(String[] args) {
-        if (args.length < 1) {
-            System.err.println("Please specify document root directory");
-            System.exit(1);
+        CupsServer cs = new CupsServer();
+        if (args.length > 0) {
+            cs = new CupsServer(Integer.parseInt(args[0]));
         }
-        // Document root directory
-        String docRoot = args[0];
-        int port = 8090;
-        if (args.length >= 2) {
-            port = Integer.parseInt(args[1]);
-        }
-        new CupsServer(port).start();
+        cs.start();
+        System.out.println(cs + " is started.");
     }
 
     /**
@@ -87,9 +89,9 @@ public class CupsServer implements Runnable {
      */
     public Thread start() {
         String name = "CupSrv-" + getPort();
-        Thread t = new Thread(this, this.toString());
-        t.start();
-        return t;
+        serverThread = new Thread(this, this.toString());
+        serverThread.start();
+        return serverThread;
     }
 
     /**
@@ -131,6 +133,15 @@ public class CupsServer implements Runnable {
                               .setExceptionLogger(new StdErrorExceptionLogger())
                               .registerHandler("*", new IppRequestHandler())
                               .create();
+    }
+
+    /**
+     * Looks, if the server is running.
+     * 
+     * @return true if server was started
+     */
+    public boolean isStarted() {
+        return serverThread != null;
     }
 
     /**
