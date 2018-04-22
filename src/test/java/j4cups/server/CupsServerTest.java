@@ -57,14 +57,10 @@ class CupsServerTest {
     
     /**
      * Test method for {@link CupsServer#start()}.
-     * 
-     * @throws IOException e.g. in case of network prolblems
      */
     @Test
-    public void testIsStarted() throws IOException {
+    public void testIsStarted() {
         assertTrue(SERVER.isStarted());
-        Socket socket = new Socket("localhost", SERVER.getPort());
-        assertTrue("not connected to " + SERVER, socket.isConnected());
     }
 
     /**
@@ -112,8 +108,7 @@ class CupsServerTest {
     public static void shutdownServer() {
         SERVER.shutdown();
         LOG.info("{} is shut down.", SERVER);
-        try {
-            Socket socket = new Socket("localhost", SERVER.getPort());
+        try (Socket socket = new Socket("localhost", SERVER.getPort())) {
             assertFalse("yet connected to " + SERVER, socket.isConnected());
         } catch(IOException expected)  {
             LOG.info("{} is down (as expected).", SERVER);
