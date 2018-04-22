@@ -18,8 +18,10 @@
 package j4cups.server;
 
 
+import j4cups.protocol.AbstractIppTest;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -41,6 +43,7 @@ class CupsServerTest {
 
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(CupsServerTest.class);
     private static final CupsServer SERVER = new CupsServer(6310);
+    private final HttpPost httpPost = new HttpPost("http://localhost:" + SERVER.getPort());
 
     /**
      * For the unit tests we start the server here.
@@ -64,13 +67,31 @@ class CupsServerTest {
         assertTrue("not connected to " + SERVER, socket.isConnected());
     }
 
+    /**
+     * As a first test we send an invalid request with "hello" as content.
+     *
+     * @throws IOException e.g. in case of network prolblems
+     */
     @Test
     public void testSendInvalidRequest() throws IOException {
         CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost("http://localhost:" + SERVER.getPort());
         httpPost.setEntity(new StringEntity("hello"));
         CloseableHttpResponse response = client.execute(httpPost);
         assertEquals(400, response.getStatusLine().getStatusCode());
+        client.close();
+    }
+
+    /**
+     * As a second test we send an valid request.
+     *
+     * @throws IOException e.g. in case of network prolblems
+     */
+    @Test
+    public void testSendRequest() throws IOException {
+        httpPost.setEntity(new ByteArrayEntity(AbstractIppTest.REQUEST_GET_JOBS.toByteArray()));
+        CloseableHttpClient client = HttpClients.createDefault();
+        CloseableHttpResponse response = client.execute(httpPost);
+        assertEquals(200, response.getStatusLine().getStatusCode());
         client.close();
     }
 
