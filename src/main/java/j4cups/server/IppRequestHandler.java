@@ -17,6 +17,7 @@
  */
 package j4cups.server;
 
+import j4cups.protocol.IppRequest;
 import org.apache.http.*;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -27,6 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.BufferUnderflowException;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 /**
@@ -54,8 +57,6 @@ public class IppRequestHandler implements HttpRequestHandler {
         if (!method.equals("GET") && !method.equals("HEAD") && !method.equals("POST")) {
             throw new MethodNotSupportedException(method + " method not supported");
         }
-        String target = request.getRequestLine().getUri();
-
         if (request instanceof HttpEntityEnclosingRequest) {
             handle((HttpEntityEnclosingRequest) request, response);
         } else {
@@ -72,8 +73,16 @@ public class IppRequestHandler implements HttpRequestHandler {
     private void handle(HttpEntityEnclosingRequest request, HttpResponse response) throws IOException {
         HttpEntity entity = request.getEntity();
         byte[] entityContent = EntityUtils.toByteArray(entity);
-        LOG.info("Request with {} bytes received.", entityContent.length);
-        response.setStatusCode(HttpStatus.SC_OK);
+        try {
+            IppRequest ippRequest = new IppRequest(entityContent);
+            LOG.info("Received: {}", ippRequest);
+            response.setStatusCode(HttpStatus.SC_OK);
+        } catch (BufferUnderflowException ex) {
+            response.setStatusCode(HttpStatus.SC_BAD_REQUEST);
+            LOG.warn("Status code is set to {} because only {} bytes (\"{}\") were received.", HttpStatus.SC_BAD_REQUEST,
+                    entityContent.length, new String(entityContent, StandardCharsets.UTF_8));
+            LOG.debug("Details:", ex);
+        }
     }
 
 }

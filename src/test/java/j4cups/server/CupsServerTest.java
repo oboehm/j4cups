@@ -37,7 +37,7 @@ import static org.junit.Assert.*;
 /**
  * Unit tests for {@link CupsServer}.
  */
-public class CupsServerTest {
+class CupsServerTest {
 
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(CupsServerTest.class);
     private static final CupsServer SERVER = new CupsServer(6310);
@@ -65,12 +65,12 @@ public class CupsServerTest {
     }
 
     @Test
-    public void testSendRequest() throws IOException {
+    public void testSendInvalidRequest() throws IOException {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost("http://localhost:" + SERVER.getPort());
         httpPost.setEntity(new StringEntity("hello"));
         CloseableHttpResponse response = client.execute(httpPost);
-        assertEquals(200, response.getStatusLine().getStatusCode());
+        assertEquals(400, response.getStatusLine().getStatusCode());
         client.close();
     }
 

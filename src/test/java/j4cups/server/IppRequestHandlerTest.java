@@ -29,6 +29,8 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * Unit tests for {@link IppRequestHandler}.
  */
@@ -37,20 +39,22 @@ class IppRequestHandlerTest {
     private final IppRequestHandler requestHandler = new IppRequestHandler();
 
     /**
-     * For a first simple test we just call the handle method.
+     * For a first simple test we just call the handle method with an invalid
+     * request.
      * 
      * @throws IOException in case of network problems
      * @throws HttpException HTTP exception
      */
     @Test
     void testHandle() throws IOException, HttpException {
-        HttpPost request = createHttpRequest();
+        HttpPost request = createInvalidHttpRequest();
         HttpResponse response = createHttpResponse();
         HttpContext context = new HttpClientContext();
         requestHandler.handle(request, response, context);
+        assertEquals(400, response.getStatusLine().getStatusCode());
     }
 
-    private static HttpPost createHttpRequest() throws UnsupportedEncodingException {
+    private static HttpPost createInvalidHttpRequest() throws UnsupportedEncodingException {
         HttpPost request = new HttpPost();
         HttpEntity entity = new StringEntity("hello");
         request.setEntity(entity);
