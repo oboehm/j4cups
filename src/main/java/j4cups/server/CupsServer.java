@@ -21,7 +21,6 @@ import j4cups.protocol.IppOperations;
 import j4cups.protocol.IppRequest;
 import org.apache.http.ConnectionClosedException;
 import org.apache.http.ExceptionLogger;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.entity.ByteArrayEntity;
@@ -95,14 +94,14 @@ public class CupsServer implements Runnable {
         }
     }
 
-    public static void stop(int serverPort) throws IOException {
-        CloseableHttpClient client = HttpClients.createDefault();
+    private static void stop(int serverPort) throws IOException {
         IppRequest request = new IppRequest();
         request.setOpCode(IppOperations.ADDITIONAL_REGISTERED_OPERATIONS.getCode());
         HttpPost httpPost = new HttpPost("http://localhost:" + serverPort);
         httpPost.setEntity(new ByteArrayEntity(request.toByteArray()));
-        CloseableHttpResponse response = client.execute(httpPost);
-        client.close();
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
+            client.execute(httpPost);
+        }
     }
 
     /**
