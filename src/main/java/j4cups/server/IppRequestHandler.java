@@ -41,6 +41,17 @@ import java.util.Locale;
 public class IppRequestHandler implements HttpRequestHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppRequestHandler.class);
+    private final CupsServer cupsServer;
+
+    /**
+     * For shutdown request we must know the server. The server is given
+     * with this constructor.
+     *
+     * @param cupsServer server for shutdonw
+     */
+    public IppRequestHandler(CupsServer cupsServer) {
+        this.cupsServer = cupsServer;
+    }
 
     /**
      * Handles the incomming IPP request.
@@ -77,6 +88,11 @@ public class IppRequestHandler implements HttpRequestHandler {
             IppRequest ippRequest = new IppRequest(entityContent);
             LOG.info("Received: {}", ippRequest);
             response.setStatusCode(HttpStatus.SC_OK);
+            switch (ippRequest.getOperation()) {
+                case ADDITIONAL_REGISTERED_OPERATIONS:
+                    LOG.info("Stop request received - will shut down {}...", cupsServer);
+                    cupsServer.shutdown();
+            }
         } catch (BufferUnderflowException ex) {
             response.setStatusCode(HttpStatus.SC_BAD_REQUEST);
             LOG.warn("Status code is set to {} because only {} bytes (\"{}\") were received.", HttpStatus.SC_BAD_REQUEST,

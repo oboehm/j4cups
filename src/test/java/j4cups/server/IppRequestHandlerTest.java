@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class IppRequestHandlerTest {
     
-    private final IppRequestHandler requestHandler = new IppRequestHandler();
+    private final IppRequestHandler requestHandler = new IppRequestHandler(new CupsServer());
 
     /**
      * For a first simple test we just call the handle method with an invalid
