@@ -17,25 +17,36 @@
  */
 package j4cups.server;
 
+import j4cups.protocol.AbstractIppTest;
+import j4cups.protocol.IppRequest;
+import j4cups.protocol.IppResponse;
+import j4cups.protocol.StatusCode;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
 import org.apache.http.protocol.HttpContext;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link IppRequestHandler}.
  */
 class IppRequestHandlerTest {
-    
+
+    private static final Logger LOG = LoggerFactory.getLogger(IppRequestHandlerTest.class);
     private final IppRequestHandler requestHandler = new IppRequestHandler(new CupsServer());
 
     /**
@@ -65,6 +76,32 @@ class IppRequestHandlerTest {
         ProtocolVersion protocolVersion = new ProtocolVersion("HTTP", 1, 0);
         StatusLine statusLine = new BasicStatusLine(protocolVersion, 200, "OK");
         return new BasicHttpResponse(statusLine);
+    }
+
+    /**
+     * This is a replay of a send-document request which is invalid because
+     * the job-id is missing.
+     *
+     * @throws IOException in case of network problems
+     * @throws HttpException HTTP exception
+     */
+    @Test
+    void testHandleInvalidSendDocument() throws IOException, HttpException {
+        HttpPost request = createHttpRequest(AbstractIppTest.readIppRequest("op", "send-document-request-invalid.ipp"));
+        HttpResponse response = createHttpResponse();
+        requestHandler.handle(request, response, new HttpClientContext());
+        assertEquals(400, response.getStatusLine().getStatusCode());
+        byte[] content = IOUtils.toByteArray(response.getEntity().getContent());
+        IppResponse ippResponse = new IppResponse(content);
+        LOG.info("Received: {}", ippResponse);
+        assertEquals(StatusCode.CLIENT_ERROR_BAD_REQUEST, ippResponse.getStatusCode());
+        assertThat(ippResponse.getStatusMessage(), containsString("job-id"));
+    }
+
+    private static HttpPost createHttpRequest(IppRequest op) {
+        HttpPost request = new HttpPost();
+        request.setEntity(new ByteArrayEntity(op.toByteArray()));
+        return request;
     }
 
 }

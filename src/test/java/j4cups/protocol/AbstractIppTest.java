@@ -46,17 +46,38 @@ public abstract class AbstractIppTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractIppTest.class);
 
-    public final static IppRequest REQUEST_PRINT_JOB = readRequest("Print-Job.bin");
-    public final static IppRequest REQUEST_GET_JOBS = readRequest("Get-Jobs.bin");
-    public final static IppRequest REQUEST_GET_PRINTER_ATTRIBUTES = readRequest("Get-Printer-Attributes.bin");
+    public final static IppRequest REQUEST_PRINT_JOB = readIppRequest("request", "Print-Job.bin");
+    public final static IppRequest REQUEST_GET_JOBS = readIppRequest("request", "Get-Jobs.bin");
+    public final static IppRequest REQUEST_GET_PRINTER_ATTRIBUTES = readIppRequest("request", "Get-Printer-Attributes.bin");
 
     private AbstractIpp ippPackage;
-    
-    private static IppRequest readRequest(String name) {
-        Path recordedPrintJob = Paths.get("src", "test", "resources", "j4cups", "request", name);
+
+    /**
+     * Shortcut to read prepared (recorded) IPP requests.
+     *
+     * @param dir e.g. "request" or "op"
+     * @param name filenane
+     * @return a recored IPP request
+     */
+    public static IppRequest readIppRequest(String dir, String name) {
+        return new IppRequest(readIppBytes(dir, name));
+    }
+
+    /**
+     * Shortcut to read prepared (recorded) IPP response.
+     *
+     * @param dir e.g. "request" or "op"
+     * @param name filenane
+     * @return a recored IPP request
+     */
+    public static IppResponse readIppResponse(String dir, String name) {
+        return new IppResponse(readIppBytes(dir, name));
+    }
+
+    private static byte[] readIppBytes(String dir, String name) {
+        Path recordedPrintJob = Paths.get("src", "test", "resources", "j4cups", dir, name);
         try {
-            byte[] requestData = Files.readAllBytes(recordedPrintJob);
-            return new IppRequest(requestData);
+            return Files.readAllBytes(recordedPrintJob);
         } catch (IOException ioe) {
             throw new IllegalArgumentException("no file '" + recordedPrintJob + "' found", ioe);
         }

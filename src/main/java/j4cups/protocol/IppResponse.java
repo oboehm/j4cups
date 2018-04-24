@@ -133,7 +133,29 @@ public class IppResponse extends AbstractIpp {
     public StatusCode getStatusCode() {
         return StatusCode.of(getOpCode());
     }
-    
+
+    /**
+     * In case of a bad request or other error status you can set the
+     * message for this status with this function.
+     *
+     * @param message the status message
+     * @since 0.5
+     */
+    public void setStatusMessage(String message) {
+        Attribute attr = Attribute.of(ValueTags.TEXT_WITHOUT_LANGUAGE, "status-message", message);
+        setAttribute(attr, DelimiterTags.OPERATION_ATTRIBUTES_TAG);
+    }
+
+    /**
+     * Gets the content of the attribute 'status-message'.
+     *
+     * @return string with the status message
+     * @since 0.5
+     */
+    public String getStatusMessage() {
+        return getAttribute("status-message").getStringValue();
+    }
+
     /**
      * Returns the 2nd part (byte 2-3) with the status-code as string.
      *

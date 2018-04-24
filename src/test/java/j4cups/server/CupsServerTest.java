@@ -28,6 +28,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
@@ -41,7 +42,7 @@ import static org.junit.Assert.*;
  */
 class CupsServerTest {
 
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(CupsServerTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CupsServerTest.class);
     private static final CupsServer SERVER = new CupsServer(6310);
     private final HttpPost httpPost = new HttpPost("http://localhost:" + SERVER.getPort());
 
