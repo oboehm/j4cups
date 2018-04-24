@@ -18,7 +18,8 @@
 package j4cups.op;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import javax.validation.ValidationException;
 import java.io.File;
@@ -39,11 +40,13 @@ public class SendDocumentTest {
      * 
      * @throws IOException may happen
      */
-    @Test(expected = ValidationException.class)
+    @Test
     public void validateRequest() throws IOException {
         byte[] ippRequest = FileUtils
                 .readFileToByteArray(new File("src/test/resources/j4cups/op/send-document-request-invalid.ipp"));
-        operation.validateRequest(ippRequest);
+        Assertions.assertThrows(ValidationException.class, () -> {
+            operation.validateRequest(ippRequest);
+        });
     }
 
 }

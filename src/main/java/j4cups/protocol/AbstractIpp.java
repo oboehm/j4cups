@@ -35,7 +35,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * The class AbstractIpp is the common super class of {@link IppRequest} and
@@ -338,6 +337,16 @@ public abstract class AbstractIpp implements Externalizable {
     }
 
     /**
+     * Sets the operation attribute.
+     *
+     * @param attr attribute
+     * @since 0.5
+     */
+    public void setOperationAttribute(Attribute attr) {
+        setAttribute(attr, DelimiterTags.OPERATION_ATTRIBUTES_TAG);
+    }
+
+    /**
      * Sets the data part of the request or response.
      * 
      * @param data new data
@@ -474,11 +483,9 @@ public abstract class AbstractIpp implements Externalizable {
      *
      * @param in the stream to read data from in order to restore the object
      * @throws IOException            if I/O errors occur
-     * @throws ClassNotFoundException If the class for an object being
-     *                                restored cannot be found.
      */
     @Override
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    public void readExternal(ObjectInput in) throws IOException {
         this.version = new Version(in.readByte(), in.readByte());
         this.opCode = in.readShort();
         this.requestId = in.readInt();
@@ -562,7 +569,7 @@ public abstract class AbstractIpp implements Externalizable {
 
         @Override
         public int hashCode() {
-            return Objects.hash(bytes);
+            return bytes[0] * 256 + bytes[1];
         }
     }
     

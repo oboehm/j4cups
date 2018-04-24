@@ -143,7 +143,7 @@ public class IppResponse extends AbstractIpp {
      */
     public void setStatusMessage(String message) {
         Attribute attr = Attribute.of(ValueTags.TEXT_WITHOUT_LANGUAGE, "status-message", message);
-        setAttribute(attr, DelimiterTags.OPERATION_ATTRIBUTES_TAG);
+        setOperationAttribute(attr);
     }
 
     /**
