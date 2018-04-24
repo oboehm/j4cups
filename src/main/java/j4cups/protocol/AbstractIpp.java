@@ -347,6 +347,16 @@ public abstract class AbstractIpp implements Externalizable {
     }
 
     /**
+     * Gets a collected list of all operation attributes.
+     *
+     * @return list of operation attibutes
+     * @since 0.5
+     */
+    public List<Attribute> getOperationAttributes() {
+        return getAttributeGroup(DelimiterTags.OPERATION_ATTRIBUTES_TAG).getAttributes();
+    }
+
+    /**
      * Sets the data part of the request or response.
      * 
      * @param data new data
@@ -391,6 +401,28 @@ public abstract class AbstractIpp implements Externalizable {
         }
         buffer.append("|");
         return buildString(buffer.toString());
+    }
+
+    /**
+     * Provides a shorter version with only the main elements and
+     * attributes.
+     *
+     * @return a string with operation and main operation attributes
+     * @since 0.5
+     */
+    public String toShortString() {
+        StringBuilder buffer = new StringBuilder("|");
+        buffer.append(getOpCodeAsString());
+        buffer.append("-");
+        buffer.append(getRequestId());
+        for (Attribute attr : getOperationAttributes()) {
+            if (!attr.getName().startsWith("attributes-")) {
+                buffer.append("|");
+                buffer.append(attr);
+            }
+        }
+        buffer.append("|");
+        return buffer.toString();
     }
 
     /**

@@ -47,7 +47,8 @@ public class SendDocument extends Operation {
     public void validateRequest(IppRequest request) {
         super.validateRequest(request);
         if (!hasTarget(request)) {
-            throw new ValidationException("neither 'printer-uri' & 'job-id' nor 'job-uri' is given in " + request);
+            throw new ValidationException(
+                    "neither 'printer-uri' & 'job-id' nor 'job-uri' is given in " + request.toShortString());
         }
     }
 
