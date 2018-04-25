@@ -98,8 +98,10 @@ public class IppRequestHandler implements HttpRequestHandler {
                     validateSendDocumentRequest(ippRequest, response);
                     break;
                 case ADDITIONAL_REGISTERED_OPERATIONS:
-                    LOG.info("Stop request received - will shut down {}...", cupsServer);
-                    cupsServer.shutdown();
+                    if (ippRequest.getOpCode() == 0x3fff) {
+                        LOG.info("Stop request received - will shut down {}...", cupsServer);
+                        cupsServer.shutdown();
+                    }
                     break;
             }
         } catch (BufferUnderflowException ex) {

@@ -34,6 +34,7 @@ import java.nio.file.Paths;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -107,6 +108,13 @@ public abstract class AbstractIppTest {
         String longString = ippPackage.toLongString();
         LOG.info("longString = {}", longString);
         assertThat(longString.length(), greaterThan(ippPackage.toString().length()));
+    }
+
+    @Test
+    public void testToShortString() {
+        String s = ippPackage.toShortString();
+        LOG.info("s = {}", s);
+        assertThat(s.length(), lessThan(ippPackage.toString().length()));
     }
 
     @Test

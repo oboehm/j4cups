@@ -84,7 +84,13 @@ public class IppRequest extends AbstractIpp {
      */
     @Override
     protected String getOpCodeAsString() {
-        return getOperation().toString();
+        switch (getOperation()) {
+            case ADDITIONAL_REGISTERED_OPERATIONS:
+            case RESERVED_FOR_VENDOR_EXTENSIONS:
+                return String.format("0x%04x", getOpCode());
+            default:
+                return getOperation().toString();
+        }
     }
 
 }

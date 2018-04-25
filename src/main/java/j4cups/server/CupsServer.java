@@ -23,6 +23,7 @@ import org.apache.http.ConnectionClosedException;
 import org.apache.http.ExceptionLogger;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.config.SocketConfig;
+import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.bootstrap.HttpServer;
 import org.apache.http.impl.bootstrap.ServerBootstrap;
@@ -104,9 +105,15 @@ public class CupsServer implements Runnable {
         request.setOpCode(IppOperations.ADDITIONAL_REGISTERED_OPERATIONS.getCode());
         HttpPost httpPost = new HttpPost("http://localhost:" + serverPort);
         httpPost.setEntity(new ByteArrayEntity(request.toByteArray()));
-        try (CloseableHttpClient client = HttpClients.createDefault()) {
+        try (CloseableHttpClient client = createHppClient()) {
             client.execute(httpPost);
         }
+    }
+
+    // see https://stackoverflow.com/questions/36198302/proper-way-to-shutdown-apache-httpcomponents-blocking-http-server
+    private static CloseableHttpClient createHppClient() {
+        ConnectionKeepAliveStrategy myStrategy = (httpResponse, httpContext) -> 5 * 1000;
+        return HttpClients.custom().setKeepAliveStrategy(myStrategy).build();
     }
 
     /**
