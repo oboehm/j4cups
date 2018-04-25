@@ -207,7 +207,13 @@ public enum IppOperations {
                 return op;
             }
         }
-        throw new IllegalArgumentException("invalid id: " + id);
+        if ((0x0013 <= id) && (id <= 0x3fff)) {
+            return ADDITIONAL_REGISTERED_OPERATIONS;
+        }
+        if ((0x4000 <= id) && (id <= 0x7fff)) {
+            return RESERVED_FOR_VENDOR_EXTENSIONS;
+        }
+        throw new IllegalArgumentException("invalid id: 0x" + Integer.toHexString(id));
     }
 
 }

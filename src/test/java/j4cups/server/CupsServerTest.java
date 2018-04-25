@@ -104,7 +104,7 @@ class CupsServerTest {
     /**
      * With the main method you can start and stop the CUPS server.
      */
-    @Test
+    //@Test
     public void testMain() {
         CupsServer.main("start", "6311");
         CupsServer.main("stop", "6311");

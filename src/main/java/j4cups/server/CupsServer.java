@@ -74,6 +74,10 @@ public class CupsServer implements Runnable {
      * @param args "start", "631"
      */
     public static void main(String... args) {
+        if (args.length < 1) {
+            System.out.println("Usage: " + CupsServer.class.getName() + " start/stop [port]");
+            return;
+        }
         String command = args[0];
         int serverPort = 631;
         if (args.length > 1) {
@@ -90,6 +94,7 @@ public class CupsServer implements Runnable {
             } catch (IOException ioe) {
                 System.err.println("CupsServer:" + serverPort + " cannot be stopped: " + ioe.getMessage());
                 LOG.debug("Details:", ioe);
+                System.exit(1);
             }
         }
     }

@@ -38,4 +38,20 @@ public class IppOperationsTest {
         assertEquals("Print-Job", IppOperations.PRINT_JOB.toString());
     }
 
+    /**
+     * This is the test for the operation ids between 0x0013-0x3fff.
+     */
+    @Test
+    public void testOfAdditionalRegisteredOperations() {
+        assertEquals(IppOperations.ADDITIONAL_REGISTERED_OPERATIONS, IppOperations.of(0x3eee));
+    }
+
+    /**
+     * This is the test for the operation ids between 0x4000-0x7fff.
+     */
+    @Test
+    public void testOfReservedForVendorExtensions() {
+        assertEquals(IppOperations.RESERVED_FOR_VENDOR_EXTENSIONS, IppOperations.of(0x4444));
+    }
+
 }
