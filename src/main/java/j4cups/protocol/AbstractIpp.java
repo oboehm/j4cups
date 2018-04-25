@@ -393,7 +393,7 @@ public abstract class AbstractIpp implements Externalizable {
      */
     @Override
     public String toString() {
-        StringBuilder buffer = new StringBuilder("|");
+        StringBuilder buffer = new StringBuilder("-");
         buffer.append(getRequestId());
         for (Attribute attr : getAttributes()) {
             buffer.append("|");
