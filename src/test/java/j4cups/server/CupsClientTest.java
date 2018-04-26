@@ -22,9 +22,13 @@ import j4cups.protocol.AbstractIppTest;
 import j4cups.protocol.IppRequest;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.net.URI;
+import java.net.UnknownHostException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -35,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class CupsClientTest {
 
+    private static final Logger LOG = LoggerFactory.getLogger(CupsClientTest.class);
     private final CupsClient client = new CupsClient(URI.create("http://localhost:631"));
 
     /**
@@ -44,9 +49,26 @@ class CupsClientTest {
      */
     @Test
     public void sendGetPrinters() throws IOException {
-        IppRequest getPrintersRequest = AbstractIppTest.readIppRequest("request", "Get-Printers.bin");
-        CloseableHttpResponse response = client.send(getPrintersRequest);
-        assertEquals(200, response.getStatusLine().getStatusCode());
+        if (isOnline("localhost", 631)) {
+            IppRequest getPrintersRequest = AbstractIppTest.readIppRequest("request", "Get-Printers.bin");
+            CloseableHttpResponse response = client.send(getPrintersRequest);
+            assertEquals(200, response.getStatusLine().getStatusCode());
+        } else {
+            LOG.info("Test 'sendGetPrinters' is SKIPPED because localhost:631 is not reachable.");
+        }
+    }
+
+    private static boolean isOnline(String host, int port) {
+        try (Socket socket = new Socket(host, port)) {
+            LOG.debug("Socket {} for {}:{} is created.", socket, host, port);
+            return socket.isConnected();
+        } catch (UnknownHostException ex) {
+            throw new IllegalArgumentException("invalid host: " + host, ex);
+        } catch (IOException ex) {
+            LOG.info("Cannot connect to {}:{} ({}).", host, port, ex.getMessage());
+            LOG.debug("Details:", ex);
+            return false;
+        }
     }
 
 }
