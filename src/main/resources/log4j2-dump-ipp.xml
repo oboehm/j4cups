@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" xmlns="http://logging.apache.org/log4j/2.0/config">
+  <Appenders>
+    <Console name="CONSOLE" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{HH:mm:ss}%5level [%-8.8t] %-23.23C{3} - %msg%n" />
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Logger name="j4cups" level="INFO" />
+    <Logger name="j4cups.protocol.AbstractIpp" level="TRACE" />
+    <Root level="INFO">
+      <AppenderRef ref="CONSOLE" />
+    </Root>
+  </Loggers>
+</Configuration>

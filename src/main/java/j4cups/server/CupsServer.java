@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -48,6 +49,7 @@ public class CupsServer implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(CupsServer.class);
     private final int port;
     private final HttpServer server;
+    private final URI forwardURI;
     private Thread serverThread;
 
     /**
@@ -59,11 +61,23 @@ public class CupsServer implements Runnable {
 
     /**
      * Instantiates a CUPS server with the given IPP port.
-     * 
+     *
      * @param port e.g. 631
      */
     public CupsServer(int port) {
+        this(port, URI.create("http://localhost:631"));
+    }
+
+    /**
+     * Instantiates a CUPS server with the given IPP port. The request will be
+     * forwarded to the given forwardURI.
+     *
+     * @param port e.g. 631
+     * @param forwardURI CUPS server where the requests are forwarded to
+     */
+    public CupsServer(int port, URI forwardURI) {
         this.port = port;
+        this.forwardURI = forwardURI;
         this.server = createServer(port);
     }
 
@@ -126,10 +140,18 @@ public class CupsServer implements Runnable {
     }
 
     /**
+     * Gets forward uri.
+     *
+     * @return the forward uri
+     */
+    public URI getForwardURI() {
+        return forwardURI;
+    }
+
+    /**
      * This is the method to start the server in the background.
      */
     public Thread start() {
-        String name = "CupSrv-" + getPort();
         serverThread = new Thread(this, this.toString());
         serverThread.start();
         return serverThread;

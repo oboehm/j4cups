@@ -57,7 +57,7 @@ public abstract class AbstractIppTest {
      * Shortcut to read prepared (recorded) IPP requests.
      *
      * @param dir e.g. "request" or "op"
-     * @param name filenane
+     * @param name filename
      * @return a recored IPP request
      */
     public static IppRequest readIppRequest(String dir, String name) {
