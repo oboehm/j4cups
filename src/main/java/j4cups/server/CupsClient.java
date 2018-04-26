@@ -52,7 +52,9 @@ public final class CupsClient {
     }
 
     /**
-     * Sends an IPP request to a CUPS server.
+     * Sends an IPP request to a CUPS server. Normally the resonse from CUPS is
+     * an {@link j4cups.protocol.IppResponse}. But in some case (like the
+     * get-printers operation the answer is returned as HTML page.
      *
      * @param ippRequest the ipp request
      * @return response from CUPS
