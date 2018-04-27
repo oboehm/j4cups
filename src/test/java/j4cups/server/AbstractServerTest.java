@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URI;
-import java.net.UnknownHostException;
 
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
@@ -81,8 +80,6 @@ public abstract class AbstractServerTest {
             socket.connect(new InetSocketAddress(host, port), 200);
             LOG.debug("Socket {} for {}:{} is created.", socket, host, port);
             return socket.isConnected();
-        } catch (UnknownHostException ex) {
-            throw new IllegalArgumentException("invalid host: " + host, ex);
         } catch (IOException ex) {
             LOG.info("Cannot connect to {}:{} ({}).", host, port, ex.getMessage());
             LOG.debug("Details:", ex);
