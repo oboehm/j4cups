@@ -22,6 +22,7 @@ import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
 import org.apache.http.*;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -47,6 +48,7 @@ public class IppRequestHandler implements HttpRequestHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppRequestHandler.class);
     private final CupsServer cupsServer;
+    private final CupsClient cupsClient;
 
     /**
      * For shutdown request we must know the server. The server is given
@@ -56,6 +58,7 @@ public class IppRequestHandler implements HttpRequestHandler {
      */
     public IppRequestHandler(CupsServer cupsServer) {
         this.cupsServer = cupsServer;
+        this.cupsClient = new CupsClient(cupsServer.getForwardURI());
     }
 
     /**
@@ -93,16 +96,21 @@ public class IppRequestHandler implements HttpRequestHandler {
             IppRequest ippRequest = new IppRequest(entityContent);
             LOG.info("Received: {}", ippRequest);
             response.setStatusCode(HttpStatus.SC_OK);
-            switch (ippRequest.getOperation()) {
-                case SEND_DOCUMENT:
-                    validateSendDocumentRequest(ippRequest, response);
-                    break;
-                case ADDITIONAL_REGISTERED_OPERATIONS:
-                    if (ippRequest.getOpCode() == 0x3fff) {
-                        LOG.info("Stop request received - will shut down {}...", cupsServer);
-                        cupsServer.shutdown();
-                    }
-                    break;
+            try {
+                switch (ippRequest.getOperation()) {
+                    case SEND_DOCUMENT:
+                        new SendDocument().validateRequest(ippRequest);
+                        break;
+                    case ADDITIONAL_REGISTERED_OPERATIONS:
+                        if (ippRequest.getOpCode() == 0x3fff) {
+                            LOG.info("Stop request received - will shut down {}...", cupsServer);
+                            cupsServer.shutdown();
+                        }
+                        break;
+                }
+                send(ippRequest, response);
+            } catch (ValidationException ex) {
+                handleException(ippRequest, response, ex);
             }
         } catch (BufferUnderflowException ex) {
             response.setStatusCode(HttpStatus.SC_BAD_REQUEST);
@@ -112,19 +120,22 @@ public class IppRequestHandler implements HttpRequestHandler {
         }
     }
 
-    private static void validateSendDocumentRequest(IppRequest ippRequest, HttpResponse response) {
-        SendDocument operation = new SendDocument();
+    private void send(IppRequest ippRequest, HttpResponse response) throws IOException {
+        CloseableHttpResponse cupsResponse = cupsClient.send(ippRequest);
+        response.setStatusCode(cupsResponse.getStatusLine().getStatusCode());
+        response.setEntity(cupsResponse.getEntity());
+        response.setStatusLine(cupsResponse.getStatusLine());
+        response.setHeaders(cupsResponse.getAllHeaders());
+        response.setLocale(cupsResponse.getLocale());
+    }
+
+    private static void handleException(IppRequest ippRequest, HttpResponse response, ValidationException ex) {
         IppResponse ippResponse = new IppResponse(ippRequest);
-        try {
-            operation.validateRequest(ippRequest);
-            response.setStatusCode(HttpStatus.SC_OK);
-        } catch (ValidationException ex) {
-            LOG.info("{} is not valid ({}).", ippRequest, ex.getMessage());
-            LOG.debug("Details:", ex);
-            response.setStatusCode(HttpStatus.SC_BAD_REQUEST);
-            ippResponse.setStatusCode(StatusCode.CLIENT_ERROR_BAD_REQUEST);
-            ippResponse.setStatusMessage(ex.getMessage());
-        }
+        LOG.info("{} is not valid ({}).", ippRequest, ex.getMessage());
+        LOG.debug("Details:", ex);
+        response.setStatusCode(HttpStatus.SC_BAD_REQUEST);
+        ippResponse.setStatusCode(StatusCode.CLIENT_ERROR_BAD_REQUEST);
+        ippResponse.setStatusMessage(ex.getMessage());
         response.setEntity(new ByteArrayEntity(ippResponse.toByteArray()));
     }
 

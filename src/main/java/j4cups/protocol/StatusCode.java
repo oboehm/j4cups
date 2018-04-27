@@ -186,7 +186,7 @@ public enum StatusCode {
      * object Administrator and/or Printer implementation.
      * </p>
      */
-    CLIENT_ERRROR_GONE (0x0407),
+    CLIENT_ERROR_GONE (0x0407),
 
     /**
      * The IPP object is refusing to process a request because the request
