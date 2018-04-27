@@ -31,6 +31,7 @@ import java.net.URI;
 import java.net.UnknownHostException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * Unit tests for class {@link CupsClient}.
@@ -49,13 +50,17 @@ class CupsClientTest {
      */
     @Test
     public void sendGetPrinters() throws IOException {
-        if (isOnline("localhost", 631)) {
-            IppRequest getPrintersRequest = AbstractIppTest.readIppRequest("request", "Get-Printers.bin");
-            CloseableHttpResponse response = client.send(getPrintersRequest);
-            assertEquals(200, response.getStatusLine().getStatusCode());
-        } else {
-            LOG.info("Test 'sendGetPrinters' is SKIPPED because localhost:631 is not reachable.");
-        }
+        IppRequest getPrintersRequest = AbstractIppTest.readIppRequest("request", "Get-Printers.bin");
+        URI printerURI = getPrintersRequest.getPrinterURI();
+        assumeTrue(isOnline(printerURI), printerURI + " is not available");
+        LOG.info("Test 'sendGetPrinters' is executed because localhost:631 is available.");
+        CloseableHttpResponse response = client.send(getPrintersRequest);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+    }
+
+    private static boolean isOnline(URI uri) {
+        int port = uri.getPort();
+        return isOnline(uri.getHost(), port == -1 ? 631 : port);
     }
 
     private static boolean isOnline(String host, int port) {
