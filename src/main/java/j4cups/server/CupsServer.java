@@ -17,18 +17,11 @@
  */
 package j4cups.server;
 
-import j4cups.protocol.IppOperations;
-import j4cups.protocol.IppRequest;
 import org.apache.http.ConnectionClosedException;
 import org.apache.http.ExceptionLogger;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.config.SocketConfig;
-import org.apache.http.conn.ConnectionKeepAliveStrategy;
-import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.bootstrap.HttpServer;
 import org.apache.http.impl.bootstrap.ServerBootstrap;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +42,6 @@ public class CupsServer implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(CupsServer.class);
     private final int port;
     private final HttpServer server;
-    private final URI forwardURI;
     private Thread serverThread;
 
     /**
@@ -77,8 +69,7 @@ public class CupsServer implements Runnable {
      */
     public CupsServer(int port, URI forwardURI) {
         this.port = port;
-        this.forwardURI = forwardURI;
-        this.server = createServer(port);
+        this.server = createServer(port, forwardURI);
     }
 
     /**
@@ -90,7 +81,7 @@ public class CupsServer implements Runnable {
      */
     public static void main(String... args) {
         if (args.length < 1) {
-            System.out.println("Usage: " + CupsServer.class.getName() + " start/stop [port]");
+            System.out.println("Usage: " + CupsServer.class.getName() + " start [port]");
             return;
         }
         String command = args[0];
@@ -102,32 +93,7 @@ public class CupsServer implements Runnable {
             CupsServer cs = new CupsServer(serverPort);
             cs.start();
             System.out.println(cs + " is started.");
-        } else {
-            try {
-                stop(serverPort);
-                System.out.println("CupsServer:" + serverPort + " is stopped.");
-            } catch (IOException ioe) {
-                System.err.println("CupsServer:" + serverPort + " cannot be stopped: " + ioe.getMessage());
-                LOG.debug("Details:", ioe);
-                System.exit(1);
-            }
         }
-    }
-
-    private static void stop(int serverPort) throws IOException {
-        IppRequest request = new IppRequest();
-        request.setOpCode(IppOperations.ADDITIONAL_REGISTERED_OPERATIONS.getCode());
-        HttpPost httpPost = new HttpPost("http://localhost:" + serverPort);
-        httpPost.setEntity(new ByteArrayEntity(request.toByteArray()));
-        try (CloseableHttpClient client = createHppClient()) {
-            client.execute(httpPost);
-        }
-    }
-
-    // see https://stackoverflow.com/questions/36198302/proper-way-to-shutdown-apache-httpcomponents-blocking-http-server
-    private static CloseableHttpClient createHppClient() {
-        ConnectionKeepAliveStrategy myStrategy = (httpResponse, httpContext) -> 5 * 1000;
-        return HttpClients.custom().setKeepAliveStrategy(myStrategy).build();
     }
 
     /**
@@ -137,15 +103,6 @@ public class CupsServer implements Runnable {
      */
     public int getPort() {
         return port;
-    }
-
-    /**
-     * Gets forward uri.
-     *
-     * @return the forward uri
-     */
-    public URI getForwardURI() {
-        return forwardURI;
     }
 
     /**
@@ -184,7 +141,7 @@ public class CupsServer implements Runnable {
         }
     }
 
-    private HttpServer createServer(int serverPort) {
+    private static HttpServer createServer(int serverPort, URI forwardURI) {
         SocketConfig socketConfig = SocketConfig.custom()
                                                 .setSoTimeout(15000)
                                                 .setTcpNoDelay(true)
@@ -194,7 +151,7 @@ public class CupsServer implements Runnable {
                               .setServerInfo("Test/1.1")
                               .setSocketConfig(socketConfig)
                               .setExceptionLogger(new StdErrorExceptionLogger())
-                              .registerHandler("*", new IppRequestHandler(this))
+                              .registerHandler("*", new IppRequestHandler(forwardURI))
                               .addInterceptorLast(new LogInterceptor("<="))
                               .create();
     }
@@ -225,12 +182,13 @@ public class CupsServer implements Runnable {
         @Override
         public void log(final Exception ex) {
             if (ex instanceof SocketTimeoutException) {
-                System.err.println("Connection timed out");
+                LOG.warn("Connection timed out ({}).", ex.getMessage());
             } else if (ex instanceof ConnectionClosedException) {
-                System.err.println(ex.getMessage());
+                LOG.warn("Conncection is closed ({}).", ex.getMessage());
             } else {
-                ex.printStackTrace();
+                LOG.error("Shit happened:", ex);
             }
+            LOG.debug("Details:", ex);
         }
 
     }

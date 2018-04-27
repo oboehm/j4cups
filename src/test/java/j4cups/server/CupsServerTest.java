@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.Socket;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
@@ -123,15 +122,6 @@ class CupsServerTest extends AbstractServerTest {
     }
 
     /**
-     * With the main method you can start and stop the CUPS server.
-     */
-    //@Test
-    public void testMain() {
-        CupsServer.main("start", "6311");
-        CupsServer.main("stop", "6311");
-    }
-
-    /**
      * At the end of the tests we shut down the server. And we test if it is
      * really down.
      */
@@ -139,12 +129,8 @@ class CupsServerTest extends AbstractServerTest {
     public static void shutdownServer() {
         SERVER.shutdown();
         LOG.info("{} is shut down.", SERVER);
-        try (Socket socket = new Socket("localhost", SERVER.getPort())) {
-            assertFalse("yet connected to " + SERVER, socket.isConnected());
-        } catch(IOException expected)  {
-            LOG.info("{} is down (as expected).", SERVER);
-            LOG.debug("Details:", expected);
-        }
+        assertFalse(isOnline("localhost", SERVER.getPort()));
+        LOG.info("{} is offline (as expected).", SERVER);
     }
 
 }

@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.validation.ValidationException;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.BufferUnderflowException;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
@@ -47,18 +48,23 @@ import java.util.Locale;
 public class IppRequestHandler implements HttpRequestHandler, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppRequestHandler.class);
-    private final CupsServer cupsServer;
     private final CupsClient cupsClient;
+
+    /**
+     * The default ctor is mainly intented for testing.
+     */
+    public IppRequestHandler() {
+        this(URI.create("http://localhost:631"));
+    }
 
     /**
      * For shutdown request we must know the server. The server is given
      * with this constructor.
      *
-     * @param cupsServer server for shutdonw
+     * @param forwardURI URI where the request should be forwarded to
      */
-    public IppRequestHandler(CupsServer cupsServer) {
-        this.cupsServer = cupsServer;
-        this.cupsClient = new CupsClient(cupsServer.getForwardURI());
+    public IppRequestHandler(URI forwardURI) {
+        this.cupsClient = new CupsClient(forwardURI);
     }
 
     /**
@@ -101,12 +107,6 @@ public class IppRequestHandler implements HttpRequestHandler, AutoCloseable {
                 switch (ippRequest.getOperation()) {
                     case SEND_DOCUMENT:
                         new SendDocument().validateRequest(ippRequest);
-                        break;
-                    case ADDITIONAL_REGISTERED_OPERATIONS:
-                        if (ippRequest.getOpCode() == 0x3fff) {
-                            LOG.info("Stop request received - will shut down {}...", cupsServer);
-                            cupsServer.shutdown();
-                        }
                         break;
                 }
                 send(ippRequest, response);

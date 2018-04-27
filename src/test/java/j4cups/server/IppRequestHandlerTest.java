@@ -48,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class IppRequestHandlerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppRequestHandlerTest.class);
-    private final IppRequestHandler requestHandler = new IppRequestHandler(new CupsServer());
+    private final IppRequestHandler requestHandler = new IppRequestHandler();
 
     /**
      * For a first simple test we just call the handle method with an invalid
