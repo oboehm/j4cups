@@ -18,7 +18,6 @@
 package j4cups.server;
 
 
-import j4cups.protocol.AbstractIppTest;
 import j4cups.protocol.IppRequest;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -74,25 +73,25 @@ class CupsServerTest extends AbstractServerTest {
      */
     @Test
     public void testSendInvalidRequest() throws IOException {
-        CloseableHttpClient client = HttpClients.createDefault();
-        httpPost.setEntity(new StringEntity("hello"));
-        CloseableHttpResponse response = client.execute(httpPost);
-        assertEquals(400, response.getStatusLine().getStatusCode());
-        client.close();
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
+            httpPost.setEntity(new StringEntity("hello"));
+            CloseableHttpResponse response = client.execute(httpPost);
+            assertEquals(400, response.getStatusLine().getStatusCode());
+        }
     }
 
     /**
      * As a second test we send an valid request.
+     *
+     * @throws IOException e.g. in case of network prolblems
      */
     @Test
-    public void testSendRequest() {
-        httpPost.setEntity(new ByteArrayEntity(AbstractIppTest.REQUEST_GET_JOBS.toByteArray()));
+    public void testSendRequest() throws IOException {
+        IppRequest getJobsReqeust = readIppRequest("Get-Jobs.bin");
+        httpPost.setEntity(new ByteArrayEntity(getJobsReqeust.toByteArray()));
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             CloseableHttpResponse response = client.execute(httpPost);
             assertEquals(200, response.getStatusLine().getStatusCode());
-        } catch (IOException mayhappen) {
-            LOG.info("Cannot connect to printer ({}).", mayhappen.getMessage());
-            LOG.debug("Details:", mayhappen);
         }
     }
 

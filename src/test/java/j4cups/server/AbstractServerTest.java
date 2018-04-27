@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URI;
 import java.net.UnknownHostException;
@@ -76,7 +77,8 @@ public abstract class AbstractServerTest {
      * @return true or false
      */
     protected static boolean isOnline(String host, int port) {
-        try (Socket socket = new Socket(host, port)) {
+        try (Socket socket = new Socket()) {
+            socket.connect(new InetSocketAddress(host, port), 200);
             LOG.debug("Socket {} for {}:{} is created.", socket, host, port);
             return socket.isConnected();
         } catch (UnknownHostException ex) {
