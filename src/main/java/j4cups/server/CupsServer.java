@@ -195,6 +195,7 @@ public class CupsServer implements Runnable {
                               .setSocketConfig(socketConfig)
                               .setExceptionLogger(new StdErrorExceptionLogger())
                               .registerHandler("*", new IppRequestHandler(this))
+                              .addInterceptorLast(new LogInterceptor("<="))
                               .create();
     }
 

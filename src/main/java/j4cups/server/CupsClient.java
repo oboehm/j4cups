@@ -65,11 +65,15 @@ public final class CupsClient {
         LOG.info("Sending to {}: {}.", printerURI, ippRequest);
         HttpPost httpPost = new HttpPost(printerURI);
         httpPost.setEntity(new ByteArrayEntity(ippRequest.toByteArray()));
-        try (CloseableHttpClient client = HttpClients.createDefault()) {
+        try (CloseableHttpClient client = createHttpClient()) {
             CloseableHttpResponse response = client.execute(httpPost);
             LOG.info("Received from {}: {}", printerURI, response);
             return response;
         }
+    }
+
+    private static CloseableHttpClient createHttpClient() {
+        return HttpClients.custom().addInterceptorLast(new LogInterceptor("=>")).build();
     }
 
     private URI getPrinterURI(IppRequest ippRequest) {
