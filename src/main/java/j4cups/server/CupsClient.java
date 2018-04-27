@@ -73,14 +73,17 @@ public final class CupsClient {
     }
 
     private URI getPrinterURI(IppRequest ippRequest) {
-        URI portlessURI = ippRequest.getPrinterURI();
-        try {
-            return new URI(portlessURI.getScheme(), portlessURI.getUserInfo(), portlessURI.getHost(),
-                    forwardURI.getPort(), portlessURI.getPath(), portlessURI.getQuery(), portlessURI.getFragment());
-        } catch (URISyntaxException ex) {
-            LOG.warn("Cannot create printer-uri '{}' with port {}:", portlessURI, forwardURI.getPort(), ex);
-            return portlessURI;
+        URI printerURI = ippRequest.getPrinterURI();
+        if (printerURI.getPort() < 0) {
+            LOG.debug("Port is missing in {} and will be replaced with port of {}.", printerURI, forwardURI);
+            try {
+                return new URI(printerURI.getScheme(), printerURI.getUserInfo(), printerURI.getHost(),
+                        forwardURI.getPort(), printerURI.getPath(), printerURI.getQuery(), printerURI.getFragment());
+            } catch (URISyntaxException ex) {
+                LOG.warn("Cannot create printer-uri '{}' with port {}:", printerURI, forwardURI.getPort(), ex);
+            }
         }
+        return printerURI;
     }
 
 }
