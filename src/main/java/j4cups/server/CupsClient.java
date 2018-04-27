@@ -37,10 +37,11 @@ import java.net.URISyntaxException;
  * @author oboehm
  * @since 0.5 (26.04.2018)
  */
-public final class CupsClient {
+public final class CupsClient implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(CupsClient.class);
     private final URI forwardURI;
+    private final CloseableHttpClient client = createHttpClient();
 
     /**
      * Instantiates a new Cups client.
@@ -65,11 +66,9 @@ public final class CupsClient {
         LOG.info("Sending to {}: {}.", printerURI, ippRequest);
         HttpPost httpPost = new HttpPost(printerURI);
         httpPost.setEntity(new ByteArrayEntity(ippRequest.toByteArray()));
-        try (CloseableHttpClient client = createHttpClient()) {
-            CloseableHttpResponse response = client.execute(httpPost);
-            LOG.info("Received from {}: {}", printerURI, response);
-            return response;
-        }
+        CloseableHttpResponse response = client.execute(httpPost);
+        LOG.info("Received from {}: {}", printerURI, response);
+        return response;
     }
 
     private static CloseableHttpClient createHttpClient() {
@@ -88,6 +87,17 @@ public final class CupsClient {
             }
         }
         return printerURI;
+    }
+
+    /**
+     * Closes the HttpClient which used to connect the CUPS server or
+     * printer.
+     *
+     * @throws IOException if this resource cannot be closed
+     */
+    @Override
+    public void close() throws IOException {
+        client.close();
     }
 
 }

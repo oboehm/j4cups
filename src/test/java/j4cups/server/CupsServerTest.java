@@ -19,6 +19,8 @@ package j4cups.server;
 
 
 import j4cups.protocol.AbstractIppTest;
+import j4cups.protocol.IppRequest;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
@@ -35,12 +37,13 @@ import java.io.IOException;
 import java.net.Socket;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link CupsServer}.
  */
-class CupsServerTest {
+class CupsServerTest extends AbstractServerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(CupsServerTest.class);
     private static final CupsServer SERVER = new CupsServer(6310);
@@ -90,6 +93,24 @@ class CupsServerTest {
         } catch (IOException mayhappen) {
             LOG.info("Cannot connect to printer ({}).", mayhappen.getMessage());
             LOG.debug("Details:", mayhappen);
+        }
+    }
+
+    /**
+     * We ask the CUPS server for the registered printers.
+     *
+     * @throws IOException e.g. in case of network problems
+     */
+    @Test
+    public void testSendGetPrinters() throws IOException {
+        IppRequest getPrintersRequest = readIppRequest("Get-Printers.bin");
+        httpPost.setEntity(new ByteArrayEntity(getPrintersRequest.toByteArray()));
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
+            CloseableHttpResponse response = client.execute(httpPost);
+            assertEquals(200, response.getStatusLine().getStatusCode());
+            byte[] content = IOUtils.toByteArray(response.getEntity().getContent());
+            assertThat(content.length, greaterThan(10));
+            LOG.info("{} bytes received.", content.length);
         }
     }
 

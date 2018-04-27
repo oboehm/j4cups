@@ -18,30 +18,27 @@
 
 package j4cups.server;
 
-import j4cups.protocol.AbstractIppTest;
 import j4cups.protocol.IppRequest;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.Socket;
 import java.net.URI;
-import java.net.UnknownHostException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * Unit tests for class {@link CupsClient}.
  *
  * @author oliver (boehm@javatux.de)
  */
-class CupsClientTest {
+class CupsClientTest extends AbstractServerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(CupsClientTest.class);
-    private final CupsClient client = new CupsClient(URI.create("http://localhost:631"));
+    private static final CupsClient CLIENT = new CupsClient(URI.create("http://localhost:631"));
 
     /**
      * Unit test for {@link CupsClient#send(IppRequest)}.
@@ -50,30 +47,14 @@ class CupsClientTest {
      */
     @Test
     public void sendGetPrinters() throws IOException {
-        IppRequest getPrintersRequest = AbstractIppTest.readIppRequest("request", "Get-Printers.bin");
-        URI printerURI = getPrintersRequest.getPrinterURI();
-        assumeTrue(isOnline(printerURI), printerURI + " is not available");
-        LOG.info("Test 'sendGetPrinters' is executed because localhost:631 is available.");
-        CloseableHttpResponse response = client.send(getPrintersRequest);
+        IppRequest getPrintersRequest = readIppRequest("Get-Printers.bin");
+        CloseableHttpResponse response = CLIENT.send(getPrintersRequest);
         assertEquals(200, response.getStatusLine().getStatusCode());
     }
 
-    private static boolean isOnline(URI uri) {
-        int port = uri.getPort();
-        return isOnline(uri.getHost(), port == -1 ? 631 : port);
-    }
-
-    private static boolean isOnline(String host, int port) {
-        try (Socket socket = new Socket(host, port)) {
-            LOG.debug("Socket {} for {}:{} is created.", socket, host, port);
-            return socket.isConnected();
-        } catch (UnknownHostException ex) {
-            throw new IllegalArgumentException("invalid host: " + host, ex);
-        } catch (IOException ex) {
-            LOG.info("Cannot connect to {}:{} ({}).", host, port, ex.getMessage());
-            LOG.debug("Details:", ex);
-            return false;
-        }
+    @AfterAll
+    public static void closeClient() throws IOException {
+        CLIENT.close();
     }
 
 }

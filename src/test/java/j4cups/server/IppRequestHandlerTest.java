@@ -30,6 +30,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
 import org.apache.http.protocol.HttpContext;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,6 +103,11 @@ class IppRequestHandlerTest {
         HttpPost request = new HttpPost();
         request.setEntity(new ByteArrayEntity(op.toByteArray()));
         return request;
+    }
+
+    @AfterEach
+    public void closeRequestHandler() throws IOException {
+        this.requestHandler.close();
     }
 
 }

@@ -44,7 +44,7 @@ import java.util.Locale;
  * @author <a href="ob@aosd.de">oliver</a>
  * @since (15.04.18)
  */
-public class IppRequestHandler implements HttpRequestHandler {
+public class IppRequestHandler implements HttpRequestHandler, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppRequestHandler.class);
     private final CupsServer cupsServer;
@@ -62,7 +62,8 @@ public class IppRequestHandler implements HttpRequestHandler {
     }
 
     /**
-     * Handles the incomming IPP request.
+     * Handles the incomming IPP request and sends it to the real CUPS server
+     * (given by the forwardURI or the inserted printer-uri).
      *
      * @param request incoming request
      * @param response outgoing response
@@ -122,10 +123,9 @@ public class IppRequestHandler implements HttpRequestHandler {
 
     private void send(IppRequest ippRequest, HttpResponse response) throws IOException {
         CloseableHttpResponse cupsResponse = cupsClient.send(ippRequest);
-        response.setStatusCode(cupsResponse.getStatusLine().getStatusCode());
         response.setEntity(cupsResponse.getEntity());
+        response.setStatusCode(cupsResponse.getStatusLine().getStatusCode());
         response.setStatusLine(cupsResponse.getStatusLine());
-        response.setHeaders(cupsResponse.getAllHeaders());
         response.setLocale(cupsResponse.getLocale());
     }
 
@@ -137,6 +137,17 @@ public class IppRequestHandler implements HttpRequestHandler {
         ippResponse.setStatusCode(StatusCode.CLIENT_ERROR_BAD_REQUEST);
         ippResponse.setStatusMessage(ex.getMessage());
         response.setEntity(new ByteArrayEntity(ippResponse.toByteArray()));
+    }
+
+    /**
+     * Closes the CupsClient which used to connect the CUPS server or
+     * printer.
+     *
+     * @throws IOException if this resource cannot be closed
+     */
+    @Override
+    public void close() throws IOException {
+        cupsClient.close();
     }
 
 }
