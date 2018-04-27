@@ -27,6 +27,7 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.protocol.HttpProcessor;
 import org.apache.http.protocol.HttpRequestHandler;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
@@ -45,7 +46,7 @@ import java.util.Locale;
  * @author <a href="ob@aosd.de">oliver</a>
  * @since (15.04.18)
  */
-public class IppRequestHandler implements HttpRequestHandler, AutoCloseable {
+public class IppRequestHandler implements HttpRequestHandler, HttpProcessor, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppRequestHandler.class);
     private final CupsClient cupsClient;
@@ -140,6 +141,40 @@ public class IppRequestHandler implements HttpRequestHandler, AutoCloseable {
     }
 
     /**
+     * Processes (validates) a request.
+     * On the client side, this step is performed before the request is
+     * sent to the server. On the server side, this step is performed
+     * on incoming messages before the message body is evaluated.
+     *
+     * @param request the request to preprocess
+     * @param context the context for the request
+     * @throws HttpException in case of an HTTP protocol violation
+     * @throws IOException   in case of an I/O error
+     */
+    @Override
+    public void process(HttpRequest request, HttpContext context) throws HttpException, IOException {
+        LOG.info("<= {}", request);
+        LOG.debug("<= {}", context);
+    }
+
+    /**
+     * Processes a response.
+     * On the server side, this step is performed before the response is
+     * sent to the client. On the client side, this step is performed
+     * on incoming messages before the message body is evaluated.
+     *
+     * @param response the response to postprocess
+     * @param context  the context for the request
+     * @throws HttpException in case of an HTTP protocol violation
+     * @throws IOException   in case of an I/O error
+     */
+    @Override
+    public void process(HttpResponse response, HttpContext context) throws HttpException, IOException {
+        LOG.info("=> {}", response);
+        LOG.debug("=> {}", context);
+    }
+
+    /**
      * Closes the CupsClient which used to connect the CUPS server or
      * printer.
      *
@@ -149,5 +184,4 @@ public class IppRequestHandler implements HttpRequestHandler, AutoCloseable {
     public void close() throws IOException {
         cupsClient.close();
     }
-
 }

@@ -65,7 +65,9 @@ public final class CupsClient implements AutoCloseable {
         URI printerURI = getPrinterURI(ippRequest);
         LOG.info("Sending to {}: {}.", printerURI, ippRequest);
         HttpPost httpPost = new HttpPost(printerURI);
-        httpPost.setEntity(new ByteArrayEntity(ippRequest.toByteArray()));
+        ByteArrayEntity entity = new ByteArrayEntity(ippRequest.toByteArray());
+        entity.setContentType("application/ipp");
+        httpPost.setEntity(entity);
         CloseableHttpResponse response = client.execute(httpPost);
         LOG.info("Received from {}: {}", printerURI, response);
         return response;
