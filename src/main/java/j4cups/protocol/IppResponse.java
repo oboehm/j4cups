@@ -98,7 +98,7 @@ public class IppResponse extends AbstractIpp {
     private static AttributeGroup createPrintJobJobAttributes(IppRequest request) {
         AttributeGroup group = new AttributeGroup(DelimiterTags.JOB_ATTRIBUTES_TAG);
         int jobId = parseInt(request.getAttribute("job-name").getStringValue());
-        URI jobUri = URI.create(request.getAttribute("printer-uri").getUriValue() + "/" + jobId);
+        URI jobUri = URI.create(request.getPrinterURI() + "/" + jobId);
         group.addAttribute(Attribute.of("job-id", jobId));
         group.addAttribute(Attribute.of("job-uri", jobUri));
         group.addAttribute(Attribute.of(ValueTags.ENUM, "job-state", JobState.COMPLETED.getValue()));

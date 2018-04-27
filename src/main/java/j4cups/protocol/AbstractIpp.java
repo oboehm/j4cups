@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.*;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -354,6 +355,16 @@ public abstract class AbstractIpp implements Externalizable {
      */
     public List<Attribute> getOperationAttributes() {
         return getAttributeGroup(DelimiterTags.OPERATION_ATTRIBUTES_TAG).getAttributes();
+    }
+
+    /**
+     * Gets the URI of the printer from the attributes.
+     *
+     * @return printer-uri
+     * @since 0.5
+     */
+    public URI getPrinterURI() {
+        return getAttribute("printer-uri").getUriValue();
     }
 
     /**

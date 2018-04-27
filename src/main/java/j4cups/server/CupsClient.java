@@ -73,7 +73,7 @@ public final class CupsClient {
     }
 
     private URI getPrinterURI(IppRequest ippRequest) {
-        URI portlessURI = ippRequest.getAttribute("printer-uri").getUriValue();
+        URI portlessURI = ippRequest.getPrinterURI();
         try {
             return new URI(portlessURI.getScheme(), portlessURI.getUserInfo(), portlessURI.getHost(),
                     forwardURI.getPort(), portlessURI.getPath(), portlessURI.getQuery(), portlessURI.getFragment());
