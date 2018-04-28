@@ -25,7 +25,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
@@ -101,7 +100,7 @@ class IppRequestHandlerTest {
 
     private static HttpPost createHttpRequest(IppRequest op) {
         HttpPost request = new HttpPost();
-        request.setEntity(new ByteArrayEntity(op.toByteArray()));
+        request.setEntity(new IppEntity(op));
         return request;
     }
 

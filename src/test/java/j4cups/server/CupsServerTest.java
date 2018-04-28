@@ -87,7 +87,7 @@ class CupsServerTest extends AbstractServerTest {
     @Test
     public void testSendRequest() throws IOException {
         IppRequest getJobsReqeust = readIppRequest("Get-Jobs.bin");
-        httpPost.setEntity(new ByteArrayEntity(getJobsReqeust.toByteArray()));
+        httpPost.setEntity(new IppEntity(getJobsReqeust));
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             CloseableHttpResponse response = client.execute(httpPost);
             assertEquals(200, response.getStatusLine().getStatusCode());

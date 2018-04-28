@@ -490,6 +490,15 @@ public abstract class AbstractIpp implements Externalizable {
             throw new IllegalStateException("cannot dump package", ioe);
         }
     }
+
+    /**
+     * Calculates the size of the request or response.
+     *
+     * @return length in bytes
+     */
+    public long getLength() {
+        return toByteArray().length;
+    }
     
     private void writeTo(OutputStream ostream) throws IOException {
         try (DataOutputStream dos = new DataOutputStream(ostream)) {

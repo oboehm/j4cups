@@ -20,7 +20,6 @@ package j4cups.server;
 import j4cups.protocol.IppRequest;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
@@ -65,8 +64,7 @@ public final class CupsClient implements AutoCloseable {
         URI printerURI = getPrinterURI(ippRequest);
         LOG.info("Sending to {}: {}.", printerURI, ippRequest);
         HttpPost httpPost = new HttpPost(printerURI);
-        ByteArrayEntity entity = new ByteArrayEntity(ippRequest.toByteArray());
-        entity.setContentType("application/ipp");
+        IppEntity entity = new IppEntity(ippRequest);
         httpPost.setEntity(entity);
         CloseableHttpResponse response = client.execute(httpPost);
         LOG.info("Received from {}: {}", printerURI, response);

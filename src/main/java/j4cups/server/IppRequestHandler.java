@@ -23,7 +23,6 @@ import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
 import org.apache.http.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.protocol.HttpContext;
@@ -137,7 +136,7 @@ public class IppRequestHandler implements HttpRequestHandler, HttpProcessor, Aut
         response.setStatusCode(HttpStatus.SC_BAD_REQUEST);
         ippResponse.setStatusCode(StatusCode.CLIENT_ERROR_BAD_REQUEST);
         ippResponse.setStatusMessage(ex.getMessage());
-        response.setEntity(new ByteArrayEntity(ippResponse.toByteArray()));
+        response.setEntity(new IppEntity(ippResponse));
     }
 
     /**
@@ -148,11 +147,9 @@ public class IppRequestHandler implements HttpRequestHandler, HttpProcessor, Aut
      *
      * @param request the request to preprocess
      * @param context the context for the request
-     * @throws HttpException in case of an HTTP protocol violation
-     * @throws IOException   in case of an I/O error
      */
     @Override
-    public void process(HttpRequest request, HttpContext context) throws HttpException, IOException {
+    public void process(HttpRequest request, HttpContext context)  {
         LOG.info("<= {}", request);
         LOG.debug("<= {}", context);
     }
@@ -165,11 +162,9 @@ public class IppRequestHandler implements HttpRequestHandler, HttpProcessor, Aut
      *
      * @param response the response to postprocess
      * @param context  the context for the request
-     * @throws HttpException in case of an HTTP protocol violation
-     * @throws IOException   in case of an I/O error
      */
     @Override
-    public void process(HttpResponse response, HttpContext context) throws HttpException, IOException {
+    public void process(HttpResponse response, HttpContext context) {
         LOG.info("=> {}", response);
         LOG.debug("=> {}", context);
     }
