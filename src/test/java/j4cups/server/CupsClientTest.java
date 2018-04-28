@@ -19,6 +19,10 @@
 package j4cups.server;
 
 import j4cups.protocol.IppRequest;
+import j4cups.protocol.IppResponse;
+import j4cups.protocol.StatusCode;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
@@ -41,6 +45,7 @@ class CupsClientTest extends AbstractServerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(CupsClientTest.class);
     private static final CupsClient CLIENT = new CupsClient(URI.create("http://localhost:631"));
+    public static final URI TEST_PRINTER_URI = URI.create("http://localhost:631/printers/Brother_MFC_J5910DW_2");
 
     /**
      * Unit test for {@link CupsClient#send(IppRequest)}.
@@ -48,7 +53,7 @@ class CupsClientTest extends AbstractServerTest {
      * @throws IOException the io exception
      */
     @Test
-    public void sendGetPrinters() throws IOException {
+    public void testSendGetPrinters() throws IOException {
         IppRequest getPrintersRequest = readIppRequest("Get-Printers.bin");
         CloseableHttpResponse response = CLIENT.send(getPrintersRequest);
         assertEquals(200, response.getStatusLine().getStatusCode());
@@ -60,10 +65,23 @@ class CupsClientTest extends AbstractServerTest {
      * @throws IOException the io exception
      */
     @Test
-    public void sendGetJobs() throws IOException {
-        IppRequest jobsRequest = readIppRequest("Get-Jobs.bin");
+    public void testSendGetJobs() throws IOException {
+        IppRequest jobsRequest = readIppRequest("Get-Jobs.bin", TEST_PRINTER_URI);
         CloseableHttpResponse response = CLIENT.send(jobsRequest);
         assertEquals(200, response.getStatusLine().getStatusCode());
+        HttpEntity httpEntity = response.getEntity();
+        byte[] content = IOUtils.toByteArray(httpEntity.getContent());
+        IppResponse ippResponse = new IppResponse(content);
+        assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
+    }
+
+    /**
+     * Test method for {@link CupsClient#getJobs(URI)}.
+     */
+    @Test
+    public void testGetJobs() {
+        IppResponse ippResponse = CLIENT.getJobs(TEST_PRINTER_URI);
+        assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
     }
 
     @AfterAll

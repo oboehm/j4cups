@@ -30,12 +30,14 @@ import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * The class AbstractIpp is the common super class of {@link IppRequest} and
@@ -227,13 +229,23 @@ public abstract class AbstractIpp implements Externalizable {
     protected abstract String getOpCodeAsString();
 
     /**
-     * Retunns the 3rd part (byte 4-7) of the request which
+     * Returns the 3rd part (byte 4-7) of the request which
      * contains the request-id.
      *
      * @return the request-id
      */
     public int getRequestId() {
         return requestId;
+    }
+
+    /**
+     * Sets the request-id.
+     *
+     * @param id the new request-id
+     * @since 0.5
+     */
+    public void setRequestId(int id) {
+        requestId = id;
     }
 
     /**
@@ -372,9 +384,43 @@ public abstract class AbstractIpp implements Externalizable {
      * overwritten.
      *
      * @param printerURI the printer uri
+     * @since 0.5
      */
     public void setPrinterURI(URI printerURI) {
         Attribute attr = Attribute.of("printer-uri", printerURI);
+        setOperationAttribute(attr);
+    }
+
+    /**
+     * Sets the attributes-charset attribute.
+     *
+     * @param charset e.g. UTF_8
+     * @since 0.5
+     */
+    public void setAttributesCharset(Charset charset) {
+        Attribute attr = Attribute.of("attributes-charset", charset);
+        setOperationAttribute(attr);
+    }
+
+    /**
+     * Sets the attributes-natural-language attribute.
+     *
+     * @param locale e.g. GERMANY
+     * @since 0.5
+     */
+    public void setAttributesNaturalLanguage(Locale locale) {
+        Attribute attr = Attribute.of("attributes-natural-language", locale);
+        setOperationAttribute(attr);
+    }
+
+    /**
+     * Sets the requesting-user-name attribute.
+     *
+     * @param username user name
+     * @since 0.5
+     */
+    public void setRequestingUserName(String username) {
+        Attribute attr = Attribute.of(ValueTags.NAME_WITHOUT_LANGUAGE, "requesting-user-name", username);
         setOperationAttribute(attr);
     }
 

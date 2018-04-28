@@ -41,18 +41,37 @@ public abstract class AbstractServerTest {
     private static final Logger LOG = LoggerFactory.getLogger(CupsClientTest.class);
 
     /**
-     * Redas a recorded request and checks if the needed CUPS server or printer
+     * Reads a recorded request and checks if the needed CUPS server or printer
      * is available. If not the test will be ignored.
      *
      * @param filename of the request resource
      * @return recorded IPP request
      */
     protected static IppRequest readIppRequest(String filename) {
-        IppRequest getPrintersRequest = AbstractIppTest.readIppRequest("request", filename);
-        URI printerURI = getPrintersRequest.getPrinterURI();
+        IppRequest ippRequest = AbstractIppTest.readIppRequest("request", filename);
+        URI printerURI = ippRequest.getPrinterURI();
+        return checkIppPrinterURI(printerURI, ippRequest);
+    }
+
+    /**
+     * Reads a recorded request and replaces the printerURI in the recorded
+     * request with the given printer-uri.
+     *
+     * @param filename   of the request resource
+     * @param printerURI the printer uri which will be used
+     * @return recorded IPP request with replaces printer-uri
+     */
+    protected static IppRequest readIppRequest(String filename, URI printerURI) {
+        IppRequest ippRequest = AbstractIppTest.readIppRequest("request", filename);
+        return checkIppPrinterURI(printerURI, ippRequest);
+    }
+
+    private static IppRequest checkIppPrinterURI(URI printerURI, IppRequest ippRequest) {
         assumeTrue(isOnline(printerURI), printerURI + " is not available");
         LOG.debug("Test is executed because {} is available.", printerURI);
-        return getPrintersRequest;
+        ippRequest.setPrinterURI(printerURI);
+        ippRequest.setPrinterURI(printerURI);
+        return ippRequest;
     }
 
     /**

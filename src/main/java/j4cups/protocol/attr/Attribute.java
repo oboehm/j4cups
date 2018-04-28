@@ -74,7 +74,7 @@ public final class Attribute implements Binary {
     }
     
     private Attribute(AttributeWithOneValue value) {
-        this(value, new ArrayList<AdditionalValue>());
+        this(value, new ArrayList<>());
     }
 
     private Attribute(AttributeWithOneValue value, List<AdditionalValue> additionalValues) {
@@ -175,6 +175,26 @@ public final class Attribute implements Binary {
     public static Attribute of(ValueTags tag, String name, byte[] value) {
         AttributeWithOneValue attr = new AttributeWithOneValue(tag, name, value);
         return new Attribute(attr);
+    }
+
+    /**
+     * Creates a multi-value attribute for character-string values.
+     *
+     * @param tag   the value-tag
+     * @param name  the name of the attribute
+     * @param value the string value of the attribute
+     * @return the attribute
+     */
+    public static Attribute of(ValueTags tag, String name, String value, String... additionalValues) {
+        byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
+        AttributeWithOneValue attr = new AttributeWithOneValue(tag, name, bytes);
+        List<AdditionalValue> addValues = new ArrayList<>();
+        for (String s : additionalValues) {
+            AttributeWithOneValue addAttr = new AttributeWithOneValue(tag, "", s.getBytes(StandardCharsets.UTF_8));
+            ByteBuffer buffer = ByteBuffer.wrap(addAttr.toByteArray());
+            addValues.add(new AdditionalValue(buffer));
+        }
+        return new Attribute(attr, addValues);
     }
 
     /**

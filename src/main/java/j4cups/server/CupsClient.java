@@ -17,7 +17,12 @@
  */
 package j4cups.server;
 
+import j4cups.op.GetJobs;
+import j4cups.op.Operation;
 import j4cups.protocol.IppRequest;
+import j4cups.protocol.IppResponse;
+import j4cups.protocol.StatusCode;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -26,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -41,6 +47,7 @@ public final class CupsClient implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(CupsClient.class);
     private final URI forwardURI;
     private final CloseableHttpClient client = createHttpClient();
+    private int requestId = 1;
 
     /**
      * Instantiates a new Cups client.
@@ -49,6 +56,35 @@ public final class CupsClient implements AutoCloseable {
      */
     public CupsClient(URI forwardURI) {
         this.forwardURI = forwardURI;
+    }
+
+    /**
+     * Gets all jobs of a printer.
+     *
+     * @param printerURI printer URI
+     * @return answer from CUPS
+     */
+    public IppResponse getJobs(URI printerURI) {
+        GetJobs op = new GetJobs();
+        op.setPrinterURI(printerURI);
+        op.setIppRequestId(requestId);
+        return send(op);
+    }
+
+    private IppResponse send(Operation op) {
+        IppRequest ippRequest = op.getIppRequest();
+        try {
+            CloseableHttpResponse httpResponse = send(ippRequest);
+            try (InputStream istream = httpResponse.getEntity().getContent()) {
+                return new IppResponse(IOUtils.toByteArray(istream));
+            }
+        } catch (IOException ex) {
+            LOG.warn("Cannot sent {}:", op, ex);
+            IppResponse ippResponse = new IppResponse(ippRequest);
+            ippResponse.setStatusCode(StatusCode.SERVER_ERROR_INTERNAL_ERROR);
+            ippResponse.setStatusMessage(ex.getMessage());
+            return ippResponse;
+        }
     }
 
     /**

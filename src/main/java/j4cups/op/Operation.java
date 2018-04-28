@@ -19,8 +19,12 @@ package j4cups.op;
 
 import j4cups.protocol.IppOperations;
 import j4cups.protocol.IppRequest;
+import org.apache.commons.lang3.SystemUtils;
 
 import javax.validation.ValidationException;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 /**
  * This is the common super class of all IPP operations.
@@ -31,6 +35,7 @@ import javax.validation.ValidationException;
 public class Operation {
     
     private final IppOperations id;
+    private final IppRequest ippRequest;
 
     /**
      * Instantiates an operation with the given id.
@@ -38,7 +43,54 @@ public class Operation {
      * @param id a positiv number between 0x0000 and 0x0031
      */
     public Operation(IppOperations id) {
+        this(id, createIppRequest(id));
+    }
+
+    /**
+     * Instantiates an operation with the given id and the given IPP request.
+     *
+     * @param id         a positiv number between 0x0000 and 0x0031
+     * @param ippRequest the ipp request
+     */
+    protected Operation(IppOperations id, IppRequest ippRequest) {
         this.id = id;
+        this.ippRequest = ippRequest;
+    }
+
+    protected static IppRequest createIppRequest(IppOperations ippOp) {
+        IppRequest request = new IppRequest();
+        request.setOpCode(ippOp.getCode());
+        request.setAttributesCharset(StandardCharsets.UTF_8);
+        request.setAttributesNaturalLanguage(Locale.US);
+        request.setRequestingUserName(SystemUtils.USER_NAME);
+        return request;
+    }
+
+    /**
+     * Gets the IPP request which belongs to this operation.
+     *
+     * @return IPP request
+     */
+    public IppRequest getIppRequest() {
+        return ippRequest;
+    }
+
+    /**
+     * Sets the ID of the IPP request.
+     *
+     * @param id the new ID
+     */
+    public void setIppRequestId(int id) {
+        ippRequest.setRequestId(id);
+    }
+
+    /**
+     * Sets the printer-uri.
+     *
+     * @param printerURI the printer uri
+     */
+    public void setPrinterURI(URI printerURI) {
+        ippRequest.setPrinterURI(printerURI);
     }
 
     /**
