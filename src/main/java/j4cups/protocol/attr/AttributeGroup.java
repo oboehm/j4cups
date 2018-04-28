@@ -19,6 +19,8 @@ package j4cups.protocol.attr;
 
 import j4cups.protocol.Binary;
 import j4cups.protocol.tags.DelimiterTags;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -48,7 +50,8 @@ import java.util.List;
  * @since 0.0.2 (10.02.2018)
  */
 public class AttributeGroup implements Binary {
-    
+
+    private static final Logger LOG = LoggerFactory.getLogger(AttributeGroup.class);
     private final DelimiterTags beginTag;
     private final List<Attribute> attributes;
 
@@ -134,12 +137,35 @@ public class AttributeGroup implements Binary {
     }
 
     /**
+     * Checks if the given attribute is available.
+     *
+     * @param name the name of the attribute
+     * @return true or false
+     * @since 0.5
+     */
+    public boolean hasAttribute(String name) {
+        for (Attribute attr : attributes) {
+            if (name.equals(attr.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Adds an attribute to the given attributes.
      *
      * @param attr the new attribute
      */
     public void addAttribute(Attribute attr) {
-        attributes.add(attr);
+        if (hasAttribute(attr.getName())) {
+            Attribute existing = getAttribute(attr.getName());
+            LOG.debug("{} is overwritten with {}.", existing, attr);
+            existing.setValue(attr.getValue());
+        } else {
+            attributes.add(attr);
+            LOG.debug("{} is added.", attr);
+        }
     }
 
     /**

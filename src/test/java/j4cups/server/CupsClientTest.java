@@ -31,7 +31,9 @@ import java.net.URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Unit tests for class {@link CupsClient}.
+ * Unit tests for class {@link CupsClient}. For tests with a real I used
+ * http://localhost:631/printers/Brother_MFC_J5910DW_2 in my local home
+ * network.
  *
  * @author oliver (boehm@javatux.de)
  */
@@ -49,6 +51,18 @@ class CupsClientTest extends AbstractServerTest {
     public void sendGetPrinters() throws IOException {
         IppRequest getPrintersRequest = readIppRequest("Get-Printers.bin");
         CloseableHttpResponse response = CLIENT.send(getPrintersRequest);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+    }
+
+    /**
+     * Another nit test for {@link CupsClient#send(IppRequest)}.
+     *
+     * @throws IOException the io exception
+     */
+    @Test
+    public void sendGetJobs() throws IOException {
+        IppRequest jobsRequest = readIppRequest("Get-Jobs.bin");
+        CloseableHttpResponse response = CLIENT.send(jobsRequest);
         assertEquals(200, response.getStatusLine().getStatusCode());
     }
 

@@ -368,6 +368,17 @@ public abstract class AbstractIpp implements Externalizable {
     }
 
     /**
+     * Sets the printer-uri attribute. If it is already set it will be
+     * overwritten.
+     *
+     * @param printerURI the printer uri
+     */
+    public void setPrinterURI(URI printerURI) {
+        Attribute attr = Attribute.of("printer-uri", printerURI);
+        setOperationAttribute(attr);
+    }
+
+    /**
      * Sets the data part of the request or response.
      * 
      * @param data new data

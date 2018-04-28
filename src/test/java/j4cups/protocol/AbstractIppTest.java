@@ -26,15 +26,14 @@ import patterntesting.runtime.junit.SerializableTester;
 
 import java.io.IOException;
 import java.io.NotSerializableException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -141,6 +140,16 @@ public abstract class AbstractIppTest {
         AbstractIpp one = getIppPackage();
         AbstractIpp anotherOne = getIppPackage();
         ObjectTester.assertEquals(one, anotherOne);
+    }
+
+    /**
+     * Test method for {@link AbstractIpp#setPrinterURI(URI)}.
+     */
+    @Test
+    public void testSetPrinterURI() {
+        URI printerURI = URI.create("http://localhost:631/printers/Brother_MFC_J5910DW_2");
+        ippPackage.setPrinterURI(printerURI);
+        assertEquals(printerURI, ippPackage.getPrinterURI());
     }
 
 }
