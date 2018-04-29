@@ -31,10 +31,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
@@ -97,11 +101,28 @@ class CupsClientTest extends AbstractServerTest {
     public void testCreateAndCancelJob() {
         assumeTrue(isOnline(CUPS_URI), CUPS_URI + " is not available");
         IppResponse ippResponse = CLIENT.createJob(TEST_PRINTER_URI);
-        int jobId = ippResponse.getJobId();
-        LOG.info("Job {} created.", jobId);
-        assertThat(jobId, greaterThan(0));
-        ippResponse = CLIENT.cancelJob(TEST_PRINTER_URI, jobId);
+        cancelJob(ippResponse);
+    }
+
+    /**
+     * Test method for {@link CupsClient#printJob(URI, Path)}.
+     */
+    @Test
+    public void testPrintJob() {
+        assumeTrue(isOnline(CUPS_URI), CUPS_URI + " is not available");
+        Path readme = Paths.get("src", "test", "resources", "log4j2.xml");
+        assertTrue(Files.exists(readme));
+        IppResponse ippResponse = CLIENT.printJob(TEST_PRINTER_URI, readme);
         assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
+        cancelJob(ippResponse);
+    }
+
+    private static void cancelJob(IppResponse ippResponse) {
+        int jobId = ippResponse.getJobId();
+        LOG.info("Cancelling job {}...", jobId);
+        assertThat(jobId, greaterThan(0));
+        IppResponse cancelResponse = CLIENT.cancelJob(TEST_PRINTER_URI, jobId);
+        assertEquals(StatusCode.SUCCESSFUL_OK, cancelResponse.getStatusCode());
     }
 
     @AfterAll

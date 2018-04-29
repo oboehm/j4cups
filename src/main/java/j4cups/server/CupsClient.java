@@ -17,10 +17,7 @@
  */
 package j4cups.server;
 
-import j4cups.op.CancelJob;
-import j4cups.op.CreateJob;
-import j4cups.op.GetJobs;
-import j4cups.op.Operation;
+import j4cups.op.*;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
@@ -36,6 +33,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * The CupsClient is needed for the communication to real CUPS server which
@@ -49,7 +48,7 @@ public final class CupsClient implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(CupsClient.class);
     private final URI forwardURI;
     private final CloseableHttpClient client = createHttpClient();
-    private int requestId = 0;
+    private int requestId = 1;
 
     /**
      * Instantiates a new Cups client.
@@ -58,6 +57,26 @@ public final class CupsClient implements AutoCloseable {
      */
     public CupsClient(URI forwardURI) {
         this.forwardURI = forwardURI;
+    }
+
+    /**
+     * Sends a print job to the printer.
+     *
+     * @param printerURI printer URI
+     * @param path       file to be printed
+     * @return answer from CUPS
+     */
+    public IppResponse printJob(URI printerURI, Path path) {
+        PrintJob op = new PrintJob();
+        try {
+            byte[] data = Files.readAllBytes(path);
+            op.setData(data);
+            op.setJobName(path.getFileName() + "-" + requestId);
+            op.setDocumentName(path.toString());
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("cannot read " + path, ex);
+        }
+        return send(op, printerURI);
     }
 
     /**
@@ -103,8 +122,8 @@ public final class CupsClient implements AutoCloseable {
 
     private IppResponse send(Operation op) {
         IppRequest ippRequest = op.getIppRequest();
-        requestId++;
         op.setIppRequestId(requestId);
+        requestId++;
         try {
             CloseableHttpResponse httpResponse = send(ippRequest);
             try (InputStream istream = httpResponse.getEntity().getContent()) {
