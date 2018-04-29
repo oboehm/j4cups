@@ -152,5 +152,13 @@ public abstract class AbstractIppTest {
         assertEquals(printerURI, ippPackage.getPrinterURI());
     }
 
+    /**
+     * Test method for {@link AbstractIpp#setJobId(int)}.
+     */
+    @Test
+    public void testSetJobId() {
+        ippPackage.setJobId(42);
+        assertEquals(42, ippPackage.getJobId());
+    }
 
 }

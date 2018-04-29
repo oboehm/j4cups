@@ -33,6 +33,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -100,6 +102,7 @@ class CupsClientTest extends AbstractServerTest {
         Attribute attr = ippResponse.getAttribute("job-id");
         assertNotNull(attr);
         LOG.info("Job {} created.", attr);
+        assertThat(ippResponse.getJobId(), greaterThan(0));
     }
 
     @AfterAll

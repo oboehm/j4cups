@@ -239,6 +239,16 @@ public abstract class AbstractIpp implements Externalizable {
     }
 
     /**
+     * Sets the request-id.
+     *
+     * @param id the new request-id
+     * @since 0.5
+     */
+    public void setRequestId(int id) {
+        requestId = id;
+    }
+
+    /**
      * Returns the job-id of the request or response.
      *
      * @return a positiv number
@@ -250,13 +260,14 @@ public abstract class AbstractIpp implements Externalizable {
     }
 
     /**
-     * Sets the request-id.
+     * Sets the job-id.
      *
-     * @param id the new request-id
+     * @param id the new job-id
      * @since 0.5
      */
-    public void setRequestId(int id) {
-        requestId = id;
+    public void setJobId(int id) {
+        Attribute attr = Attribute.of("job-id", id);
+        setJobAttribute(attr);
     }
 
     /**
@@ -368,6 +379,16 @@ public abstract class AbstractIpp implements Externalizable {
      */
     public void setOperationAttribute(Attribute attr) {
         setAttribute(attr, DelimiterTags.OPERATION_ATTRIBUTES_TAG);
+    }
+
+    /**
+     * Sets the job attribute.
+     *
+     * @param attr attribute
+     * @since 0.5
+     */
+    public void setJobAttribute(Attribute attr) {
+        setAttribute(attr, DelimiterTags.JOB_ATTRIBUTES_TAG);
     }
 
     /**
