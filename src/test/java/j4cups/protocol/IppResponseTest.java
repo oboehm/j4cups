@@ -160,13 +160,22 @@ public final class IppResponseTest extends AbstractIppTest {
     }
 
     /**
-     * Testmethod for {@link IppResponse#setStatusCode(StatusCode)}.
+     * Test method for {@link IppResponse#setStatusCode(StatusCode)}.
      */
     @Test
     public void setStatusCode() {
         IppResponse response = new IppResponse(REQUEST_GET_JOBS);
         response.setStatusCode(StatusCode.CLIENT_ERROR_BAD_REQUEST);
         assertEquals(StatusCode.CLIENT_ERROR_BAD_REQUEST, response.getStatusCode());
+    }
+
+    /**
+     * Test method for {@link AbstractIpp#getJobId()}.
+     */
+    @Test
+    public void testGetJobId() {
+        IppResponse response = readIppResponse("response", "Create-Jobs.bin");
+        assertEquals(101, response.getJobId());
     }
 
 }

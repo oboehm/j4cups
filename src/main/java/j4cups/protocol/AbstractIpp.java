@@ -239,6 +239,17 @@ public abstract class AbstractIpp implements Externalizable {
     }
 
     /**
+     * Returns the job-id of the request or response.
+     *
+     * @return a positiv number
+     * @since 0.5
+     */
+    public int getJobId() {
+        Attribute attr = getAttribute("job-id");
+        return attr.getIntValue();
+    }
+
+    /**
      * Sets the request-id.
      *
      * @param id the new request-id
