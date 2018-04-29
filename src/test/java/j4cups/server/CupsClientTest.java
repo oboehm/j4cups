@@ -21,7 +21,6 @@ package j4cups.server;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
-import j4cups.protocol.attr.Attribute;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -36,7 +35,6 @@ import java.net.URI;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
@@ -92,17 +90,18 @@ class CupsClientTest extends AbstractServerTest {
     }
 
     /**
-     * Test method for {@link CupsClient#createJob(URI)}.
+     * Test method for {@link CupsClient#createJob(URI)} and
+     * {@link CupsClient#cancelJob(URI, int)}.
      */
     @Test
-    public void testCreateJob() {
+    public void testCreateAndCancelJob() {
         assumeTrue(isOnline(CUPS_URI), CUPS_URI + " is not available");
         IppResponse ippResponse = CLIENT.createJob(TEST_PRINTER_URI);
+        int jobId = ippResponse.getJobId();
+        LOG.info("Job {} created.", jobId);
+        assertThat(jobId, greaterThan(0));
+        ippResponse = CLIENT.cancelJob(TEST_PRINTER_URI, jobId);
         assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
-        Attribute attr = ippResponse.getAttribute("job-id");
-        assertNotNull(attr);
-        LOG.info("Job {} created.", attr);
-        assertThat(ippResponse.getJobId(), greaterThan(0));
     }
 
     @AfterAll

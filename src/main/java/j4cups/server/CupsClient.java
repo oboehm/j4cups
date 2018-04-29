@@ -17,6 +17,7 @@
  */
 package j4cups.server;
 
+import j4cups.op.CancelJob;
 import j4cups.op.CreateJob;
 import j4cups.op.GetJobs;
 import j4cups.op.Operation;
@@ -67,8 +68,7 @@ public final class CupsClient implements AutoCloseable {
      */
     public IppResponse getJobs(URI printerURI) {
         GetJobs op = new GetJobs();
-        op.setPrinterURI(printerURI);
-        return send(op);
+        return send(op, printerURI);
     }
 
     /**
@@ -80,6 +80,23 @@ public final class CupsClient implements AutoCloseable {
      */
     public IppResponse createJob(URI printerURI) {
         CreateJob op = new CreateJob();
+        return send(op, printerURI);
+    }
+
+    /**
+     * Cancels a (created) job.
+     *
+     * @param printerURI printer URI
+     * @param jobId      the job id
+     * @return answer from CUPS
+     */
+    public IppResponse cancelJob(URI printerURI, int jobId) {
+        CancelJob op = new CancelJob();
+        op.setJobId(jobId);
+        return send(op, printerURI);
+    }
+
+    private IppResponse send(Operation op, URI printerURI) {
         op.setPrinterURI(printerURI);
         return send(op);
     }
