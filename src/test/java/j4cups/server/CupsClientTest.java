@@ -35,6 +35,7 @@ import java.net.URI;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * Unit tests for class {@link CupsClient}. For tests with a real I used
@@ -46,7 +47,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class CupsClientTest extends AbstractServerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(CupsClientTest.class);
-    private static final CupsClient CLIENT = new CupsClient(URI.create("http://localhost:631"));
+    private static final URI CUPS_URI = URI.create("http://localhost:631");
+    private static final CupsClient CLIENT = new CupsClient(CUPS_URI);
     public static final URI TEST_PRINTER_URI = URI.create("http://localhost:631/printers/Brother_MFC_J5910DW_2");
 
     /**
@@ -82,6 +84,7 @@ class CupsClientTest extends AbstractServerTest {
      */
     @Test
     public void testGetJobs() {
+        assumeTrue(isOnline(CUPS_URI), CUPS_URI + " is not available");
         IppResponse ippResponse = CLIENT.getJobs(TEST_PRINTER_URI);
         assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
     }
@@ -91,6 +94,7 @@ class CupsClientTest extends AbstractServerTest {
      */
     @Test
     public void testCreateJob() {
+        assumeTrue(isOnline(CUPS_URI), CUPS_URI + " is not available");
         IppResponse ippResponse = CLIENT.createJob(TEST_PRINTER_URI);
         assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
         Attribute attr = ippResponse.getAttribute("job-id");
