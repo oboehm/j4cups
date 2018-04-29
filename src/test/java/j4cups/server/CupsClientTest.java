@@ -21,6 +21,7 @@ package j4cups.server;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
+import j4cups.protocol.attr.Attribute;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -33,6 +34,7 @@ import java.io.IOException;
 import java.net.URI;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Unit tests for class {@link CupsClient}. For tests with a real I used
@@ -60,7 +62,7 @@ class CupsClientTest extends AbstractServerTest {
     }
 
     /**
-     * Another nit test for {@link CupsClient#send(IppRequest)}.
+     * Another unit test for {@link CupsClient#send(IppRequest)}.
      *
      * @throws IOException the io exception
      */
@@ -82,6 +84,18 @@ class CupsClientTest extends AbstractServerTest {
     public void testGetJobs() {
         IppResponse ippResponse = CLIENT.getJobs(TEST_PRINTER_URI);
         assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
+    }
+
+    /**
+     * Test method for {@link CupsClient#createJob(URI)}.
+     */
+    @Test
+    public void testCreateJob() {
+        IppResponse ippResponse = CLIENT.createJob(TEST_PRINTER_URI);
+        assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
+        Attribute attr = ippResponse.getAttribute("job-id");
+        assertNotNull(attr);
+        LOG.info("Job {} created.", attr);
     }
 
     @AfterAll

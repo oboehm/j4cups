@@ -17,6 +17,7 @@
  */
 package j4cups.server;
 
+import j4cups.op.CreateJob;
 import j4cups.op.GetJobs;
 import j4cups.op.Operation;
 import j4cups.protocol.IppRequest;
@@ -47,7 +48,7 @@ public final class CupsClient implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(CupsClient.class);
     private final URI forwardURI;
     private final CloseableHttpClient client = createHttpClient();
-    private int requestId = 1;
+    private int requestId = 0;
 
     /**
      * Instantiates a new Cups client.
@@ -67,12 +68,26 @@ public final class CupsClient implements AutoCloseable {
     public IppResponse getJobs(URI printerURI) {
         GetJobs op = new GetJobs();
         op.setPrinterURI(printerURI);
-        op.setIppRequestId(requestId);
+        return send(op);
+    }
+
+    /**
+     * Creates a new job. This is needed if you want to send multiple
+     * documents.
+     *
+     * @param printerURI printer URI
+     * @return answer from CUPS
+     */
+    public IppResponse createJob(URI printerURI) {
+        CreateJob op = new CreateJob();
+        op.setPrinterURI(printerURI);
         return send(op);
     }
 
     private IppResponse send(Operation op) {
         IppRequest ippRequest = op.getIppRequest();
+        requestId++;
+        op.setIppRequestId(requestId);
         try {
             CloseableHttpResponse httpResponse = send(ippRequest);
             try (InputStream istream = httpResponse.getEntity().getContent()) {
