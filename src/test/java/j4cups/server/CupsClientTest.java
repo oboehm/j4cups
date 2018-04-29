@@ -36,7 +36,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -122,7 +122,8 @@ class CupsClientTest extends AbstractServerTest {
         LOG.info("Cancelling job {}...", jobId);
         assertThat(jobId, greaterThan(0));
         IppResponse cancelResponse = CLIENT.cancelJob(TEST_PRINTER_URI, jobId);
-        assertEquals(StatusCode.SUCCESSFUL_OK, cancelResponse.getStatusCode());
+        assertThat(cancelResponse.getStatusCode(),
+                anyOf(equalTo(StatusCode.SUCCESSFUL_OK), equalTo(StatusCode.CLIENT_ERROR_NOT_POSSIBLE)));
     }
 
     @AfterAll

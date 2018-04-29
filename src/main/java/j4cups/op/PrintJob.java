@@ -19,6 +19,7 @@
 package j4cups.op;
 
 import j4cups.protocol.IppOperations;
+import j4cups.protocol.IppRequest;
 import j4cups.protocol.attr.Attribute;
 import j4cups.protocol.tags.ValueTags;
 
@@ -34,7 +35,15 @@ public class PrintJob extends Operation {
      * Instantiates an operation for 'print-job'.
      */
     public PrintJob() {
-        super(IppOperations.PRINT_JOB);
+        super(IppOperations.PRINT_JOB, createIppPrintJobRequest());
+    }
+
+    private static IppRequest createIppPrintJobRequest() {
+        IppRequest request = createIppRequest(IppOperations.PRINT_JOB);
+        request.setJobAttribute(Attribute.of("copies", 1));
+        request.setJobAttribute(Attribute.of(ValueTags.ENUM, "orientation-requested", 3));
+        request.setJobAttribute(Attribute.of(ValueTags.KEYWORD, "output-mode", "monochrome"));
+        return request;
     }
 
     /**
