@@ -120,9 +120,25 @@ class CupsClientTest extends AbstractServerTest {
      */
     @Test
     public void testSendDocument() {
+        Path testFile = readTestFile();
         int jobId = CLIENT.createJob(TEST_PRINTER_URI).getJobId();
         try {
-            Path testFile = readTestFile();
+            IppResponse ippResponse = CLIENT.sendDocument(TEST_PRINTER_URI, testFile, jobId, false);
+            assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
+        } finally {
+            CLIENT.cancelJob(TEST_PRINTER_URI, jobId);
+        }
+    }
+
+    /**
+     * Test method for {@link CupsClient#sendDocument(URI, Path, int, boolean)}.
+     */
+    @Test
+    public void testSendTwoDocuments() {
+        Path testFile = readTestFile();
+        int jobId = CLIENT.createJob(TEST_PRINTER_URI).getJobId();
+        try {
+            CLIENT.sendDocument(TEST_PRINTER_URI, testFile, jobId, false);
             IppResponse ippResponse = CLIENT.sendDocument(TEST_PRINTER_URI, testFile, jobId, true);
             assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
         } finally {
