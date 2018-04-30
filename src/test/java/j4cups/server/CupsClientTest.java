@@ -123,7 +123,7 @@ class CupsClientTest extends AbstractServerTest {
         Path testFile = readTestFile();
         int jobId = CLIENT.createJob(TEST_PRINTER_URI).getJobId();
         try {
-            IppResponse ippResponse = CLIENT.sendDocument(TEST_PRINTER_URI, testFile, jobId, false);
+            IppResponse ippResponse = CLIENT.sendDocument(TEST_PRINTER_URI, testFile, jobId, true);
             assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
         } finally {
             CLIENT.cancelJob(TEST_PRINTER_URI, jobId);
