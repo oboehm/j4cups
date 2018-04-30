@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.URI;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
@@ -90,6 +91,26 @@ class CupsServerTest extends AbstractServerTest {
         httpPost.setEntity(new IppEntity(getJobsReqeust));
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             CloseableHttpResponse response = client.execute(httpPost);
+            assertEquals(200, response.getStatusLine().getStatusCode());
+        }
+    }
+
+
+    /**
+     * This is the same test as before except that we ask the CupsServer as
+     * printer.
+     *
+     * @throws IOException e.g. in case of network prolblems
+     */
+    @Test
+    public void testSendRequestToPrinter() throws IOException {
+        URI printerURI = URI.create("http://localhost:" + SERVER.getPort() + "/printers/text");
+        assertTrue(isOnline(printerURI));
+        HttpPost httpPrinterPost = new HttpPost(printerURI);
+        IppRequest getJobsRequest = readIppRequest("Get-Jobs.bin", printerURI);
+        httpPrinterPost.setEntity(new IppEntity(getJobsRequest));
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
+            CloseableHttpResponse response = client.execute(httpPrinterPost);
             assertEquals(200, response.getStatusLine().getStatusCode());
         }
     }

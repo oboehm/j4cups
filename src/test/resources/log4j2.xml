@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN" xmlns="http://logging.apache.org/log4j/2.0/config">
+<Configuration status="WARN">
   <Appenders>
     <Console name="CONSOLE" target="SYSTEM_OUT">
-      <PatternLayout pattern="%d{HH:mm:ss.SSS} %4.4level [%-8.8t] %-23.23C{3} - %msg%n" />
+      <PatternLayout pattern="%d{HH:mm:ss}%5.-5level [%-8.8t] %-24.24C{3} - %msg%n" />
     </Console>
   </Appenders>
   <Loggers>

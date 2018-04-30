@@ -151,6 +151,7 @@ public class CupsServer implements Runnable {
                               .setServerInfo("Test/1.1")
                               .setSocketConfig(socketConfig)
                               .setExceptionLogger(new StdErrorExceptionLogger())
+                              .registerHandler("/printers/*", new IppPrinterRequestHandler())
                               .registerHandler("*", new IppRequestHandler(forwardURI))
                               .addInterceptorFirst(new LogRequestInterceptor("S"))
                               .addInterceptorLast(new LogResponseInterceptor("S"))
