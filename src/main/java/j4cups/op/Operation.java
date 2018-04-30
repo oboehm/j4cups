@@ -105,6 +105,15 @@ public class Operation {
     }
 
     /**
+     * Sets job id.
+     *
+     * @param jobId the job id
+     */
+    public void setJobId(int jobId) {
+        getIppRequest().setJobId(jobId);
+    }
+
+    /**
      * Sets the given operation attribute in the generated IPP request.
      *
      * @param attribute operation attribute

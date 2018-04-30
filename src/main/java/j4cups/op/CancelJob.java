@@ -35,13 +35,4 @@ public class CancelJob extends Operation {
         super(IppOperations.CANCEL_JOB);
     }
 
-    /**
-     * Sets job id.
-     *
-     * @param jobId the job id
-     */
-    public void setJobId(int jobId) {
-        getIppRequest().setJobId(jobId);
-    }
-
 }

@@ -109,12 +109,32 @@ class CupsClientTest extends AbstractServerTest {
      */
     @Test
     public void testPrintJob() {
-        assumeTrue(isOnline(CUPS_URI), CUPS_URI + " is not available");
-        Path readme = Paths.get("src", "test", "resources", "j4cups", "test.txt");
-        assertTrue(Files.exists(readme));
+        Path readme = readTestFile();
         IppResponse ippResponse = CLIENT.printJob(TEST_PRINTER_URI, readme);
         assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
         cancelJob(ippResponse);
+    }
+
+    /**
+     * Test method for {@link CupsClient#sendDocument(URI, Path, int, boolean)}.
+     */
+    @Test
+    public void testSendDocument() {
+        int jobId = CLIENT.createJob(TEST_PRINTER_URI).getJobId();
+        try {
+            Path testFile = readTestFile();
+            IppResponse ippResponse = CLIENT.sendDocument(TEST_PRINTER_URI, testFile, jobId, true);
+            assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
+        } finally {
+            CLIENT.cancelJob(TEST_PRINTER_URI, jobId);
+        }
+    }
+
+    private static Path readTestFile() {
+        assumeTrue(isOnline(CUPS_URI), CUPS_URI + " is not available");
+        Path testFile = Paths.get("src", "test", "resources", "j4cups", "test.txt");
+        assertTrue(Files.exists(testFile));
+        return testFile;
     }
 
     private static void cancelJob(IppResponse ippResponse) {

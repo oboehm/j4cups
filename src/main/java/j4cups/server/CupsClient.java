@@ -68,14 +68,7 @@ public final class CupsClient implements AutoCloseable {
      */
     public IppResponse printJob(URI printerURI, Path path) {
         PrintJob op = new PrintJob();
-        try {
-            byte[] data = Files.readAllBytes(path);
-            op.setData(data);
-            op.setJobName(path.getFileName() + "-" + requestId);
-            op.setDocumentName(path.toString());
-        } catch (IOException ex) {
-            throw new IllegalArgumentException("cannot read " + path, ex);
-        }
+        setPrintJob(op, path);
         return send(op, printerURI);
     }
 
@@ -100,6 +93,34 @@ public final class CupsClient implements AutoCloseable {
     public IppResponse createJob(URI printerURI) {
         CreateJob op = new CreateJob();
         return send(op, printerURI);
+    }
+
+    /**
+     * Sends one print job of a multiple document to the printer
+     *
+     * @param printerURI   printer URI
+     * @param path         file to be printed
+     * @param jobId        the job id
+     * @param lastDocument if it is the last document
+     * @return answer from CUPS
+     */
+    public IppResponse sendDocument(URI printerURI, Path path, int jobId, boolean lastDocument) {
+        SendDocument op = new SendDocument();
+        op.setJobId(jobId);
+        op.setLastDocument(lastDocument);
+        setPrintJob(op, path);
+        return send(op, printerURI);
+    }
+
+    private void setPrintJob(PrintJob op, Path path) {
+        try {
+            byte[] data = Files.readAllBytes(path);
+            op.setData(data);
+            op.setJobName(path.getFileName() + "-" + requestId);
+            op.setDocumentName(path.toString());
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("cannot read " + path, ex);
+        }
     }
 
     /**
