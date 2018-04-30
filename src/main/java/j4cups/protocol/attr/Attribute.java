@@ -259,6 +259,21 @@ public final class Attribute implements Binary {
     }
 
     /**
+     * The "value" field contains the value of a boolean attribute. The boolean
+     * value is stored as byte, whereas 0x00 is 'false' and 0x01 is 'true'.
+     *
+     * @return true (0x01) or false (0x00)
+     */
+    public boolean getBooleanValue() {
+        byte booleanByte = getValue()[0];
+        switch (booleanByte) {
+            case 0x00:  return false;
+            case 0x01:  return true;
+            default:    throw new IllegalStateException("invalid boolean value stored: 0x" + Integer.toHexString(booleanByte));
+        }
+    }
+
+    /**
      * The "value" field contains the value of a charset attribute.
      *
      * @return e.g. "one-sided"
@@ -350,9 +365,9 @@ public final class Attribute implements Binary {
             dos.write(av.toByteArray());
         }
     }
-    
 
-    
+
+
     /**
      * An "attribute-with-one-value" field is encoded with five subfields.
      * <pre>

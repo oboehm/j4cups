@@ -26,6 +26,7 @@ import javax.validation.ValidationException;
 import java.io.File;
 import java.io.IOException;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
@@ -45,6 +46,15 @@ class SendDocumentTest {
     void testLastDocument() {
         Attribute attr = operation.getIppRequest().getAttribute("last-document");
         assertNotNull(attr);
+    }
+
+    /**
+     * Test method for {@link SendDocument#setLastDocument(boolean)}.
+     */
+    @Test
+    void testSetLastDocument() {
+        operation.setLastDocument(false);
+        assertFalse(operation.isLastDocument());
     }
 
     /**

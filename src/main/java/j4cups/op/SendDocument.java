@@ -33,7 +33,7 @@ public class SendDocument extends PrintJob {
      */
     public SendDocument() {
         super(IppOperations.SEND_DOCUMENT);
-        setOperationAttribute(Attribute.of("last-document", true));
+        setLastDocument(true);
     }
 
     /**
@@ -43,7 +43,17 @@ public class SendDocument extends PrintJob {
      * @param ok true if dcoument is the last one
      */
     public void setLastDocument(boolean ok) {
-        throw new UnsupportedOperationException("not yet implemented");
+        setOperationAttribute(Attribute.of("last-document", ok));
+    }
+
+    /**
+     * Returns true if the operation belongs to the last document.
+     *
+     * @return true if it is the last document
+     */
+    public boolean isLastDocument() {
+        Attribute lastDocument = getAttribute("last-document");
+        return lastDocument.getBooleanValue();
     }
 
 }

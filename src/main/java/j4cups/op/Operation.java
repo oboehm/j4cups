@@ -86,6 +86,16 @@ public class Operation {
     }
 
     /**
+     * Returns the attribute of the give name.
+     *
+     * @param name attribute name
+     * @return the attribute
+     */
+    public Attribute getAttribute(String name) {
+        return ippRequest.getAttribute(name);
+    }
+
+    /**
      * Sets the printer-uri.
      *
      * @param printerURI the printer uri
