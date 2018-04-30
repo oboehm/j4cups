@@ -18,24 +18,21 @@
 
 package j4cups.server;
 
-import org.apache.http.HttpException;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
 /**
- * Class LogInterceptor.
+ * Class LogRequestInterceptor.
  *
  * @author oliver
  * @since 0.5
  */
-public final class LogInterceptor implements HttpRequestInterceptor {
+public final class LogResponseInterceptor implements HttpResponseInterceptor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(LogInterceptor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LogResponseInterceptor.class);
     private final String prefix;
 
     /**
@@ -43,25 +40,23 @@ public final class LogInterceptor implements HttpRequestInterceptor {
      *
      * @param prefix for the log output
      */
-    public LogInterceptor(String prefix) {
+    public LogResponseInterceptor(String prefix) {
         this.prefix = prefix;
     }
 
     /**
-     * Processes a request.
-     * On the client side, this step is performed before the request is
-     * sent to the server. On the server side, this step is performed
+     * Processes a response.
+     * On the server side, this step is performed before the response is
+     * sent to the client. On the client side, this step is performed
      * on incoming messages before the message body is evaluated.
      *
-     * @param request the request to preprocess
-     * @param context the context for the request
-     * @throws HttpException in case of an HTTP protocol violation
-     * @throws IOException   in case of an I/O error
+     * @param response the response to postprocess
+     * @param context  the context for the request
      */
     @Override
-    public void process(HttpRequest request, HttpContext context) throws HttpException, IOException {
-        LOG.info("{} {}", prefix, request);
-        LOG.debug("{} {}", prefix, context);
+    public void process(HttpResponse response, HttpContext context) {
+        LOG.info("{} => {}", prefix, response);
+        LOG.debug("{} => {}", prefix, context);
     }
 
 }

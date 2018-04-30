@@ -180,7 +180,8 @@ public final class CupsClient implements AutoCloseable {
     }
 
     private static CloseableHttpClient createHttpClient() {
-        return HttpClients.custom().addInterceptorLast(new LogInterceptor("=>")).build();
+        return HttpClients.custom().addInterceptorFirst(new LogRequestInterceptor("C"))
+                          .addInterceptorLast(new LogResponseInterceptor("C")).build();
     }
 
     private URI getPrinterURI(IppRequest ippRequest) {

@@ -146,15 +146,14 @@ public class CupsServer implements Runnable {
                                                 .setSoTimeout(15000)
                                                 .setTcpNoDelay(true)
                                                 .build();
-        IppRequestHandler processor = new IppRequestHandler(forwardURI);
         return ServerBootstrap.bootstrap()
                               .setListenerPort(serverPort)
                               .setServerInfo("Test/1.1")
                               .setSocketConfig(socketConfig)
                               .setExceptionLogger(new StdErrorExceptionLogger())
-                              .registerHandler("*", processor)
-                              .setHttpProcessor(processor)
-                              .addInterceptorLast(new LogInterceptor("<="))
+                              .registerHandler("*", new IppRequestHandler(forwardURI))
+                              .addInterceptorFirst(new LogRequestInterceptor("S"))
+                              .addInterceptorLast(new LogResponseInterceptor("S"))
                               .create();
     }
 
