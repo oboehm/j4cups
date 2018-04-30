@@ -138,6 +138,8 @@ public class CupsServer implements Runnable {
         } catch (InterruptedException ie) {
             LOG.warn("{} was interrupted and will be shutdown:", server, ie);
             server.shutdown(5, TimeUnit.SECONDS);
+            // Restore interrupted state...
+            Thread.currentThread().interrupt();
         }
     }
 
