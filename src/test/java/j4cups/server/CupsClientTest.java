@@ -110,7 +110,7 @@ class CupsClientTest extends AbstractServerTest {
     @Test
     public void testPrintJob() {
         assumeTrue(isOnline(CUPS_URI), CUPS_URI + " is not available");
-        Path readme = Paths.get("src", "test", "resources", "log4j2.xml");
+        Path readme = Paths.get("src", "test", "resources", "j4cups", "test.txt");
         assertTrue(Files.exists(readme));
         IppResponse ippResponse = CLIENT.printJob(TEST_PRINTER_URI, readme);
         assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());

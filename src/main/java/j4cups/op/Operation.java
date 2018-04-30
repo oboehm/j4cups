@@ -19,6 +19,7 @@ package j4cups.op;
 
 import j4cups.protocol.IppOperations;
 import j4cups.protocol.IppRequest;
+import j4cups.protocol.attr.Attribute;
 import org.apache.commons.lang3.SystemUtils;
 
 import javax.validation.ValidationException;
@@ -91,6 +92,15 @@ public class Operation {
      */
     public void setPrinterURI(URI printerURI) {
         ippRequest.setPrinterURI(printerURI);
+    }
+
+    /**
+     * Sets the given operation attribute in the generated IPP request.
+     *
+     * @param attribute operation attribute
+     */
+    public void setOperationAttribute(Attribute attribute) {
+        ippRequest.setOperationAttribute(attribute);
     }
 
     /**

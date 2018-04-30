@@ -23,6 +23,8 @@ import j4cups.protocol.IppRequest;
 import j4cups.protocol.attr.Attribute;
 import j4cups.protocol.tags.ValueTags;
 
+import javax.validation.ValidationException;
+
 /**
  * Class PrintJob represents the print-job operation.
  *
@@ -35,11 +37,20 @@ public class PrintJob extends Operation {
      * Instantiates an operation for 'print-job'.
      */
     public PrintJob() {
-        super(IppOperations.PRINT_JOB, createIppPrintJobRequest());
+        this(IppOperations.PRINT_JOB);
     }
 
-    private static IppRequest createIppPrintJobRequest() {
-        IppRequest request = createIppRequest(IppOperations.PRINT_JOB);
+    /**
+     * This constructor is foreseen for subclasses.
+     *
+     * @param op e.g. IppOperations.PRINT_JOB
+     */
+    protected PrintJob(IppOperations op) {
+        super(op, createIppPrintJobRequest(op));
+    }
+
+    private static IppRequest createIppPrintJobRequest(IppOperations op) {
+        IppRequest request = createIppRequest(op);
         request.setJobAttribute(Attribute.of("copies", 1));
         request.setJobAttribute(Attribute.of(ValueTags.ENUM, "orientation-requested", 3));
         request.setJobAttribute(Attribute.of(ValueTags.KEYWORD, "output-mode", "monochrome"));
@@ -73,6 +84,26 @@ public class PrintJob extends Operation {
     public void setDocumentName(String name) {
         Attribute attr = Attribute.of(ValueTags.NAME_WITHOUT_LANGUAGE, "document-name", name);
         getIppRequest().setOperationAttribute(attr);
+    }
+
+    /**
+     * Looks if the given request is valid. If not an
+     * {@link ValidationException} will be thrown
+     *
+     * @param request IPP reqeust
+     */
+    @Override
+    public void validateRequest(IppRequest request) {
+        super.validateRequest(request);
+        if (!hasTarget(request)) {
+            throw new ValidationException(
+                    "neither 'printer-uri' & 'job-id' nor 'job-uri' is given in " + request.toShortString());
+        }
+    }
+
+    private static boolean hasTarget(IppRequest request) {
+        return (request.hasAttribute("printer-uri") && request.hasAttribute("job-id"))
+                || request.hasAttribute("job-uri");
     }
 
 }

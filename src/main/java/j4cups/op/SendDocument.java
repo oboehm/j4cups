@@ -18,9 +18,7 @@
 package j4cups.op;
 
 import j4cups.protocol.IppOperations;
-import j4cups.protocol.IppRequest;
-
-import javax.validation.ValidationException;
+import j4cups.protocol.attr.Attribute;
 
 /**
  * Class SendDocument represents the Send-Document operation if IPP.
@@ -28,33 +26,24 @@ import javax.validation.ValidationException;
  * @author oboehm
  * @since 0.5 (26.03.2018)
  */
-public class SendDocument extends Operation {
+public class SendDocument extends PrintJob {
 
     /**
      * Instantiates an operation for 'send-document'.
      */
     public SendDocument() {
         super(IppOperations.SEND_DOCUMENT);
+        setOperationAttribute(Attribute.of("last-document", true));
     }
 
     /**
-     * Looks if the given request is valid. If not an
-     * {@link ValidationException} will be thrown
+     * To print multiple documents the last document must be marked as
+     * "last-document".
      *
-     * @param request IPP reqeust
+     * @param ok true if dcoument is the last one
      */
-    @Override
-    public void validateRequest(IppRequest request) {
-        super.validateRequest(request);
-        if (!hasTarget(request)) {
-            throw new ValidationException(
-                    "neither 'printer-uri' & 'job-id' nor 'job-uri' is given in " + request.toShortString());
-        }
-    }
-
-    private static boolean hasTarget(IppRequest request) {
-        return (request.hasAttribute("printer-uri") && request.hasAttribute("job-id"))
-                || request.hasAttribute("job-uri");
+    public void setLastDocument(boolean ok) {
+        throw new UnsupportedOperationException("not yet implemented");
     }
 
 }

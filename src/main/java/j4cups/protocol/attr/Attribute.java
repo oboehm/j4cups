@@ -106,6 +106,19 @@ public final class Attribute implements Binary {
     }
 
     /**
+     * Creates a singe-value attribute for boolean values.
+     *
+     * @param name e.g. "last-document"
+     * @param value true or falce
+     * @return the attribute
+     */
+    public static Attribute of(String name, boolean value) {
+        byte[] booleanByte = new byte[1];
+        booleanByte[0] = (byte) (value ? 0x01 : 0x00);
+        return of(ValueTags.BOOLEAN, name, booleanByte);
+    }
+
+    /**
      * Creates a singe-value attribute for URI values.
      *
      * @param name e.g. "job-uri"

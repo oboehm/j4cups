@@ -17,6 +17,7 @@
  */
 package j4cups.op;
 
+import j4cups.protocol.attr.Attribute;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -25,14 +26,26 @@ import javax.validation.ValidationException;
 import java.io.File;
 import java.io.IOException;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 /**
  * Unit tests for {@link SendDocument} class.
  *
  * @author oboehm
  */
-public class SendDocumentTest {
+class SendDocumentTest {
     
     private final SendDocument operation = new SendDocument();
+
+    /**
+     * If {@link SendDocument} is created the generated IPP request should
+     * contain the last-document attribute.
+     */
+    @Test
+    void testLastDocument() {
+        Attribute attr = operation.getIppRequest().getAttribute("last-document");
+        assertNotNull(attr);
+    }
 
     /**
      * The recorded request which is used for this test results in an 0x0400
@@ -44,9 +57,7 @@ public class SendDocumentTest {
     public void validateRequest() throws IOException {
         byte[] ippRequest = FileUtils
                 .readFileToByteArray(new File("src/test/resources/j4cups/op/send-document-request-invalid.ipp"));
-        Assertions.assertThrows(ValidationException.class, () -> {
-            operation.validateRequest(ippRequest);
-        });
+        Assertions.assertThrows(ValidationException.class, () -> operation.validateRequest(ippRequest));
     }
 
 }
