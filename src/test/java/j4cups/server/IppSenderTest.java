@@ -42,21 +42,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
- * Unit tests for class {@link CupsClient}. For tests with a real I used
+ * Unit tests for class {@link IppSender}. For tests with a real I used
  * http://localhost:631/printers/Brother_MFC_J5910DW_2 in my local home
  * network.
  *
  * @author oliver (boehm@javatux.de)
  */
-class CupsClientTest extends AbstractServerTest {
+class IppSenderTest extends AbstractServerTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CupsClientTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IppSenderTest.class);
     private static final URI CUPS_URI = URI.create("http://localhost:631");
-    private static final CupsClient CLIENT = new CupsClient(CUPS_URI);
+    private static final IppSender CLIENT = new IppSender(CUPS_URI);
     public static final URI TEST_PRINTER_URI = URI.create("http://localhost:631/printers/Brother_MFC_J5910DW_2");
 
     /**
-     * Unit test for {@link CupsClient#send(IppRequest)}.
+     * Unit test for {@link IppSender#send(IppRequest)}.
      *
      * @throws IOException the io exception
      */
@@ -68,7 +68,7 @@ class CupsClientTest extends AbstractServerTest {
     }
 
     /**
-     * Another unit test for {@link CupsClient#send(IppRequest)}.
+     * Another unit test for {@link IppSender#send(IppRequest)}.
      *
      * @throws IOException the io exception
      */
@@ -84,7 +84,7 @@ class CupsClientTest extends AbstractServerTest {
     }
 
     /**
-     * Test method for {@link CupsClient#getJobs(URI)}.
+     * Test method for {@link IppSender#getJobs(URI)}.
      */
     @Test
     public void testGetJobs() {
@@ -94,8 +94,8 @@ class CupsClientTest extends AbstractServerTest {
     }
 
     /**
-     * Test method for {@link CupsClient#createJob(URI)} and
-     * {@link CupsClient#cancelJob(URI, int)}.
+     * Test method for {@link IppSender#createJob(URI)} and
+     * {@link IppSender#cancelJob(URI, int)}.
      */
     @Test
     public void testCreateAndCancelJob() {
@@ -105,7 +105,7 @@ class CupsClientTest extends AbstractServerTest {
     }
 
     /**
-     * Test method for {@link CupsClient#printJob(URI, Path)}.
+     * Test method for {@link IppSender#printJob(URI, Path)}.
      */
     @Test
     public void testPrintJob() {
@@ -116,7 +116,7 @@ class CupsClientTest extends AbstractServerTest {
     }
 
     /**
-     * Test method for {@link CupsClient#sendDocument(URI, Path, int, boolean)}.
+     * Test method for {@link IppSender#sendDocument(URI, Path, int, boolean)}.
      */
     @Test
     public void testSendDocument() {
@@ -131,7 +131,7 @@ class CupsClientTest extends AbstractServerTest {
     }
 
     /**
-     * Test method for {@link CupsClient#sendDocument(URI, Path, int, boolean)}.
+     * Test method for {@link IppSender#sendDocument(URI, Path, int, boolean)}.
      */
     @Test
     public void testSendTwoDocuments() {

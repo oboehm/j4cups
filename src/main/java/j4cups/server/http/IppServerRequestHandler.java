@@ -21,7 +21,7 @@ import j4cups.op.SendDocument;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
-import j4cups.server.CupsClient;
+import j4cups.server.IppSender;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -43,7 +43,7 @@ import java.nio.BufferUnderflowException;
 public class IppServerRequestHandler extends AbstractIppRequestHandler implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppServerRequestHandler.class);
-    private final CupsClient cupsClient;
+    private final IppSender ippSender;
 
     /**
      * The default ctor is mainly intented for testing.
@@ -59,7 +59,7 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler implement
      * @param forwardURI URI where the request should be forwarded to
      */
     public IppServerRequestHandler(URI forwardURI) {
-        this.cupsClient = new CupsClient(forwardURI);
+        this.ippSender = new IppSender(forwardURI);
     }
 
     /**
@@ -93,7 +93,7 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler implement
     }
 
     private void send(IppRequest ippRequest, HttpResponse response) throws IOException {
-        CloseableHttpResponse cupsResponse = cupsClient.send(ippRequest);
+        CloseableHttpResponse cupsResponse = ippSender.send(ippRequest);
         response.setEntity(cupsResponse.getEntity());
         response.setStatusCode(cupsResponse.getStatusLine().getStatusCode());
         response.setStatusLine(cupsResponse.getStatusLine());
@@ -111,14 +111,14 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler implement
     }
 
     /**
-     * Closes the CupsClient which used to connect the CUPS server or
+     * Closes the IppSender which used to connect the CUPS server or
      * printer.
      *
      * @throws IOException if this resource cannot be closed
      */
     @Override
     public void close() throws IOException {
-        cupsClient.close();
+        ippSender.close();
     }
 
 }

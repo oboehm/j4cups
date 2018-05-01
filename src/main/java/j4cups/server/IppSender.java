@@ -40,15 +40,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * The CupsClient is needed for the communication to real CUPS server which
+ * The IppSender is needed for the communication to real CUPS server which
  * is used by the {@link CupsServer} to send the request.
  *
  * @author oboehm
  * @since 0.5 (26.04.2018)
  */
-public final class CupsClient implements AutoCloseable {
+public final class IppSender implements AutoCloseable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CupsClient.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IppSender.class);
     private final URI forwardURI;
     private final CloseableHttpClient client = createHttpClient();
     private int requestId = 1;
@@ -58,7 +58,7 @@ public final class CupsClient implements AutoCloseable {
      *
      * @param forwardURI the forward uri
      */
-    public CupsClient(URI forwardURI) {
+    public IppSender(URI forwardURI) {
         this.forwardURI = forwardURI;
     }
 

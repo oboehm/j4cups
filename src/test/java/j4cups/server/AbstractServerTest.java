@@ -20,6 +20,8 @@ package j4cups.server;
 
 import j4cups.protocol.AbstractIppTest;
 import j4cups.protocol.IppRequest;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +30,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URI;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
@@ -38,7 +41,23 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  */
 public abstract class AbstractServerTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CupsClientTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractServerTest.class);
+    protected static CupsServer cupsServer = new CupsServer(6310);
+
+    /**
+     * For the unit tests we start the server here.
+     */
+    @BeforeAll
+    public static void startServer() {
+        int port = 1024 + (int) System.currentTimeMillis() % 8000;
+        while (isOnline("localhost", port)) {
+            port++;
+        }
+        cupsServer = new CupsServer(port);
+        assertFalse(cupsServer.isStarted());
+        cupsServer.start();
+        LOG.info("{} is started.", cupsServer);
+    }
 
     /**
      * Reads a recorded request and checks if the needed CUPS server or printer
@@ -106,4 +125,15 @@ public abstract class AbstractServerTest {
         }
     }
 
+    /**
+     * At the end of the tests we shut down the server. And we test if it is
+     * really down.
+     */
+    @AfterAll
+    public static void shutdownServer() {
+        cupsServer.shutdown();
+        LOG.info("{} is shut down.", cupsServer);
+        assertFalse(isOnline("localhost", cupsServer.getPort()));
+        LOG.info("{} is offline (as expected).", cupsServer);
+    }
 }

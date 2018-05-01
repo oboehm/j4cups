@@ -27,8 +27,6 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,26 +44,15 @@ import static org.junit.Assert.*;
 class CupsServerTest extends AbstractServerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(CupsServerTest.class);
-    private static final CupsServer SERVER = new CupsServer(6310);
-    private static final URI PRINTER_URI = URI.create("http://localhost:" + SERVER.getPort() + "/printers/text");
-    private final HttpPost httpPost = new HttpPost("http://localhost:" + SERVER.getPort());
+    private static final URI PRINTER_URI = URI.create("http://localhost:" + cupsServer.getPort() + "/printers/text");
+    private final HttpPost httpPost = new HttpPost("http://localhost:" + cupsServer.getPort());
 
-    /**
-     * For the unit tests we start the server here.
-     */
-    @BeforeAll
-    public static void startServer() {
-        assertFalse(SERVER.isStarted());
-        SERVER.start();
-        LOG.info("{} is started.", SERVER);
-    }
-    
     /**
      * Test method for {@link CupsServer#start()}.
      */
     @Test
     public void testIsStarted() {
-        assertTrue(SERVER.isStarted());
+        assertTrue(cupsServer.isStarted());
     }
 
     /**
@@ -139,20 +126,8 @@ class CupsServerTest extends AbstractServerTest {
      */
     @Test
     public void testToString() {
-        String s = SERVER.toString();
-        assertThat(s, containsString(Integer.toString(SERVER.getPort())));
-    }
-
-    /**
-     * At the end of the tests we shut down the server. And we test if it is
-     * really down.
-     */
-    @AfterAll
-    public static void shutdownServer() {
-        SERVER.shutdown();
-        LOG.info("{} is shut down.", SERVER);
-        assertFalse(isOnline("localhost", SERVER.getPort()));
-        LOG.info("{} is offline (as expected).", SERVER);
+        String s = cupsServer.toString();
+        assertThat(s, containsString(Integer.toString(cupsServer.getPort())));
     }
 
 }
