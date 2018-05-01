@@ -18,7 +18,6 @@
 package j4cups.server;
 
 import j4cups.protocol.AbstractIppTest;
-import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
 import org.apache.commons.io.IOUtils;
@@ -26,8 +25,6 @@ import org.apache.http.*;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.message.BasicHttpResponse;
-import org.apache.http.message.BasicStatusLine;
 import org.apache.http.protocol.HttpContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -44,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Unit tests for {@link IppRequestHandler}.
  */
-class IppRequestHandlerTest {
+class IppRequestHandlerTest extends AbstractIppRequestHandlerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppRequestHandlerTest.class);
     private final IppRequestHandler requestHandler = new IppRequestHandler();
@@ -57,7 +54,7 @@ class IppRequestHandlerTest {
      * @throws HttpException HTTP exception
      */
     @Test
-    void testHandle() throws IOException, HttpException {
+    void testHandle400() throws IOException, HttpException {
         HttpPost request = createInvalidHttpRequest();
         HttpResponse response = createHttpResponse();
         HttpContext context = new HttpClientContext();
@@ -70,12 +67,6 @@ class IppRequestHandlerTest {
         HttpEntity entity = new StringEntity("hello");
         request.setEntity(entity);
         return request;
-    }
-
-    private static HttpResponse createHttpResponse() {
-        ProtocolVersion protocolVersion = new ProtocolVersion("HTTP", 1, 0);
-        StatusLine statusLine = new BasicStatusLine(protocolVersion, 200, "OK");
-        return new BasicHttpResponse(statusLine);
     }
 
     /**
@@ -96,12 +87,6 @@ class IppRequestHandlerTest {
         LOG.info("Received: {}", ippResponse);
         assertEquals(StatusCode.CLIENT_ERROR_BAD_REQUEST, ippResponse.getStatusCode());
         assertThat(ippResponse.getStatusMessage(), containsString("job-id"));
-    }
-
-    private static HttpPost createHttpRequest(IppRequest op) {
-        HttpPost request = new HttpPost();
-        request.setEntity(new IppEntity(op));
-        return request;
     }
 
     @AfterEach

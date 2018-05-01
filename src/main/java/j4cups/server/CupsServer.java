@@ -150,7 +150,7 @@ public class CupsServer implements Runnable {
                                                 .build();
         return ServerBootstrap.bootstrap()
                               .setListenerPort(serverPort)
-                              .setServerInfo("Test/1.1")
+                              .setServerInfo("j4CUPS/0.5")
                               .setSocketConfig(socketConfig)
                               .setExceptionLogger(new StdErrorExceptionLogger())
                               .registerHandler("/printers/*", new IppPrinterRequestHandler())

@@ -2,12 +2,12 @@
 <Configuration status="WARN">
   <Appenders>
     <Console name="CONSOLE" target="SYSTEM_OUT">
-      <PatternLayout pattern="%d{HH:mm:ss}%5.-5level [%-8.8t] %-24.24C{3} - %msg%n" />
+      <PatternLayout pattern="%d{HH:mm:ss}%5.-5level [%-6.6t] %-25.25C{3} - %msg%n" />
     </Console>
   </Appenders>
   <Loggers>
     <Logger name="j4cups" level="INFO" />
-    <Logger name="j4cups.protocol.AbstractIpp" level="DEBUG" />
+    <Logger name="j4cups.protocol.AbstractIpp" level="INFO" />
     <Root level="INFO">
       <AppenderRef ref="CONSOLE" />
     </Root>
