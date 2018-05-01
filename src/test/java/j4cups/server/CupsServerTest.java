@@ -19,6 +19,7 @@ package j4cups.server;
 
 
 import j4cups.protocol.IppRequest;
+import j4cups.server.http.IppEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -46,6 +47,7 @@ class CupsServerTest extends AbstractServerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(CupsServerTest.class);
     private static final CupsServer SERVER = new CupsServer(6310);
+    private static final URI PRINTER_URI = URI.create("http://localhost:" + SERVER.getPort() + "/printers/text");
     private final HttpPost httpPost = new HttpPost("http://localhost:" + SERVER.getPort());
 
     /**
@@ -87,7 +89,7 @@ class CupsServerTest extends AbstractServerTest {
      */
     @Test
     public void testSendRequest() throws IOException {
-        IppRequest getJobsReqeust = readIppRequest("Get-Jobs.bin");
+        IppRequest getJobsReqeust = readIppRequest("Get-Jobs.bin", PRINTER_URI);
         httpPost.setEntity(new IppEntity(getJobsReqeust));
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             CloseableHttpResponse response = client.execute(httpPost);
@@ -104,10 +106,9 @@ class CupsServerTest extends AbstractServerTest {
      */
     @Test
     public void testSendRequestToPrinter() throws IOException {
-        URI printerURI = URI.create("http://localhost:" + SERVER.getPort() + "/printers/text");
-        assertTrue(isOnline(printerURI));
-        HttpPost httpPrinterPost = new HttpPost(printerURI);
-        IppRequest getJobsRequest = readIppRequest("Get-Jobs.bin", printerURI);
+        assertTrue(isOnline(PRINTER_URI));
+        HttpPost httpPrinterPost = new HttpPost(PRINTER_URI);
+        IppRequest getJobsRequest = readIppRequest("Get-Jobs.bin", PRINTER_URI);
         httpPrinterPost.setEntity(new IppEntity(getJobsRequest));
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             CloseableHttpResponse response = client.execute(httpPrinterPost);

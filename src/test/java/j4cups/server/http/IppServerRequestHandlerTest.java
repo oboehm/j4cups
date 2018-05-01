@@ -15,7 +15,7 @@
  *
  * (c)reated 19.04.2018 by oboehm (ob@oasd.de)
  */
-package j4cups.server;
+package j4cups.server.http;
 
 import j4cups.protocol.AbstractIppTest;
 import j4cups.protocol.IppResponse;
