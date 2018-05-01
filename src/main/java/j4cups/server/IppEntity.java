@@ -19,7 +19,16 @@
 package j4cups.server;
 
 import j4cups.protocol.AbstractIpp;
+import j4cups.protocol.IppRequest;
+import j4cups.protocol.IppResponse;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.http.HttpResponse;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.util.EntityUtils;
+
+import java.io.IOException;
 
 /**
  * Class IppEntity.
@@ -37,6 +46,39 @@ public class IppEntity extends ByteArrayEntity {
     public IppEntity(AbstractIpp ippRequest) {
         super(ippRequest.toByteArray());
         setContentType("application/ipp");
+    }
+
+    /**
+     * This is a utility method to convert an {@link HttpEntityEnclosingRequest} to an
+     * {@link IppRequest}.
+     *
+     * @param request the {@link HttpEntityEnclosingRequest}
+     * @return the {@link IppRequest} inside
+     */
+    public static IppRequest toIppRequest(HttpEntityEnclosingRequest request) {
+        HttpEntity entity = request.getEntity();
+        try {
+            byte[] entityContent = EntityUtils.toByteArray(entity);
+            return new IppRequest(entityContent);
+        } catch (IOException ioe) {
+            throw new IllegalStateException("cannot read content from " + request, ioe);
+        }
+    }
+
+    /**
+     * This is a utility method to convert an {@link HttpResponse} to an
+     * {@link IppResponse}.
+     *
+     * @param response the {@link HttpResponse}
+     * @return the {@link IppResponse} inside
+     */
+    public static IppResponse toIppResponse(HttpResponse response) {
+        try {
+            byte[] content = IOUtils.toByteArray(response.getEntity().getContent());
+            return new IppResponse(content);
+        } catch (IOException ioe) {
+            throw new IllegalStateException("cannot read content from " + response, ioe);
+        }
     }
 
 }

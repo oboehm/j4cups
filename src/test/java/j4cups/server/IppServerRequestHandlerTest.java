@@ -20,8 +20,9 @@ package j4cups.server;
 import j4cups.protocol.AbstractIppTest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.*;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpException;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.StringEntity;
@@ -39,12 +40,12 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Unit tests for {@link IppRequestHandler}.
+ * Unit tests for {@link IppServerRequestHandler}.
  */
-class IppRequestHandlerTest extends AbstractIppRequestHandlerTest {
+class IppServerRequestHandlerTest extends AbstractIppRequestHandlerTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(IppRequestHandlerTest.class);
-    private final IppRequestHandler requestHandler = new IppRequestHandler();
+    private static final Logger LOG = LoggerFactory.getLogger(IppServerRequestHandlerTest.class);
+    private final IppServerRequestHandler requestHandler = new IppServerRequestHandler();
 
     /**
      * For a first simple test we just call the handle method with an invalid
@@ -82,8 +83,7 @@ class IppRequestHandlerTest extends AbstractIppRequestHandlerTest {
         HttpResponse response = createHttpResponse();
         requestHandler.handle(request, response, new HttpClientContext());
         assertEquals(400, response.getStatusLine().getStatusCode());
-        byte[] content = IOUtils.toByteArray(response.getEntity().getContent());
-        IppResponse ippResponse = new IppResponse(content);
+        IppResponse ippResponse = IppEntity.toIppResponse(response);
         LOG.info("Received: {}", ippResponse);
         assertEquals(StatusCode.CLIENT_ERROR_BAD_REQUEST, ippResponse.getStatusCode());
         assertThat(ippResponse.getStatusMessage(), containsString("job-id"));

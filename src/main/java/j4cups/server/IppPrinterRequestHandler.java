@@ -18,10 +18,10 @@
 
 package j4cups.server;
 
-import org.apache.http.HttpRequest;
+import j4cups.protocol.IppRequest;
+import j4cups.protocol.IppResponse;
+import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.protocol.HttpRequestHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * @author oliver
  * @since 0.5
  */
-public final class IppPrinterRequestHandler implements HttpRequestHandler {
+public final class IppPrinterRequestHandler extends AbstractIppRequestHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppPrinterRequestHandler.class);
 
@@ -42,11 +42,15 @@ public final class IppPrinterRequestHandler implements HttpRequestHandler {
      *
      * @param request  the HTTP request.
      * @param response the HTTP response.
-     * @param context  the HTTP execution context.
      */
     @Override
-    public void handle(HttpRequest request, HttpResponse response, HttpContext context) {
-        LOG.info("Request {} recived.", request);
+    public void handle(HttpEntityEnclosingRequest request, HttpResponse response) {
+        IppRequest ippRequest = IppEntity.toIppRequest(request);
+        LOG.info("Received: {}", ippRequest);
+        IppResponse ippResponse = new IppResponse(ippRequest);
+        IppEntity ippEntity = new IppEntity(ippResponse);
+        response.setEntity(ippEntity);
+        LOG.info("Response {} is filled.", response);
     }
 
 }

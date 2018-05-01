@@ -21,14 +21,10 @@ import j4cups.op.SendDocument;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
-import org.apache.http.*;
+import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.protocol.HttpProcessor;
-import org.apache.http.protocol.HttpRequestHandler;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,24 +32,22 @@ import javax.validation.ValidationException;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.BufferUnderflowException;
-import java.nio.charset.StandardCharsets;
-import java.util.Locale;
 
 /**
- * The class IppRequestHandler handles the IPP requests.
+ * The class IppServerRequestHandler handles the IPP requests.
  *
  * @author <a href="ob@aosd.de">oliver</a>
  * @since (15.04.18)
  */
-public class IppRequestHandler implements HttpRequestHandler, HttpProcessor, AutoCloseable {
+public class IppServerRequestHandler extends AbstractIppRequestHandler implements AutoCloseable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(IppRequestHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IppServerRequestHandler.class);
     private final CupsClient cupsClient;
 
     /**
      * The default ctor is mainly intented for testing.
      */
-    public IppRequestHandler() {
+    public IppServerRequestHandler() {
         this(URI.create("http://localhost:631"));
     }
 
@@ -63,7 +57,7 @@ public class IppRequestHandler implements HttpRequestHandler, HttpProcessor, Aut
      *
      * @param forwardURI URI where the request should be forwarded to
      */
-    public IppRequestHandler(URI forwardURI) {
+    public IppServerRequestHandler(URI forwardURI) {
         this.cupsClient = new CupsClient(forwardURI);
     }
 
@@ -73,34 +67,11 @@ public class IppRequestHandler implements HttpRequestHandler, HttpProcessor, Aut
      *
      * @param request incoming request
      * @param response outgoing response
-     * @param context context
-     * @throws HttpException in case of HTTP problems
      * @throws IOException e.g. network problems
      */
-    public void handle(HttpRequest request, HttpResponse response, HttpContext context)
-            throws HttpException, IOException {
-        String method = request.getRequestLine().getMethod().toUpperCase(Locale.ROOT);
-        if (!method.equals("GET") && !method.equals("HEAD") && !method.equals("POST")) {
-            throw new MethodNotSupportedException(method + " method not supported");
-        }
-        if (request instanceof HttpEntityEnclosingRequest) {
-            handle((HttpEntityEnclosingRequest) request, response);
-        } else {
-            response.setStatusCode(HttpStatus.SC_NOT_IMPLEMENTED);
-            StringEntity entity = new StringEntity(
-                    "<html><body><h1>" + request +
-                            " not supported</h1></body></html>",
-                    ContentType.create("text/html", "UTF-8"));
-            response.setEntity(entity);
-            LOG.warn("{} is not supported.", request);
-        }
-    }
-
-    private void handle(HttpEntityEnclosingRequest request, HttpResponse response) throws IOException {
-        HttpEntity entity = request.getEntity();
-        byte[] entityContent = EntityUtils.toByteArray(entity);
+    protected void handle(HttpEntityEnclosingRequest request, HttpResponse response) throws IOException {
         try {
-            IppRequest ippRequest = new IppRequest(entityContent);
+            IppRequest ippRequest = IppEntity.toIppRequest(request);
             LOG.info("Received: {}", ippRequest);
             response.setStatusCode(HttpStatus.SC_OK);
             try {
@@ -115,8 +86,7 @@ public class IppRequestHandler implements HttpRequestHandler, HttpProcessor, Aut
             }
         } catch (BufferUnderflowException ex) {
             response.setStatusCode(HttpStatus.SC_BAD_REQUEST);
-            LOG.warn("Status code is set to {} because only {} bytes (\"{}\") were received.", HttpStatus.SC_BAD_REQUEST,
-                    entityContent.length, new String(entityContent, StandardCharsets.UTF_8));
+            LOG.warn("Status code is set to {} because too less bytes were received.", HttpStatus.SC_BAD_REQUEST);
             LOG.debug("Details:", ex);
         }
     }
@@ -140,36 +110,6 @@ public class IppRequestHandler implements HttpRequestHandler, HttpProcessor, Aut
     }
 
     /**
-     * Processes (validates) a request.
-     * On the client side, this step is performed before the request is
-     * sent to the server. On the server side, this step is performed
-     * on incoming messages before the message body is evaluated.
-     *
-     * @param request the request to preprocess
-     * @param context the context for the request
-     */
-    @Override
-    public void process(HttpRequest request, HttpContext context)  {
-        LOG.info("<= {}", request);
-        LOG.debug("<= {}", context);
-    }
-
-    /**
-     * Processes a response.
-     * On the server side, this step is performed before the response is
-     * sent to the client. On the client side, this step is performed
-     * on incoming messages before the message body is evaluated.
-     *
-     * @param response the response to postprocess
-     * @param context  the context for the request
-     */
-    @Override
-    public void process(HttpResponse response, HttpContext context) {
-        LOG.info("=> {}", response);
-        LOG.debug("=> {}", context);
-    }
-
-    /**
      * Closes the CupsClient which used to connect the CUPS server or
      * printer.
      *
@@ -179,4 +119,5 @@ public class IppRequestHandler implements HttpRequestHandler, HttpProcessor, Aut
     public void close() throws IOException {
         cupsClient.close();
     }
+
 }
