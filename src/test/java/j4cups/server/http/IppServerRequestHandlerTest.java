@@ -17,6 +17,7 @@
  */
 package j4cups.server.http;
 
+import j4cups.op.CreateJob;
 import j4cups.protocol.AbstractIppTest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
@@ -34,9 +35,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -87,6 +90,23 @@ class IppServerRequestHandlerTest extends AbstractIppRequestHandlerTest {
         LOG.info("Received: {}", ippResponse);
         assertEquals(StatusCode.CLIENT_ERROR_BAD_REQUEST, ippResponse.getStatusCode());
         assertThat(ippResponse.getStatusMessage(), containsString("job-id"));
+    }
+
+    /**
+     * A create-job request should be answered with a response containing a job-id.
+     *
+     * @throws IOException in case of network problems
+     */
+    //@Test
+    void testHandleCreateJob() throws IOException {
+        CreateJob createJob = new CreateJob();
+        URI printerURI = URI.create("http://localhost:631/printers/Brother_MFC_J5910DW_2");
+        createJob.setPrinterURI(printerURI);
+        createJob.setIppRequestId(4711);
+        HttpResponse response = createHttpResponse();
+        requestHandler.handle(createHttpRequest(createJob.getIppRequest()), response);
+        IppResponse ippResponse = IppEntity.toIppResponse(response);
+        assertThat(ippResponse.getJobId(), greaterThan(0));
     }
 
     @AfterEach
