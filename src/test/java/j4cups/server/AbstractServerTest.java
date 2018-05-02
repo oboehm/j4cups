@@ -48,7 +48,7 @@ public abstract class AbstractServerTest {
      * For the unit tests we start the server here.
      */
     @BeforeAll
-    public static void startServer() {
+    static void startServer() {
         int port = 1024 + (int) System.currentTimeMillis() % 8000;
         while (isOnline("localhost", port)) {
             port++;

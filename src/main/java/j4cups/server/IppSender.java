@@ -211,5 +211,10 @@ public final class IppSender implements AutoCloseable {
     public void close() throws IOException {
         client.close();
     }
+    
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + " to " + forwardURI;
+    }
 
 }
