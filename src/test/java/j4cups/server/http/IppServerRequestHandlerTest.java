@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.nio.file.Paths;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -48,7 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class IppServerRequestHandlerTest extends AbstractIppRequestHandlerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppServerRequestHandlerTest.class);
-    private final IppServerRequestHandler requestHandler = new IppServerRequestHandler();
+    private final IppServerRequestHandler requestHandler = new IppServerRequestHandler(Paths.get("target").toUri());
 
     /**
      * For a first simple test we just call the handle method with an invalid
@@ -78,13 +79,28 @@ class IppServerRequestHandlerTest extends AbstractIppRequestHandlerTest {
      * the job-id is missing.
      *
      * @throws IOException in case of network problems
-     * @throws HttpException HTTP exception
      */
     @Test
-    void testHandleInvalidSendDocument() throws IOException, HttpException {
+    void testHandleInvalidSendDocument() throws IOException {
+        IppServerRequestHandler handler = new IppServerRequestHandler(URI.create("http://localhost:631"));
+        sendIncompleteDocument(handler);
+    }
+
+    /**
+     * Here we test the {@link IppServerRequestHandler}, if it is created with
+     * a file URI.
+     *
+     * @throws IOException in case of network problems
+     */
+    @Test
+    void testIppServerRequestHandlerFile() throws IOException {
+        sendIncompleteDocument(requestHandler);
+    }
+
+    private static void sendIncompleteDocument(IppServerRequestHandler handler) throws IOException {
         HttpPost request = createHttpRequest(AbstractIppTest.readIppRequest("op", "send-document-request-invalid.ipp"));
         HttpResponse response = createHttpResponse();
-        requestHandler.handle(request, response, new HttpClientContext());
+        handler.handle(request, response);
         assertEquals(400, response.getStatusLine().getStatusCode());
         IppResponse ippResponse = IppEntity.toIppResponse(response);
         LOG.info("Received: {}", ippResponse);
