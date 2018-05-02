@@ -18,9 +18,11 @@
 
 package j4cups.server;
 
+import j4cups.protocol.AbstractIppTest;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
+import j4cups.protocol.attr.Attribute;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -117,6 +119,10 @@ class IppSenderTest extends AbstractServerTest {
         assumeTrue(isOnline(cupsURI), cupsURI + " is not available");
         IppResponse ippResponse = ippSender.createJob(TEST_PRINTER_URI);
         cancelJob(ippResponse);
+        IppResponse reference = AbstractIppTest.readIppResponse("response", "Create-Jobs.bin");
+        for (Attribute attr : reference.getAttributes()) {
+            assertThat("missing attribute: " + attr, ippResponse.hasAttribute(attr.getName()), is(true));
+        }
     }
 
     /**
