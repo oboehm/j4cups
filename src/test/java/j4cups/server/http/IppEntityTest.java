@@ -13,36 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * (c)reated 28.04.18 by oliver (ob@oasd.de)
+ * (c)reated 02.05.18 by oliver (ob@oasd.de)
  */
+package j4cups.server.http;
 
-package j4cups.op;
-
-import j4cups.protocol.IppOperations;
+import j4cups.protocol.AbstractIppTest;
 import j4cups.protocol.IppRequest;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Class CreateJob.
- *
- * @author oliver
- * @since 0.5
+ * Unit tests for {@link IppEntity}.
  */
-public class CreateJob extends Operation {
+class IppEntityTest {
 
-    /**
-     * Instantiates an operation for 'create-job'.
-     */
-    public CreateJob() {
-        super(IppOperations.CREATE_JOB);
-    }
-
-    /**
-     * Instantiates an operation with the given IPP request.
-     *
-     * @param ippRequest the IPP request
-     */
-    public CreateJob(IppRequest ippRequest) {
-        super(IppOperations.CREATE_JOB, ippRequest);
+    @Test
+    void testIppEntity() {
+        IppRequest request = AbstractIppTest.REQUEST_GET_JOBS;
+        IppEntity entity = new IppEntity(request);
+        assertEquals(request.getLength(), entity.getContentLength());
     }
 
 }

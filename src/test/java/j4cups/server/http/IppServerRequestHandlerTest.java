@@ -113,7 +113,7 @@ class IppServerRequestHandlerTest extends AbstractIppRequestHandlerTest {
      *
      * @throws IOException in case of network problems
      */
-    //@Test
+    @Test
     void testHandleCreateJob() throws IOException {
         CreateJob createJob = new CreateJob();
         URI printerURI = URI.create("http://localhost:631/printers/Brother_MFC_J5910DW_2");

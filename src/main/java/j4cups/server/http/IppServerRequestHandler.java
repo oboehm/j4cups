@@ -17,6 +17,8 @@
  */
 package j4cups.server.http;
 
+import j4cups.op.CreateJob;
+import j4cups.op.Operation;
 import j4cups.op.SendDocument;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
@@ -44,6 +46,8 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler implement
 
     private static final Logger LOG = LoggerFactory.getLogger(IppServerRequestHandler.class);
     private final IppSender ippSender;
+    private final URI forwardURI;
+    private int jobId = 0;
 
     /**
      * The default ctor is mainly intented for testing.
@@ -60,6 +64,7 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler implement
      */
     public IppServerRequestHandler(URI forwardURI) {
         this.ippSender = new IppSender(forwardURI);
+        this.forwardURI = forwardURI;
     }
 
     /**
@@ -81,7 +86,7 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler implement
                         new SendDocument().validateRequest(ippRequest);
                         break;
                 }
-                send(ippRequest, response);
+                handle(ippRequest, response);
             } catch (ValidationException ex) {
                 handleException(ippRequest, response, ex);
             }
@@ -90,6 +95,33 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler implement
             LOG.warn("Status code is set to {} because too less bytes were received.", HttpStatus.SC_BAD_REQUEST);
             LOG.debug("Details:", ex);
         }
+    }
+
+    private void handle(IppRequest ippRequest, HttpResponse response) throws IOException {
+        if ("file".equals(forwardURI.getScheme())) {
+            store(ippRequest, response);
+        } else {
+            send(ippRequest, response);
+        }
+    }
+    
+    private void store(IppRequest ippRequest, HttpResponse response) {
+        Operation op = new Operation(ippRequest.getOperation());
+        switch (ippRequest.getOperation()) {
+            case CREATE_JOB:
+                op = new CreateJob(ippRequest);
+                setJobIdFor(op);
+                break;
+            default:
+                op.validateRequest();
+                break;
+        }
+        response.setEntity(new IppEntity(op.getIppResponse()));
+    }
+
+    private void setJobIdFor(Operation op) {
+        jobId++;
+        op.setJobId(jobId);
     }
 
     private void send(IppRequest ippRequest, HttpResponse response) throws IOException {

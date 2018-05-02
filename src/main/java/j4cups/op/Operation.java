@@ -19,6 +19,7 @@ package j4cups.op;
 
 import j4cups.protocol.IppOperations;
 import j4cups.protocol.IppRequest;
+import j4cups.protocol.IppResponse;
 import j4cups.protocol.attr.Attribute;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -74,6 +75,15 @@ public class Operation {
      */
     public IppRequest getIppRequest() {
         return ippRequest;
+    }
+
+    /**
+     * Gets the IPP response for the stored IPP request.
+     * 
+     * @return IPP response
+     */
+    public IppResponse getIppResponse() {
+        return new IppResponse(ippRequest);
     }
 
     /**
@@ -142,6 +152,16 @@ public class Operation {
         if (request.getOperation() != id) {
             throw new ValidationException("not a " + id + " request:" + request);
         }
+    }
+
+    /**
+     * Looks if the stored request is valid. If not an
+     * {@link ValidationException} will be thrown
+     * 
+     * @since 0.5
+     */
+    public void validateRequest() {
+        validateRequest(getIppRequest());
     }
 
 }
