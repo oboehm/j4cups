@@ -21,6 +21,8 @@ import j4cups.op.*;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
+import j4cups.protocol.enums.JobState;
+import j4cups.protocol.enums.JobStateReasons;
 import j4cups.server.http.IppEntity;
 import j4cups.server.http.LogRequestInterceptor;
 import j4cups.server.http.LogResponseInterceptor;
@@ -52,6 +54,7 @@ public final class IppSender implements AutoCloseable {
     private final URI forwardURI;
     private final CloseableHttpClient client = createHttpClient();
     private int requestId = 1;
+    private int jobId = 0;
 
     /**
      * Instantiates a new Cups client.
@@ -148,6 +151,37 @@ public final class IppSender implements AutoCloseable {
         IppRequest ippRequest = op.getIppRequest();
         op.setIppRequestId(requestId);
         requestId++;
+        if ("file".equals(forwardURI.getScheme())) {
+            return handle(op);
+        } else {
+            return send(op, ippRequest);
+        }
+    }
+
+    private IppResponse handle(Operation op) {
+        IppRequest ippRequest = op.getIppRequest();
+        switch (ippRequest.getOperation()) {
+            case PRINT_JOB:
+                setJobIdFor(op);
+                break;
+            case CREATE_JOB:
+                setJobIdFor(op);
+                op.setJobState(JobState.PENDING_HELD);
+                op.setJobStateReasons(JobStateReasons.JOB_INCOMING);
+                break;
+            default:
+                op.validateRequest();
+                break;
+        }
+        return op.getIppResponse();
+    }
+
+    private void setJobIdFor(Operation op) {
+        jobId++;
+        op.setJobId(jobId);
+    }
+
+    private IppResponse send(Operation op, IppRequest ippRequest) {
         try {
             CloseableHttpResponse httpResponse = send(ippRequest);
             try (InputStream istream = httpResponse.getEntity().getContent()) {

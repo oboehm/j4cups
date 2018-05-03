@@ -19,6 +19,8 @@ package j4cups.protocol;
 
 import j4cups.protocol.attr.Attribute;
 import j4cups.protocol.attr.AttributeGroup;
+import j4cups.protocol.enums.JobState;
+import j4cups.protocol.enums.JobStateReasons;
 import j4cups.protocol.tags.DelimiterTags;
 import j4cups.protocol.tags.ValueTags;
 import org.apache.commons.lang3.StringUtils;
@@ -270,6 +272,94 @@ public abstract class AbstractIpp implements Externalizable {
         setJobAttribute(attr);
     }
 
+    /**
+     * Returns the job-state of the request or response.
+     *
+     * @return a job state
+     * @since 0.5
+     */
+    public JobState getJobState() {
+        Attribute attr = getAttribute("job-state");
+        return JobState.of(attr.getIntValue());
+    }
+
+    /**
+     * Sets the job-state.
+     *
+     * @param state the new job-state
+     * @since 0.5
+     */
+    public void setJobState(JobState state) {
+        Attribute attr = Attribute.of(ValueTags.ENUM, "job-state", state.getValue());
+        setJobAttribute(attr);
+    }
+
+    /**
+     * Returns the job-state-reason of the request or response.
+     *
+     * @return the job-state-reason
+     * @since 0.5
+     */
+    public JobStateReasons getJobStateReasons() {
+        Attribute attr = getAttribute("job-state-reasons");
+        return JobStateReasons.of(attr.getStringValue());
+    }
+
+    /**
+     * Sets the job-state-rease.
+     *
+     * @param reason the new job-state-reason
+     * @since 0.5
+     */
+    public void setJobStateReasons(JobStateReasons reason) {
+        Attribute attr = Attribute.of(ValueTags.KEYWORD, "job-state-reasons", reason.toString());
+        setJobAttribute(attr);
+    }
+
+    /**
+     * Returns the job-state-message of the request or response.
+     *
+     * @return the job-state-message
+     * @since 0.5
+     */
+    public String getJobStateMessage() {
+        Attribute attr = getAttribute("job-state-message");
+        return attr.getStringValue();
+    }
+
+    /**
+     * Sets the job-state-message.
+     *
+     * @param msg the new message
+     * @since 0.5
+     */
+    public void setJobStateMessage(String msg) {
+        Attribute attr = Attribute.of(ValueTags.TEXT_WITHOUT_LANGUAGE, "job-state-message", msg);
+        setJobAttribute(attr);
+    }
+
+    /**
+     * Returns the job-uri of the request or response.
+     *
+     * @return URI, e.g. "ipp://localhost:631/jobs/101"
+     * @since 0.5
+     */
+    public URI getJobURI() {
+        Attribute attr = getAttribute("job-uri");
+        return attr.getUriValue();
+    }
+
+    /**
+     * Sets the job-uri.
+     *
+     * @param uri the new job-uri
+     * @since 0.5
+     */
+    public void setJobURI(URI uri) {
+        Attribute attr = Attribute.of("job-uri", uri);
+        setJobAttribute(attr);
+    }
+    
     /**
      * The fourth field is the "attribute-group" field, and it occurs 0 or
      * more times.

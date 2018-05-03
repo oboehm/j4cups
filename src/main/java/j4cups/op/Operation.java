@@ -21,6 +21,8 @@ import j4cups.protocol.IppOperations;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.attr.Attribute;
+import j4cups.protocol.enums.JobState;
+import j4cups.protocol.enums.JobStateReasons;
 import org.apache.commons.lang3.SystemUtils;
 
 import javax.validation.ValidationException;
@@ -120,7 +122,27 @@ public class Operation {
      * @param jobId the job id
      */
     public void setJobId(int jobId) {
-        getIppRequest().setJobId(jobId);
+        ippRequest.setJobId(jobId);
+        ippRequest.setJobURI(URI.create("ipp://localhost:631/jobs/" + jobId));
+    }
+
+    /**
+     * Sets job state.
+     *
+     * @param state the state
+     */
+    public void setJobState(JobState state) {
+        ippRequest.setJobState(state);
+    }
+
+    /**
+     * Sets job state reason.
+     *
+     * @param reason the job-state-reason
+     */
+    public void setJobStateReasons(JobStateReasons reason) {
+        ippRequest.setJobStateReasons(reason);
+        ippRequest.setJobStateMessage(reason.toString());
     }
 
     /**
@@ -163,5 +185,4 @@ public class Operation {
     public void validateRequest() {
         validateRequest(getIppRequest());
     }
-
 }

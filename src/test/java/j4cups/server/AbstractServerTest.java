@@ -29,6 +29,9 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -101,8 +104,13 @@ public abstract class AbstractServerTest {
      * @return true or false
      */
     protected static boolean isOnline(URI uri) {
-        int port = uri.getPort();
-        return isOnline(uri.getHost(), port == -1 ? 631 : port);
+        if ("file".equals(uri.getScheme())) {
+            Path dir = Paths.get(uri);
+            return Files.isDirectory(dir);
+        } else {
+            int port = uri.getPort();
+            return isOnline(uri.getHost(), port == -1 ? 631 : port);
+        }
     }
 
     /**
