@@ -103,7 +103,7 @@ public abstract class AbstractServerTest {
      * @param uri to the CUPS server or printer
      * @return true or false
      */
-    protected static boolean isOnline(URI uri) {
+    public static boolean isOnline(URI uri) {
         if ("file".equals(uri.getScheme())) {
             Path dir = Paths.get(uri);
             return Files.isDirectory(dir);
@@ -121,7 +121,7 @@ public abstract class AbstractServerTest {
      * @param port e.g. 631
      * @return true or false
      */
-    protected static boolean isOnline(String host, int port) {
+    public static boolean isOnline(String host, int port) {
         try (Socket socket = new Socket()) {
             socket.connect(new InetSocketAddress(host, port), 200);
             LOG.debug("Socket {} for {}:{} is created.", socket, host, port);

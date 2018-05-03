@@ -47,7 +47,7 @@ public abstract class AbstractIppRequestHandlerTest {
 
     /**
      * Use this method to create an empty {@link HttpResponse}.
-     * +
+     * 
      * @return an empty {@link HttpResponse}
      */
     protected static HttpResponse createHttpResponse() {

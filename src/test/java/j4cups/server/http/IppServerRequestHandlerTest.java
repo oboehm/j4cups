@@ -21,6 +21,7 @@ import j4cups.op.CreateJob;
 import j4cups.protocol.AbstractIppTest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
+import j4cups.server.AbstractServerTest;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
@@ -42,6 +43,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * Unit tests for {@link IppServerRequestHandler}.
@@ -117,6 +119,7 @@ class IppServerRequestHandlerTest extends AbstractIppRequestHandlerTest {
     void testHandleCreateJob() throws IOException {
         CreateJob createJob = new CreateJob();
         URI printerURI = URI.create("http://localhost:631/printers/Brother_MFC_J5910DW_2");
+        assumeTrue(AbstractServerTest.isOnline(printerURI));
         createJob.setPrinterURI(printerURI);
         createJob.setIppRequestId(4711);
         HttpResponse response = createHttpResponse();
