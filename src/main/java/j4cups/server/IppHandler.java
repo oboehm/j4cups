@@ -177,6 +177,7 @@ public final class IppHandler implements AutoCloseable {
         switch (ippRequest.getOperation()) {
             case PRINT_JOB:
                 setJobIdFor(op);
+                op.setJobStateReasons(JobStateReasons.NONE);
                 break;
             case CREATE_JOB:
                 setJobIdFor(op);

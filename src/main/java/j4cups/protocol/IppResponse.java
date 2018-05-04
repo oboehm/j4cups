@@ -97,7 +97,7 @@ public class IppResponse extends AbstractIpp {
 
     private static AttributeGroup createPrintJobJobAttributes(IppRequest request) {
         AttributeGroup group = new AttributeGroup(DelimiterTags.JOB_ATTRIBUTES_TAG);
-        int jobId = parseInt(request.getAttribute("job-name").getStringValue());
+        int jobId = request.getAttribute("job-id").getIntValue();
         URI jobUri = URI.create(request.getPrinterURI() + "/" + jobId);
         group.addAttribute(Attribute.of("job-id", jobId));
         group.addAttribute(Attribute.of("job-uri", jobUri));
@@ -111,7 +111,7 @@ public class IppResponse extends AbstractIpp {
         try {
             return Integer.parseInt(number);
         } catch (NumberFormatException ex) {
-            LOG.warn("No number in '{}' detected - will return 0:", ex);
+            LOG.warn("No number in '{}' detected - will return 0:", value, ex);
             return 0;
         }
     }
