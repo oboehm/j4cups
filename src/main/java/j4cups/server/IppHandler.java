@@ -163,13 +163,12 @@ public final class IppHandler implements AutoCloseable {
     }
 
     private IppResponse send(Operation op) {
-        IppRequest ippRequest = op.getIppRequest();
         op.setIppRequestId(requestId);
         requestId++;
         if ("file".equals(forwardURI.getScheme())) {
             return handle(op);
         } else {
-            return send(op, ippRequest);
+            return send(op, op.getIppRequest());
         }
     }
 

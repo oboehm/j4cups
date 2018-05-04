@@ -73,7 +73,7 @@ public class PrintJob extends Operation {
      */
     public void setJobName(String name) {
         Attribute attr = Attribute.of(ValueTags.NAME_WITHOUT_LANGUAGE, "job-name", name);
-        getIppRequest().setOperationAttribute(attr);
+        setOperationAttribute(attr);
     }
 
     /**
@@ -83,7 +83,7 @@ public class PrintJob extends Operation {
      */
     public void setDocumentName(String name) {
         Attribute attr = Attribute.of(ValueTags.NAME_WITHOUT_LANGUAGE, "document-name", name);
-        getIppRequest().setOperationAttribute(attr);
+        setOperationAttribute(attr);
     }
 
     /**

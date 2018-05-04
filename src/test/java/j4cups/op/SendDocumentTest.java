@@ -44,7 +44,7 @@ class SendDocumentTest {
      */
     @Test
     void testLastDocument() {
-        Attribute attr = operation.getIppRequest().getAttribute("last-document");
+        Attribute attr = operation.getAttribute("last-document");
         assertNotNull(attr);
     }
 

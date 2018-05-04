@@ -38,7 +38,7 @@ final class PrintJobTest {
      */
     @Test
     public void testOrientationRequested() {
-        Attribute attr = op.getIppRequest().getAttribute("orientation-requested");
+        Attribute attr = op.getAttribute("orientation-requested");
         assertNotNull(attr);
     }
 

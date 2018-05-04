@@ -111,7 +111,7 @@ public class Operation {
     public Attribute getAttribute(String name) {
         return ippRequest.getAttribute(name);
     }
-
+    
     /**
      * Sets the printer-uri.
      *

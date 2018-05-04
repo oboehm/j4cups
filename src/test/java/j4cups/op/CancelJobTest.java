@@ -39,7 +39,7 @@ final class CancelJobTest {
     @Test
     public void testRequestingUserName() {
         String expected = SystemUtils.USER_NAME;
-        Attribute userAttribute = op.getIppRequest().getAttribute("requesting-user-name");
+        Attribute userAttribute = op.getAttribute("requesting-user-name");
         assertNotNull(userAttribute);
         LOG.info("Requesting user name is {}.", userAttribute);
         assertEquals(expected, userAttribute.getStringValue());
