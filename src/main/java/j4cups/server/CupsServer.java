@@ -152,13 +152,14 @@ public class CupsServer implements Runnable {
                                                 .setSoTimeout(15000)
                                                 .setTcpNoDelay(true)
                                                 .build();
+        URI cupsURI = URI.create("http://localhost:" + serverPort);
         return ServerBootstrap.bootstrap()
                               .setListenerPort(serverPort)
                               .setServerInfo("j4CUPS/0.5")
                               .setSocketConfig(socketConfig)
                               .setExceptionLogger(new StdErrorExceptionLogger())
                               .registerHandler("/printers/*", new IppPrinterRequestHandler())
-                              .registerHandler("*", new IppServerRequestHandler(forwardURI))
+                              .registerHandler("*", new IppServerRequestHandler(forwardURI, cupsURI))
                               .addInterceptorFirst(new LogRequestInterceptor("S"))
                               .addInterceptorLast(new LogResponseInterceptor("S"))
                               .create();

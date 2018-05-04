@@ -54,13 +54,25 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler implement
     }
 
     /**
-     * For shutdown request we must know the server. The server is given
-     * with this constructor.
+     * If the request handler acts as a proxy he need to know ther URI where
+     * the request should be forwarded.
      *
      * @param forwardURI URI where the request should be forwarded to
      */
     public IppServerRequestHandler(URI forwardURI) {
-        this.ippSender = new IppSender(forwardURI);
+        this(forwardURI, forwardURI);
+    }
+
+    /**
+     * If the request handler acts as a proxy he need to know ther URI where
+     * the request should be forwarded. And for the generated responses it
+     * must known the CUPS URI.
+     *
+     * @param forwardURI URI where the request should be forwarded to
+     * @param cupsURI    the cups uri
+     */
+    public IppServerRequestHandler(URI forwardURI, URI cupsURI) {
+        this.ippSender = new IppSender(forwardURI, cupsURI);
         this.forwardURI = forwardURI;
     }
 

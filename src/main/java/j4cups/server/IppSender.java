@@ -52,6 +52,7 @@ public final class IppSender implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppSender.class);
     private final URI forwardURI;
+    private final URI cupsURI;
     private final CloseableHttpClient client = createHttpClient();
     private int requestId = 1;
     private int jobId = 0;
@@ -59,10 +60,21 @@ public final class IppSender implements AutoCloseable {
     /**
      * Instantiates a new Cups client.
      *
-     * @param forwardURI the forward uri
+     * @param cupsURI the cups uri
      */
-    public IppSender(URI forwardURI) {
+    public IppSender(URI cupsURI) {
+        this(cupsURI, cupsURI);
+    }
+
+    /**
+     * Instantiates a new Cups client.
+     *
+     * @param forwardURI the forward uri
+     * @param cupsURI    the cups uri
+     */
+    public IppSender(URI forwardURI, URI cupsURI) {
         this.forwardURI = forwardURI;
+        this.cupsURI = cupsURI;
     }
 
     /**
@@ -166,6 +178,7 @@ public final class IppSender implements AutoCloseable {
                 break;
             case CREATE_JOB:
                 setJobIdFor(op);
+                op.setCupsURI(cupsURI);
                 op.setJobState(JobState.PENDING_HELD);
                 op.setJobStateReasons(JobStateReasons.JOB_INCOMING);
                 break;

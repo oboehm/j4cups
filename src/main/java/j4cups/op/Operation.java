@@ -24,9 +24,12 @@ import j4cups.protocol.attr.Attribute;
 import j4cups.protocol.enums.JobState;
 import j4cups.protocol.enums.JobStateReasons;
 import org.apache.commons.lang3.SystemUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.ValidationException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
@@ -37,9 +40,11 @@ import java.util.Locale;
  * @since 0.5 (26.03.2018)
  */
 public class Operation {
-    
+
+    private static final Logger LOG = LoggerFactory.getLogger(Operation.class);
     private final IppOperations id;
     private final IppRequest ippRequest;
+    private URI cupsURI = URI.create("http://localhost:631");
 
     /**
      * Instantiates an operation with the given id.
@@ -117,13 +122,29 @@ public class Operation {
     }
 
     /**
+     * Sets the CUPS URI. This is needed e.g. to set the job-uri.
+     *
+     * @param cupsURI the printer uri
+     */
+    public void setCupsURI(URI cupsURI) {
+        this.cupsURI = cupsURI;
+    }
+
+    /**
      * Sets job id.
      *
      * @param jobId the job id
      */
     public void setJobId(int jobId) {
         ippRequest.setJobId(jobId);
-        ippRequest.setJobURI(URI.create("ipp://localhost:631/jobs/" + jobId));
+        try {
+            URI ippURI = new URI("ipp", cupsURI.getUserInfo(), cupsURI.getHost(), cupsURI.getPort(),
+                    cupsURI.getPath() + "/jobs/" + jobId, cupsURI.getQuery(), cupsURI.getFragment());
+            ippRequest.setJobURI(ippURI);
+        } catch (URISyntaxException ex) {
+            LOG.warn("Cannot set job-uri from {}:", cupsURI, ex);
+            ippRequest.setJobURI(URI.create("ipp://localhost:631/jobs/" + jobId));
+        }
     }
 
     /**
