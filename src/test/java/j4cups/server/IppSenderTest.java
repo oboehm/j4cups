@@ -119,7 +119,11 @@ class IppSenderTest extends AbstractServerTest {
         assumeTrue(isOnline(cupsURI), cupsURI + " is not available");
         IppResponse ippResponse = ippSender.createJob(TEST_PRINTER_URI);
         cancelJob(ippResponse);
-        IppResponse reference = AbstractIppTest.readIppResponse("response", "Create-Jobs.bin");
+        checkIppResponse(ippResponse, "Create-Jobs.bin");
+    }
+
+    private static void checkIppResponse(IppResponse ippResponse, String refResource) {
+        IppResponse reference = AbstractIppTest.readIppResponse("response", refResource);
         for (Attribute attr : reference.getAttributes()) {
             assertThat("missing attribute: " + attr, ippResponse.hasAttribute(attr.getName()), is(true));
         }
