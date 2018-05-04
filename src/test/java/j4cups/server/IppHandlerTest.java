@@ -123,13 +123,6 @@ class IppHandlerTest extends AbstractServerTest {
         checkIppResponse(ippResponse, "Create-Jobs.bin");
     }
 
-    private static void checkIppResponse(IppResponse ippResponse, String refResource) {
-        IppResponse reference = AbstractIppTest.readIppResponse("response", refResource);
-        for (Attribute attr : reference.getAttributes()) {
-            assertThat("missing attribute: " + attr, ippResponse.hasAttribute(attr.getName()), is(true));
-        }
-    }
-
     /**
      * Test method for {@link IppHandler#printJob(URI, Path)}.
      */
@@ -139,6 +132,14 @@ class IppHandlerTest extends AbstractServerTest {
         IppResponse ippResponse = ippHandler.printJob(testPrinterUri, readme);
         assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
         cancelJob(ippResponse);
+        checkIppResponse(ippResponse, "Print-Job.bin");
+    }
+
+    private static void checkIppResponse(IppResponse ippResponse, String refResource) {
+        IppResponse reference = AbstractIppTest.readIppResponse("response", refResource);
+        for (Attribute attr : reference.getAttributes()) {
+            assertThat("missing attribute: " + attr, ippResponse.hasAttribute(attr.getName()), is(true));
+        }
     }
 
     /**
