@@ -42,15 +42,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * The IppSender is needed for the communication to real CUPS server which
- * is used by the {@link CupsServer} to send the request.
+ * The IppHandler is reponsible for handling IPP requests. He can do it by
+ * forwarding the request to a real CUPS server. Or it can handle the IPP
+ * requests itself and acts like a (more ore less) real CUPS server. This
+ * may be useful if you want to do some tests with a CUPS server but do not
+ * want to waste paper.
  *
  * @author oboehm
  * @since 0.5 (26.04.2018)
  */
-public final class IppSender implements AutoCloseable {
+public final class IppHandler implements AutoCloseable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(IppSender.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IppHandler.class);
     private final URI forwardURI;
     private final URI cupsURI;
     private final CloseableHttpClient client = createHttpClient();
@@ -62,7 +65,7 @@ public final class IppSender implements AutoCloseable {
      *
      * @param cupsURI the cups uri
      */
-    public IppSender(URI cupsURI) {
+    public IppHandler(URI cupsURI) {
         this(cupsURI, cupsURI);
     }
 
@@ -72,7 +75,7 @@ public final class IppSender implements AutoCloseable {
      * @param forwardURI the forward uri
      * @param cupsURI    the cups uri
      */
-    public IppSender(URI forwardURI, URI cupsURI) {
+    public IppHandler(URI forwardURI, URI cupsURI) {
         this.forwardURI = forwardURI;
         this.cupsURI = cupsURI;
     }

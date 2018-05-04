@@ -21,7 +21,7 @@ import j4cups.op.SendDocument;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
-import j4cups.server.IppSender;
+import j4cups.server.IppHandler;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -43,7 +43,7 @@ import java.nio.BufferUnderflowException;
 public class IppServerRequestHandler extends AbstractIppRequestHandler implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppServerRequestHandler.class);
-    private final IppSender ippSender;
+    private final IppHandler ippHandler;
     private final URI forwardURI;
 
     /**
@@ -72,7 +72,7 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler implement
      * @param cupsURI    the cups uri
      */
     public IppServerRequestHandler(URI forwardURI, URI cupsURI) {
-        this.ippSender = new IppSender(forwardURI, cupsURI);
+        this.ippHandler = new IppHandler(forwardURI, cupsURI);
         this.forwardURI = forwardURI;
     }
 
@@ -107,7 +107,7 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler implement
     }
 
     private void send(IppRequest ippRequest, HttpResponse response) throws IOException {
-        CloseableHttpResponse cupsResponse = ippSender.send(ippRequest);
+        CloseableHttpResponse cupsResponse = ippHandler.send(ippRequest);
         response.setEntity(cupsResponse.getEntity());
         response.setStatusCode(cupsResponse.getStatusLine().getStatusCode());
         response.setStatusLine(cupsResponse.getStatusLine());
@@ -125,14 +125,14 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler implement
     }
 
     /**
-     * Closes the IppSender which used to connect the CUPS server or
+     * Closes the IppHandler which used to connect the CUPS server or
      * printer.
      *
      * @throws IOException if this resource cannot be closed
      */
     @Override
     public void close() throws IOException {
-        ippSender.close();
+        ippHandler.close();
     }
 
 }

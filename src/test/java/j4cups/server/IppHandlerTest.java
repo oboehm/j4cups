@@ -45,11 +45,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
- * Unit tests for class {@link IppSender}. For tests with a real I used
+ * Unit tests for class {@link IppHandler}. For tests with a real I used
  * http://localhost:631/printers/Brother_MFC_J5910DW_2 in my local home
  * network.
  * <p>
- * To set a real CUPS server for {@link IppSenderTest} as forward URI you can
+ * To set a real CUPS server for {@link IppHandlerTest} as forward URI you can
  * use the environment variable "cupsURI":
  * </p>
  * <pre>
@@ -58,42 +58,42 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  *
  * @author oliver (boehm@javatux.de)
  */
-class IppSenderTest extends AbstractServerTest {
+class IppHandlerTest extends AbstractServerTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(IppSenderTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IppHandlerTest.class);
     private static URI cupsURI;
-    private static IppSender ippSender;
+    private static IppHandler ippHandler;
     private static URI testPrinterUri =
             URI.create(System.getProperty("printerURI", "http://localhost:631/printers/Brother_MFC_J5910DW_2"));
 
     @BeforeAll
     static void setUpCupsURI() {
         cupsURI = URI.create(System.getProperty("cupsURI", "http://localhost:631"));
-        ippSender = new IppSender(cupsURI);
-        LOG.info("{} is used for testing.", ippSender);
+        ippHandler = new IppHandler(cupsURI);
+        LOG.info("{} is used for testing.", ippHandler);
     }
 
     /**
-     * Unit test for {@link IppSender#send(IppRequest)}.
+     * Unit test for {@link IppHandler#send(IppRequest)}.
      *
      * @throws IOException the io exception
      */
     @Test
     void testSendGetPrinters() throws IOException {
         IppRequest getPrintersRequest = readIppRequest("Get-Printers.bin");
-        CloseableHttpResponse response = ippSender.send(getPrintersRequest);
+        CloseableHttpResponse response = ippHandler.send(getPrintersRequest);
         assertEquals(200, response.getStatusLine().getStatusCode());
     }
 
     /**
-     * Another unit test for {@link IppSender#send(IppRequest)}.
+     * Another unit test for {@link IppHandler#send(IppRequest)}.
      *
      * @throws IOException the io exception
      */
     @Test
     void testSendGetJobs() throws IOException {
         IppRequest jobsRequest = readIppRequest("Get-Jobs.bin", testPrinterUri);
-        CloseableHttpResponse response = ippSender.send(jobsRequest);
+        CloseableHttpResponse response = ippHandler.send(jobsRequest);
         assertEquals(200, response.getStatusLine().getStatusCode());
         HttpEntity httpEntity = response.getEntity();
         byte[] content = IOUtils.toByteArray(httpEntity.getContent());
@@ -102,23 +102,23 @@ class IppSenderTest extends AbstractServerTest {
     }
 
     /**
-     * Test method for {@link IppSender#getJobs(URI)}.
+     * Test method for {@link IppHandler#getJobs(URI)}.
      */
     @Test
     void testGetJobs() {
         assumeTrue(isOnline(cupsURI), cupsURI + " is not available");
-        IppResponse ippResponse = ippSender.getJobs(testPrinterUri);
+        IppResponse ippResponse = ippHandler.getJobs(testPrinterUri);
         assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
     }
 
     /**
-     * Test method for {@link IppSender#createJob(URI)} and
-     * {@link IppSender#cancelJob(URI, int)}.
+     * Test method for {@link IppHandler#createJob(URI)} and
+     * {@link IppHandler#cancelJob(URI, int)}.
      */
     @Test
     void testCreateAndCancelJob() {
         assumeTrue(isOnline(cupsURI), cupsURI + " is not available");
-        IppResponse ippResponse = ippSender.createJob(testPrinterUri);
+        IppResponse ippResponse = ippHandler.createJob(testPrinterUri);
         cancelJob(ippResponse);
         checkIppResponse(ippResponse, "Create-Jobs.bin");
     }
@@ -131,44 +131,44 @@ class IppSenderTest extends AbstractServerTest {
     }
 
     /**
-     * Test method for {@link IppSender#printJob(URI, Path)}.
+     * Test method for {@link IppHandler#printJob(URI, Path)}.
      */
     @Test
     void testPrintJob() {
         Path readme = readTestFile();
-        IppResponse ippResponse = ippSender.printJob(testPrinterUri, readme);
+        IppResponse ippResponse = ippHandler.printJob(testPrinterUri, readme);
         assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
         cancelJob(ippResponse);
     }
 
     /**
-     * Test method for {@link IppSender#sendDocument(URI, Path, int, boolean)}.
+     * Test method for {@link IppHandler#sendDocument(URI, Path, int, boolean)}.
      */
     @Test
     void testSendDocument() {
         Path testFile = readTestFile();
-        int jobId = ippSender.createJob(testPrinterUri).getJobId();
+        int jobId = ippHandler.createJob(testPrinterUri).getJobId();
         try {
-            IppResponse ippResponse = ippSender.sendDocument(testPrinterUri, testFile, jobId, true);
+            IppResponse ippResponse = ippHandler.sendDocument(testPrinterUri, testFile, jobId, true);
             assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
         } finally {
-            ippSender.cancelJob(testPrinterUri, jobId);
+            ippHandler.cancelJob(testPrinterUri, jobId);
         }
     }
 
     /**
-     * Test method for {@link IppSender#sendDocument(URI, Path, int, boolean)}.
+     * Test method for {@link IppHandler#sendDocument(URI, Path, int, boolean)}.
      */
     @Test
     void testSendTwoDocuments() {
         Path testFile = readTestFile();
-        int jobId = ippSender.createJob(testPrinterUri).getJobId();
+        int jobId = ippHandler.createJob(testPrinterUri).getJobId();
         try {
-            ippSender.sendDocument(testPrinterUri, testFile, jobId, false);
-            IppResponse ippResponse = ippSender.sendDocument(testPrinterUri, testFile, jobId, true);
+            ippHandler.sendDocument(testPrinterUri, testFile, jobId, false);
+            IppResponse ippResponse = ippHandler.sendDocument(testPrinterUri, testFile, jobId, true);
             assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
         } finally {
-            ippSender.cancelJob(testPrinterUri, jobId);
+            ippHandler.cancelJob(testPrinterUri, jobId);
         }
     }
 
@@ -183,14 +183,14 @@ class IppSenderTest extends AbstractServerTest {
         int jobId = ippResponse.getJobId();
         LOG.info("Cancelling job {}...", jobId);
         assertThat(jobId, greaterThan(0));
-        IppResponse cancelResponse = ippSender.cancelJob(testPrinterUri, jobId);
+        IppResponse cancelResponse = ippHandler.cancelJob(testPrinterUri, jobId);
         assertThat(cancelResponse.getStatusCode(),
                 anyOf(equalTo(StatusCode.SUCCESSFUL_OK), equalTo(StatusCode.CLIENT_ERROR_NOT_POSSIBLE)));
     }
 
     @AfterAll
     static void closeClient() throws IOException {
-        ippSender.close();
+        ippHandler.close();
     }
 
 }
