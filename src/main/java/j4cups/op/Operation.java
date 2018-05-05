@@ -44,6 +44,7 @@ public class Operation {
     private static final Logger LOG = LoggerFactory.getLogger(Operation.class);
     private final IppOperations id;
     private final IppRequest ippRequest;
+    private final IppResponse ippResponse;
     private URI cupsURI = URI.create("http://localhost:631");
 
     /**
@@ -64,6 +65,7 @@ public class Operation {
     protected Operation(IppOperations id, IppRequest ippRequest) {
         this.id = id;
         this.ippRequest = ippRequest;
+        this.ippResponse = new IppResponse(ippRequest);
     }
 
     protected static IppRequest createIppRequest(IppOperations ippOp) {

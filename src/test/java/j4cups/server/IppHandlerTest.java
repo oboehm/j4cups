@@ -68,7 +68,7 @@ class IppHandlerTest extends AbstractServerTest {
 
     @BeforeAll
     static void setUpCupsURI() {
-        cupsURI = URI.create(System.getProperty("cupsURI", "http://localhost:631"));
+        cupsURI = URI.create(System.getProperty("cupsURI", "http://localhost:" + cupsServer.getPort()));
         ippHandler = new IppHandler(cupsURI);
         LOG.info("{} is used for testing.", ippHandler);
     }
@@ -106,7 +106,7 @@ class IppHandlerTest extends AbstractServerTest {
      */
     @Test
     void testGetJobs() {
-        assumeTrue(isOnline(cupsURI), cupsURI + " is not available");
+        assumeCupsAndPrinterAreOnline();
         IppResponse ippResponse = ippHandler.getJobs(testPrinterUri);
         assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
     }
@@ -117,10 +117,15 @@ class IppHandlerTest extends AbstractServerTest {
      */
     @Test
     void testCreateAndCancelJob() {
-        assumeTrue(isOnline(cupsURI), cupsURI + " is not available");
+        assumeCupsAndPrinterAreOnline();
         IppResponse ippResponse = ippHandler.createJob(testPrinterUri);
         cancelJob(ippResponse);
         checkIppResponse(ippResponse, "Create-Jobs.bin");
+    }
+
+    private static void assumeCupsAndPrinterAreOnline() {
+        assumeTrue(isOnline(cupsURI), cupsURI + " is not available");
+        assumeTrue(isOnline(testPrinterUri), testPrinterUri + " is not available");
     }
 
     /**
@@ -128,6 +133,7 @@ class IppHandlerTest extends AbstractServerTest {
      */
     @Test
     void testPrintJob() {
+        assumeCupsAndPrinterAreOnline();
         Path readme = readTestFile();
         IppResponse ippResponse = ippHandler.printJob(testPrinterUri, readme);
         assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
@@ -147,6 +153,7 @@ class IppHandlerTest extends AbstractServerTest {
      */
     @Test
     void testSendDocument() {
+        assumeCupsAndPrinterAreOnline();
         Path testFile = readTestFile();
         int jobId = ippHandler.createJob(testPrinterUri).getJobId();
         try {
@@ -162,6 +169,7 @@ class IppHandlerTest extends AbstractServerTest {
      */
     @Test
     void testSendTwoDocuments() {
+        assumeCupsAndPrinterAreOnline();
         Path testFile = readTestFile();
         int jobId = ippHandler.createJob(testPrinterUri).getJobId();
         try {

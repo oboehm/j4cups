@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 public abstract class AbstractServerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractServerTest.class);
-    protected static CupsServer cupsServer = new CupsServer(6310);
+    protected static CupsServer cupsServer;
 
     /**
      * For the unit tests we start the server here.
