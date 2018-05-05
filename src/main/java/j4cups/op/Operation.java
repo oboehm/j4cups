@@ -138,7 +138,7 @@ public class Operation {
      * @param jobId the job id
      */
     public void setJobId(int jobId) {
-        ippRequest.setJobId(jobId);
+        ippResponse.setJobId(jobId);
         try {
             URI ippURI = new URI("ipp", cupsURI.getUserInfo(), cupsURI.getHost(), cupsURI.getPort(),
                     cupsURI.getPath() + "/jobs/" + jobId, cupsURI.getQuery(), cupsURI.getFragment());
@@ -164,8 +164,8 @@ public class Operation {
      * @param reason the job-state-reason
      */
     public void setJobStateReasons(JobStateReasons reason) {
-        ippRequest.setJobStateReasons(reason);
-        ippRequest.setJobStateMessage(reason.toString());
+        ippResponse.setJobStateReasons(reason);
+        ippResponse.setJobStateMessage(reason.toString());
     }
 
     /**

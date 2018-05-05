@@ -180,10 +180,14 @@ public final class IppHandler implements AutoCloseable {
                 op.setJobStateReasons(JobStateReasons.NONE);
                 break;
             case CREATE_JOB:
-                setJobIdFor(op);
                 op.setCupsURI(cupsURI);
                 op.setJobState(JobState.PENDING_HELD);
                 op.setJobStateReasons(JobStateReasons.JOB_INCOMING);
+                setJobIdFor(op);
+                break;
+            case SEND_DOCUMENT:
+                op.setCupsURI(cupsURI);
+                setJobIdFor(op);
                 break;
             default:
                 op.validateRequest();

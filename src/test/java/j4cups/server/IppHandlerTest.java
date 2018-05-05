@@ -64,11 +64,12 @@ class IppHandlerTest extends AbstractServerTest {
     private static URI cupsURI;
     private static IppHandler ippHandler;
     private static URI testPrinterUri =
-            URI.create(System.getProperty("printerURI", "http://localhost:631/printers/Brother_MFC_J5910DW_2"));
+            URI.create(System.getProperty("printerURI", "http://localhost:" + cupsServer.getPort() + "/printers/text"));
 
     @BeforeAll
     static void setUpCupsURI() {
-        cupsURI = URI.create(System.getProperty("cupsURI", "http://localhost:" + cupsServer.getPort()));
+        Path spoolDir = Paths.get("target");
+        cupsURI = URI.create(System.getProperty("cupsURI", spoolDir.toUri().toString()));
         ippHandler = new IppHandler(cupsURI);
         LOG.info("{} is used for testing.", ippHandler);
     }
