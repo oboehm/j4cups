@@ -92,7 +92,7 @@ public class Operation {
      * @return IPP response
      */
     public IppResponse getIppResponse() {
-        return new IppResponse(ippRequest);
+        return ippResponse;
     }
 
     /**
@@ -142,10 +142,10 @@ public class Operation {
         try {
             URI ippURI = new URI("ipp", cupsURI.getUserInfo(), cupsURI.getHost(), cupsURI.getPort(),
                     cupsURI.getPath() + "/jobs/" + jobId, cupsURI.getQuery(), cupsURI.getFragment());
-            ippRequest.setJobURI(ippURI);
+            ippResponse.setJobURI(ippURI);
         } catch (URISyntaxException ex) {
             LOG.warn("Cannot set job-uri from {}:", cupsURI, ex);
-            ippRequest.setJobURI(URI.create("ipp://localhost:631/jobs/" + jobId));
+            ippResponse.setJobURI(URI.create("ipp://localhost:631/jobs/" + jobId));
         }
     }
 
@@ -155,7 +155,7 @@ public class Operation {
      * @param state the state
      */
     public void setJobState(JobState state) {
-        ippRequest.setJobState(state);
+        ippResponse.setJobState(state);
     }
 
     /**
