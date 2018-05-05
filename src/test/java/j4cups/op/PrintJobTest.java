@@ -17,13 +17,20 @@
  */
 package j4cups.op;
 
+import j4cups.protocol.IppResponse;
 import j4cups.protocol.attr.Attribute;
+import j4cups.protocol.tags.DelimiterTags;
 import org.junit.jupiter.api.Test;
 import patterntesting.runtime.junit.ArrayTester;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link PrintJob}.
@@ -37,7 +44,7 @@ final class PrintJobTest {
      * attribute.
      */
     @Test
-    public void testOrientationRequested() {
+    void testOrientationRequested() {
         Attribute attr = op.getAttribute("orientation-requested");
         assertNotNull(attr);
     }
@@ -46,10 +53,24 @@ final class PrintJobTest {
      * Test method for {@link PrintJob#setData(byte[])}.
      */
     @Test
-    public void testSetData() {
+    void testSetData() {
         byte[] data = "test".getBytes(StandardCharsets.UTF_8);
         op.setData(data);
         ArrayTester.assertEquals(data, op.getIppRequest().getData());
+    }
+    
+    /**
+     * The Printer MUST return "job-id" and other  job attributes. This is described in
+     * <a href="https://tools.ietf.org/html/rfc8011#section-4.2.1.2">Section 4.1.4.2.</a>
+     * of RFC-8011.
+     */
+    @Test
+    void testPrintJobResponseJobAttributes() {
+        IppResponse responsePrintJob = op.getIppResponse();
+        List<Attribute> jobAttributes =
+                responsePrintJob.getAttributeGroup(DelimiterTags.JOB_ATTRIBUTES_TAG).getAttributes();
+        assertThat(jobAttributes, not(empty()));
+        assertTrue(responsePrintJob.hasAttribute("job-state"));
     }
 
 }

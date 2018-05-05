@@ -20,7 +20,9 @@ package j4cups.op;
 
 import j4cups.protocol.IppOperations;
 import j4cups.protocol.IppRequest;
+import j4cups.protocol.IppResponse;
 import j4cups.protocol.attr.Attribute;
+import j4cups.protocol.enums.JobState;
 import j4cups.protocol.tags.ValueTags;
 
 import javax.validation.ValidationException;
@@ -104,6 +106,18 @@ public class PrintJob extends Operation {
     private static boolean hasTarget(IppRequest request) {
         return (request.hasAttribute("printer-uri") && request.hasAttribute("job-id"))
                 || request.hasAttribute("job-uri");
+    }
+
+    /**
+     * Gets the IPP response for the stored IPP request.
+     *
+     * @return IPP response
+     */
+    @Override
+    public IppResponse getIppResponse() {
+        IppResponse response = super.getIppResponse();
+        response.setJobAttribute(Attribute.of(ValueTags.ENUM, "job-state", JobState.COMPLETED.getValue()));
+        return response;
     }
 
 }

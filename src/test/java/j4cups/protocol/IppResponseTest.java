@@ -19,7 +19,6 @@ package j4cups.protocol;
 
 import j4cups.protocol.attr.Attribute;
 import j4cups.protocol.attr.AttributeGroup;
-import j4cups.protocol.enums.JobState;
 import j4cups.protocol.tags.DelimiterTags;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -73,19 +72,6 @@ public final class IppResponseTest extends AbstractIppTest {
     }
     
     /**
-     * The Printer MUST return "job-id" and other  job attributes. This is described in
-     * <a href="https://tools.ietf.org/html/rfc8011#section-4.2.1.2">Section 4.1.4.2.</a>
-     * of RFC-8011.
-     */
-    @Test
-    void testPrintJobResponseJobAttributes() {
-        List<Attribute> jobAttributes =
-                RESPONSE_PRINT_JOB.getAttributeGroup(DelimiterTags.JOB_ATTRIBUTES_TAG).getAttributes();
-        assertThat(jobAttributes, not(empty()));
-        checkAttribute(RESPONSE_PRINT_JOB,"job-state", JobState.COMPLETED.getValue());
-    }
-
-    /**
      * The Printer returns to the Client the "attributes-charset" and 
      * "attributes-natural-language" as operation attributes. This is described in
      * <a href="https://tools.ietf.org/html/rfc8011#section-4.2.6.1">Section 4.2.6.1.</a>
@@ -110,9 +96,7 @@ public final class IppResponseTest extends AbstractIppTest {
      */
     @Test
     void testGetIllegalAttributes() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            checkOperationAttributes(RESPONSE_GET_JOBS, "no-name");
-        });
+        assertThrows(IllegalArgumentException.class, () -> checkOperationAttributes(RESPONSE_GET_JOBS, "no-name"));
     }
 
     private void checkOperationAttributes(IppResponse response, String... attributeNames) {
@@ -176,6 +160,13 @@ public final class IppResponseTest extends AbstractIppTest {
     public void testGetJobId() {
         IppResponse response = readIppResponse("response", "Create-Jobs.bin");
         assertEquals(101, response.getJobId());
+    }
+    
+    @Test
+    void testIppResponse() {
+        IppResponse response = new IppResponse(REQUEST_PRINT_JOB);
+        List<AttributeGroup> attributeGroups = response.getAttributeGroups();
+        assertEquals(4, attributeGroups.size());
     }
 
 }

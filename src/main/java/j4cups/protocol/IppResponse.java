@@ -19,14 +19,10 @@ package j4cups.protocol;
 
 import j4cups.protocol.attr.Attribute;
 import j4cups.protocol.attr.AttributeGroup;
-import j4cups.protocol.enums.JobState;
-import j4cups.protocol.tags.DelimiterTags;
 import j4cups.protocol.tags.ValueTags;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,31 +85,7 @@ public class IppResponse extends AbstractIpp {
         for (AttributeGroup g : request.getAttributeGroups()) {
             groups.add(new AttributeGroup(g));
         }
-        if (request.getOperation() == IppOperations.PRINT_JOB) {
-            groups.add(createPrintJobJobAttributes(request));
-        }
         return groups;
-    }
-
-    private static AttributeGroup createPrintJobJobAttributes(IppRequest request) {
-        AttributeGroup group = new AttributeGroup(DelimiterTags.JOB_ATTRIBUTES_TAG);
-        int jobId = request.getAttribute("job-id").getIntValue();
-        URI jobUri = URI.create(request.getPrinterURI() + "/" + jobId);
-        group.addAttribute(Attribute.of("job-id", jobId));
-        group.addAttribute(Attribute.of("job-uri", jobUri));
-        group.addAttribute(Attribute.of(ValueTags.ENUM, "job-state", JobState.COMPLETED.getValue()));
-        LOG.debug("Print-job attributes added to {} as answer to {}.", group, request);
-        return group;
-    }
-    
-    private static int parseInt(String value) {
-        String number = StringUtils.substringBefore(value, " ");
-        try {
-            return Integer.parseInt(number);
-        } catch (NumberFormatException ex) {
-            LOG.warn("No number in '{}' detected - will return 0:", value, ex);
-            return 0;
-        }
     }
 
     /**
