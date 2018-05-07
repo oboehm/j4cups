@@ -59,8 +59,8 @@ import java.util.Locale;
  */
 public final class Attribute implements Binary {
     
-    private final AttributeWithOneValue value;
-    private final List<AdditionalValue> additionalValues;
+    //private final AttributeWithOneValue value;
+    private final List<AdditionalValue> additionalValues = new ArrayList<>();
 
     /**
      * Instantiates a new (single valued or multi-valued) attribute from the
@@ -78,8 +78,8 @@ public final class Attribute implements Binary {
     }
 
     private Attribute(AttributeWithOneValue value, List<AdditionalValue> additionalValues) {
-        this.value = value;
-        this.additionalValues = additionalValues;
+        this.additionalValues.add(new AdditionalValue(value.toByteArray()));
+        this.additionalValues.addAll(additionalValues);
     }
 
     private static List<AdditionalValue> readAdditionalValues(ByteBuffer buffer) {
@@ -217,7 +217,7 @@ public final class Attribute implements Binary {
      * @return e.g. {@link ValueTags#KEYWORD}
      */
     public ValueTags getValueTag() {
-        return value.getValueTag();
+        return additionalValues.get(0).getValueTag();
     }
 
     /**
@@ -226,7 +226,7 @@ public final class Attribute implements Binary {
      * @return e.g. "slides-supported"
      */
     public String getName() {
-        return value.getName();
+        return additionalValues.get(0).getName();
     }
 
     /**
@@ -235,7 +235,7 @@ public final class Attribute implements Binary {
      * @param value value as byte array
      */
     public void setValue(byte[] value) {
-        this.value.setValue(value);
+        this.additionalValues.get(0).setValue(value);
     }
 
     /**
@@ -246,7 +246,16 @@ public final class Attribute implements Binary {
      * @return e.g. the textual value 'one-sided' as bytes
      */
     public byte[] getValue() {
-        return value.getValue();
+        return additionalValues.get(0).getValue();
+    }
+
+    /**
+     * Gets the different values for a multi-value attribute.
+     *
+     * @return the values
+     */
+    public List<AdditionalValue> getAdditionalValues() {
+        return additionalValues;
     }
 
     /**
@@ -297,7 +306,7 @@ public final class Attribute implements Binary {
      * @return true or false
      */
     public boolean isMultiValue() {
-        return !this.additionalValues.isEmpty();
+        return this.additionalValues.size() > 1;
     }
 
     /**
@@ -312,7 +321,7 @@ public final class Attribute implements Binary {
         StringBuilder buffer = new StringBuilder(getName());
         buffer.append("=");
         getValueAsString(buffer);
-        if (!additionalValues.isEmpty()) {
+        if (isMultiValue()) {
             buffer.append(",...");
         }
         return buffer.toString();
@@ -327,15 +336,15 @@ public final class Attribute implements Binary {
     public String toLongString() {
         StringBuilder buffer = new StringBuilder(getName());
         buffer.append("=");
-        getValueAsString(buffer);
         for (AdditionalValue addValue : additionalValues) {
-            buffer.append(',');
             if (getValueTag().isCharacterStringValue()) {
                 buffer.append(addValue.getStringValue());
             } else {
                 buffer.append(DatatypeConverter.printHexBinary(addValue.getValue()));
             }
+            buffer.append(',');
         }
+        buffer.deleteCharAt(buffer.length()-1);
         return buffer.toString();
     }
 
@@ -360,14 +369,23 @@ public final class Attribute implements Binary {
     @Override
     public void writeBinaryTo(OutputStream ostream) throws IOException {
         DataOutputStream dos = new DataOutputStream(ostream);
-        dos.write(this.value.toByteArray());
         for (AdditionalValue av : additionalValues) {
             dos.write(av.toByteArray());
         }
     }
 
+    /**
+     * For multi-value attributes you can use this method to add the single
+     * values to the attribute.
+     *
+     * @param value the value
+     */
+    public void add(Attribute value) {
+        additionalValues.add(new AdditionalValue(value.toByteArray()));
+    }
 
 
+    
     /**
      * An "attribute-with-one-value" field is encoded with five subfields.
      * <pre>
@@ -555,11 +573,15 @@ public final class Attribute implements Binary {
      * </pre>
      */
     public static class AdditionalValue extends AttributeWithOneValue {
-        
+
+        public AdditionalValue(byte[] bytes) {
+            this(ByteBuffer.wrap(bytes));
+        }
+
         public AdditionalValue(ByteBuffer bytes) {
             super(bytes);
         }
-        
+
     }
 
 }

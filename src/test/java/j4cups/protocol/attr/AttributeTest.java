@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * during an installation of a printer in CUPS, where the header of the IPP
  * request (the first 9 bytes) were removed.
  */
-public final class AttributeTest {
+final class AttributeTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(AttributeTest.class);
     private static final byte[] DATA =
@@ -83,7 +83,7 @@ public final class AttributeTest {
     }
     
     @Test
-    public void testMultiValue() {
+    void testMultiValue() {
         byte[] multiData = {68, 0, 20, 114, 101, 113, 117, 101, 115, 116, 101, 100, 45, 97, 116, 116, 114,
                         105, 98, 117, 116, 101, 115, 0, 16, 99, 111, 112, 105, 101, 115, 45, 115, 117, 112, 112, 111, 114,
                         116, 101, 100, 68, 0, 0, 0, 12, 99, 117, 112, 115, 45, 118, 101, 114, 115, 105, 111, 110, 68, 0, 0,
@@ -114,7 +114,15 @@ public final class AttributeTest {
     }
     
     @Test
-    public void testToByteArray() {
+    void testAdd() {
+        Attribute multiValue = Attribute.of("answer", 42);
+        multiValue.add(Attribute.of("global", true));
+        assertThat(multiValue.isMultiValue(), is(true));
+        assertEquals(2, multiValue.getAdditionalValues().size());
+    }
+    
+    @Test
+    void testToByteArray() {
         byte[] bytes = ATTRIBUTE.toByteArray();
         ArrayTester.assertEquals(DATA, bytes);
     }
