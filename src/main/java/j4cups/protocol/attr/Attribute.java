@@ -30,9 +30,7 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * An "attribute" field is encoded as attribute-with-one-value and (optional)
@@ -59,7 +57,6 @@ import java.util.Locale;
  */
 public final class Attribute implements Binary {
     
-    //private final AttributeWithOneValue value;
     private final List<AdditionalValue> additionalValues = new ArrayList<>();
 
     /**
@@ -74,11 +71,15 @@ public final class Attribute implements Binary {
     }
     
     private Attribute(AttributeWithOneValue value) {
-        this(value, new ArrayList<>());
+        this(Collections.singletonList(new AdditionalValue(value)));
     }
 
     private Attribute(AttributeWithOneValue value, List<AdditionalValue> additionalValues) {
-        this.additionalValues.add(new AdditionalValue(value.toByteArray()));
+        this.additionalValues.add(new AdditionalValue(value));
+        this.additionalValues.addAll(additionalValues);
+    }
+
+    private Attribute(List<AdditionalValue> additionalValues) {
         this.additionalValues.addAll(additionalValues);
     }
 
@@ -166,18 +167,6 @@ public final class Attribute implements Binary {
     }
 
     /**
-     * Creates a singe-value attribute for character-string values.
-     *
-     * @param tag   the value-tag
-     * @param name  the name of the attribute
-     * @param value the string value of the attribute
-     * @return the attribute
-     */
-    public static Attribute of(ValueTags tag, String name, String value) {
-        return of(tag, name, value.getBytes(StandardCharsets.UTF_8));
-    }
-
-    /**
      * Creates a singe-value attribute.
      *
      * @param tag   the value-tag
@@ -195,19 +184,16 @@ public final class Attribute implements Binary {
      *
      * @param tag   the value-tag
      * @param name  the name of the attribute
-     * @param value the string value of the attribute
      * @return the attribute
      */
-    public static Attribute of(ValueTags tag, String name, String value, String... additionalValues) {
-        byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
-        AttributeWithOneValue attr = new AttributeWithOneValue(tag, name, bytes);
+    public static Attribute of(ValueTags tag, String name, String... additionalValues) {
         List<AdditionalValue> addValues = new ArrayList<>();
         for (String s : additionalValues) {
             AttributeWithOneValue addAttr = new AttributeWithOneValue(tag, "", s.getBytes(StandardCharsets.UTF_8));
             ByteBuffer buffer = ByteBuffer.wrap(addAttr.toByteArray());
             addValues.add(new AdditionalValue(buffer));
         }
-        return new Attribute(attr, addValues);
+        return new Attribute(addValues);
     }
 
     /**
@@ -381,7 +367,7 @@ public final class Attribute implements Binary {
      * @param value the value
      */
     public void add(Attribute value) {
-        additionalValues.add(new AdditionalValue(value.toByteArray()));
+        additionalValues.add(new AdditionalValue(value));
     }
 
 
@@ -574,6 +560,14 @@ public final class Attribute implements Binary {
      */
     public static class AdditionalValue extends AttributeWithOneValue {
 
+        public AdditionalValue(Attribute attr) {
+            this(attr.toByteArray());
+        }
+
+        public AdditionalValue(AttributeWithOneValue attr) {
+            this(attr.toByteArray());
+        }
+        
         public AdditionalValue(byte[] bytes) {
             this(ByteBuffer.wrap(bytes));
         }
