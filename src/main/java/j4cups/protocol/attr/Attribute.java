@@ -67,16 +67,11 @@ public final class Attribute implements Binary {
      * @param bytes ByteBuffer positioned at the beginning
      */
     public Attribute(ByteBuffer bytes) {
-        this(new AttributeWithOneValue(bytes), readAdditionalValues(bytes));
+        this(readAdditionalValues(bytes));
     }
     
     private Attribute(AttributeWithOneValue value) {
         this(Collections.singletonList(new AdditionalValue(value)));
-    }
-
-    private Attribute(AttributeWithOneValue value, List<AdditionalValue> additionalValues) {
-        this.additionalValues.add(new AdditionalValue(value));
-        this.additionalValues.addAll(additionalValues);
     }
 
     private Attribute(List<AdditionalValue> additionalValues) {
@@ -86,11 +81,11 @@ public final class Attribute implements Binary {
     private static List<AdditionalValue> readAdditionalValues(ByteBuffer buffer) {
         List<AdditionalValue> values = new ArrayList<>();
         while (buffer.remaining() > 4) {
+            values.add(new AdditionalValue(buffer));
             int pos = buffer.position();
-            if (!ValueTags.isValid(buffer.get(pos)) || (buffer.getShort(pos+1) != 0)) {
+            if ((buffer.remaining() <= 4) || (!ValueTags.isValid(buffer.get(pos)) || (buffer.getShort(pos+1) != 0))) {
                 break;
             }
-            values.add(new AdditionalValue(buffer));
         }
         return values;
     }
@@ -187,13 +182,11 @@ public final class Attribute implements Binary {
      * @return the attribute
      */
     public static Attribute of(ValueTags tag, String name, String... additionalValues) {
-        List<AdditionalValue> addValues = new ArrayList<>();
+        Attribute attr = new Attribute(new AttributeWithOneValue(tag, name, new byte[0]));
         for (String s : additionalValues) {
-            AttributeWithOneValue addAttr = new AttributeWithOneValue(tag, "", s.getBytes(StandardCharsets.UTF_8));
-            ByteBuffer buffer = ByteBuffer.wrap(addAttr.toByteArray());
-            addValues.add(new AdditionalValue(buffer));
+            attr.add(Attribute.of(tag, "", s.getBytes(StandardCharsets.UTF_8)));
         }
-        return new Attribute(addValues);
+        return attr;
     }
 
     /**

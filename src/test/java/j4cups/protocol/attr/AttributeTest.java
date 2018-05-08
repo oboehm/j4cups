@@ -28,6 +28,7 @@ import java.nio.ByteBuffer;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link Attribute}. The DATA for this tests are recorded
@@ -109,8 +110,17 @@ final class AttributeTest {
         Attribute requestedAttributes = new Attribute(ByteBuffer.wrap(multiData));
         LOG.info("toString = {}", requestedAttributes);
         LOG.info("toLongString = {}", requestedAttributes.toLongString());
+        assertEquals("requested-attributes", requestedAttributes.getName());
         assertThat(requestedAttributes.isMultiValue(), is(true));
         assertThat(requestedAttributes.toLongString().length(), greaterThan(requestedAttributes.toString().length()));
+    }
+    
+    @Test
+    void testOf() {
+        Attribute attr =
+                Attribute.of(ValueTags.KEYWORD, "requested-attributes", "copies-supported", "page-ranges-supported");
+        assertTrue(attr.isMultiValue());
+        assertEquals("requested-attributes", attr.getName());
     }
     
     @Test
