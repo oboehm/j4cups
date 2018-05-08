@@ -190,6 +190,17 @@ public final class Attribute implements Binary {
     }
 
     /**
+     * Creates a single-value attribute for character-string values.
+     *
+     * @param tag   the value-tag
+     * @param name  the name of the attribute
+     * @return the attribute
+     */
+    public static Attribute of(ValueTags tag, String name, String value) {
+        return new Attribute(new AttributeWithOneValue(tag, name, value.getBytes(StandardCharsets.UTF_8)));
+    }
+
+    /**
      * The "value-tag" field specifies the attribute syntax, e.g. 0x44
      * for the attribute syntax 'keyword'.
      *

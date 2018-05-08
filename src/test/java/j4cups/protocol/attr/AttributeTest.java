@@ -28,6 +28,7 @@ import java.nio.ByteBuffer;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -114,15 +115,24 @@ final class AttributeTest {
         assertThat(requestedAttributes.isMultiValue(), is(true));
         assertThat(requestedAttributes.toLongString().length(), greaterThan(requestedAttributes.toString().length()));
     }
-    
+
     @Test
-    void testOf() {
+    void testOfKeywords() {
         Attribute attr =
                 Attribute.of(ValueTags.KEYWORD, "requested-attributes", "copies-supported", "page-ranges-supported");
         assertTrue(attr.isMultiValue());
         assertEquals("requested-attributes", attr.getName());
     }
-    
+
+    @Test
+    void testOfName() {
+        Attribute attr =
+                Attribute.of(ValueTags.NAME_WITHOUT_LANGUAGE, "requesting-user-name", "nobody");
+        assertFalse(attr.isMultiValue());
+        assertEquals("requesting-user-name", attr.getName());
+        assertEquals("nobody", attr.getStringValue());
+    }
+
     @Test
     void testAdd() {
         Attribute multiValue = Attribute.of("answer", 42);
