@@ -102,6 +102,22 @@ public final class Attribute implements Binary {
     }
 
     /**
+     * Creates a singe-value attribute for a range of integer values.
+     *
+     * @param name e.g. "copies-supported"
+     * @param min e.g. 1
+     * @param max e.g. 9999
+     * @return the attribute
+     */
+    public static Attribute of(String name, int min, int max) {
+        byte[] data = new byte[8];
+        ByteBuffer buf = ByteBuffer.wrap(data);
+        buf.putInt(min);
+        buf.putInt(max);
+        return of(ValueTags.RANGE_OF_INTEGER, name, data);
+    }
+
+    /**
      * Creates a singe-value attribute for boolean values.
      *
      * @param name e.g. "last-document"
@@ -175,10 +191,26 @@ public final class Attribute implements Binary {
     }
 
     /**
-     * Creates a multi-value attribute for character-string values.
+     * Creates a multi-value attribute for the given value-tag.
      *
      * @param tag   the value-tag
      * @param name  the name of the attribute
+     * @return the attribute
+     */
+    public static Attribute of(ValueTags tag, String name, byte[]... additionalValues) {
+        Attribute attr = new Attribute(new AttributeWithOneValue(tag, name, new byte[0]));
+        for (byte[] bytes : additionalValues) {
+            attr.add(Attribute.of(tag, "", bytes));
+        }
+        return attr;
+    }
+
+    /**
+     * Creates a multi-value attribute for character-string values.
+     *
+     * @param tag              the value-tag
+     * @param name             the name of the attribute
+     * @param additionalValues additional values
      * @return the attribute
      */
     public static Attribute of(ValueTags tag, String name, String... additionalValues) {
@@ -198,6 +230,21 @@ public final class Attribute implements Binary {
      */
     public static Attribute of(ValueTags tag, String name, String value) {
         return new Attribute(new AttributeWithOneValue(tag, name, value.getBytes(StandardCharsets.UTF_8)));
+    }
+
+    /**
+     * Creates a multi-value attribute with the different printer resolutions.
+     *
+     * @param name        the name
+     * @param resolutions the different printer resolutions
+     * @return the attribute
+     */
+    public static Attribute of(String name, PrinterResolution... resolutions) {
+        Attribute attr = new Attribute(new AttributeWithOneValue(ValueTags.RESOLUTION, name, new byte[0]));
+        for (PrinterResolution pr : resolutions) {
+            attr.add(Attribute.of(ValueTags.RESOLUTION, "", pr.toByteArray()));
+        }
+        return attr;
     }
 
     /**

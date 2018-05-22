@@ -18,13 +18,10 @@
 
 package j4cups.server;
 
-import j4cups.protocol.AbstractIppTest;
+import j4cups.op.OperationTest;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
-import j4cups.protocol.attr.Attribute;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -87,22 +84,6 @@ class IppHandlerTest extends AbstractServerTest {
     }
 
     /**
-     * Another unit test for {@link IppHandler#send(IppRequest)}.
-     *
-     * @throws IOException the io exception
-     */
-    @Test
-    void testSendGetJobs() throws IOException {
-        IppRequest jobsRequest = readIppRequest("Get-Jobs.bin", testPrinterUri);
-        CloseableHttpResponse response = ippHandler.send(jobsRequest);
-        assertEquals(200, response.getStatusLine().getStatusCode());
-        HttpEntity httpEntity = response.getEntity();
-        byte[] content = IOUtils.toByteArray(httpEntity.getContent());
-        IppResponse ippResponse = new IppResponse(content);
-        assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
-    }
-
-    /**
      * Test method for {@link IppHandler#getJobs(URI)}.
      */
     @Test
@@ -121,14 +102,8 @@ class IppHandlerTest extends AbstractServerTest {
         assumeCupsAndPrinterAreOnline();
         IppResponse ippResponse = ippHandler.createJob(testPrinterUri);
         cancelJob(ippResponse);
-        checkIppResponse(ippResponse, "Create-Jobs.bin");
+        OperationTest.checkIppResponse(ippResponse, "Create-Jobs.bin");
     }
-
-    private static void assumeCupsAndPrinterAreOnline() {
-        assumeTrue(isOnline(cupsURI), cupsURI + " is not available");
-        assumeTrue(isOnline(testPrinterUri), testPrinterUri + " is not available");
-    }
-
     /**
      * Test method for {@link IppHandler#printJob(URI, Path)}.
      */
@@ -139,14 +114,14 @@ class IppHandlerTest extends AbstractServerTest {
         IppResponse ippResponse = ippHandler.printJob(testPrinterUri, readme);
         assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
         cancelJob(ippResponse);
-        checkIppResponse(ippResponse, "Print-Job.bin");
+        OperationTest.checkIppResponse(ippResponse, "Print-Job.bin");
     }
 
-    private static void checkIppResponse(IppResponse ippResponse, String refResource) {
-        IppResponse reference = AbstractIppTest.readIppResponse("response", refResource);
-        for (Attribute attr : reference.getAttributes()) {
-            assertThat("missing attribute: " + attr, ippResponse.hasAttribute(attr.getName()), is(true));
-        }
+    @Test
+    void testGetPrinterAttributes() {
+        assumeCupsAndPrinterAreOnline();
+        IppResponse ippResponse = ippHandler.getPrinterAttributes(testPrinterUri);
+        OperationTest.checkIppResponse(ippResponse, "Get-Printer-Attributes.bin");
     }
 
     /**
@@ -182,6 +157,11 @@ class IppHandlerTest extends AbstractServerTest {
         }
     }
 
+    private static void assumeCupsAndPrinterAreOnline() {
+        assumeTrue(isOnline(cupsURI), cupsURI + " is not available");
+        assumeTrue(isOnline(testPrinterUri), testPrinterUri + " is not available");
+    }
+    
     private static Path readTestFile() {
         assumeTrue(isOnline(cupsURI), cupsURI + " is not available");
         Path testFile = Paths.get("src", "test", "resources", "j4cups", "test.txt");

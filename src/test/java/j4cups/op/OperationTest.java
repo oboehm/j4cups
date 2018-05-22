@@ -17,17 +17,23 @@
  */
 package j4cups.op;
 
+import j4cups.protocol.AbstractIppTest;
 import j4cups.protocol.IppOperations;
+import j4cups.protocol.IppRequest;
+import j4cups.protocol.IppResponse;
+import j4cups.protocol.attr.Attribute;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static patterntesting.runtime.junit.ObjectTester.assertEquals;
 
 /**
  * Unit tests for {@link Operation}.
  */
-class OperationTest {
+public class OperationTest {
     
     private final Operation operation = new Operation(IppOperations.GET_JOBS);
 
@@ -38,4 +44,32 @@ class OperationTest {
         assertEquals(URI.create("ipp://localhost:4711/jobs/42"), operation.getIppResponse().getJobURI());
     }
 
+    /**
+     * This method compares the attributes of the given {@link IppRequest}
+     * with an {@link IppRequest} reference recorded from a test with CUPS.
+     *
+     * @param ippRequest the IPP request which should be checked
+     * @param refResource name of a resource with the recorded reference
+     */
+    public static void checkIppRequest(IppRequest ippRequest, String refResource) {
+        IppRequest reference = AbstractIppTest.readIppRequest("request", refResource);
+        for (Attribute attr : reference.getAttributes()) {
+            assertThat("missing attribute: " + attr, ippRequest.hasAttribute(attr.getName()), is(true));
+        }
+    }
+
+    /**
+     * This method compares the attributes of the given {@link IppResponse}
+     * with an {@link IppResponse} reference recorded from a test with CUPS.
+     * 
+     * @param ippResponse the IPP response which should be checked
+     * @param refResource name of a resource with the recorded reference
+     */
+    public static void checkIppResponse(IppResponse ippResponse, String refResource) {
+        IppResponse reference = AbstractIppTest.readIppResponse("response", refResource);
+        for (Attribute attr : reference.getAttributes()) {
+            assertThat("missing attribute: " + attr, ippResponse.hasAttribute(attr.getName()), is(true));
+        }
+    }
+    
 }

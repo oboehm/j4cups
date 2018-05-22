@@ -157,7 +157,19 @@ public final class IppHandler implements AutoCloseable {
         return send(op, printerURI);
     }
 
+    /**
+     * Sends a get-printer-attributes to CUPS.
+     *
+     * @param printerURI printer URI
+     * @return answer from CUPS
+     */
+    public IppResponse getPrinterAttributes(URI printerURI) {
+        Operation op = new GetPrinterAttributes();
+        return send(op, printerURI);
+    }
+
     private IppResponse send(Operation op, URI printerURI) {
+        op.setCupsURI(cupsURI);
         op.setPrinterURI(printerURI);
         return send(op);
     }
@@ -226,13 +238,12 @@ public final class IppHandler implements AutoCloseable {
      * @throws IOException the io exception
      */
     public CloseableHttpResponse send(IppRequest ippRequest) throws IOException {
-        URI printerURI = getPrinterURI(ippRequest);
-        LOG.info("Sending to {}: {}.", printerURI, ippRequest);
-        HttpPost httpPost = new HttpPost(printerURI);
+        LOG.info("Sending to {}: {}.", forwardURI, ippRequest);
+        HttpPost httpPost = new HttpPost(forwardURI);
         IppEntity entity = new IppEntity(ippRequest);
         httpPost.setEntity(entity);
         CloseableHttpResponse response = client.execute(httpPost);
-        LOG.info("Received from {}: {}", printerURI, response);
+        LOG.info("Received from {}: {}", forwardURI, response);
         return response;
     }
 

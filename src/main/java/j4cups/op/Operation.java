@@ -23,6 +23,7 @@ import j4cups.protocol.IppResponse;
 import j4cups.protocol.attr.Attribute;
 import j4cups.protocol.enums.JobState;
 import j4cups.protocol.enums.JobStateReasons;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,6 +125,24 @@ public class Operation {
     }
 
     /**
+     * Gets printer uri.
+     *
+     * @return printer uri
+     */
+    public URI getPrinterURI() {
+        return ippRequest.getPrinterURI();
+    }
+
+    /**
+     * The printer name is the last part of the printer-uri.
+     *
+     * @return the printer name
+     */
+    public String getPrinterName() {
+        return StringUtils.substringAfterLast(getPrinterURI().getPath(), "/");
+    }
+
+    /**
      * Sets the CUPS URI. This is needed e.g. to set the job-uri.
      *
      * @param cupsURI the printer uri
@@ -138,6 +157,7 @@ public class Operation {
      * @param jobId the job id
      */
     public void setJobId(int jobId) {
+        ippRequest.setJobId(jobId);
         ippResponse.setJobId(jobId);
         try {
             URI ippURI = new URI("ipp", cupsURI.getUserInfo(), cupsURI.getHost(), cupsURI.getPort(),
@@ -208,4 +228,21 @@ public class Operation {
     public void validateRequest() {
         validateRequest(getIppRequest());
     }
+
+
+    /**
+     * Converts the given URI into an URI beginning with "ipp://...".
+     *
+     * @param uri the uri
+     * @return the uri
+     */
+    protected static URI toIPP(URI uri) {
+        try {
+            return new URI("ipp", uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), uri.getQuery(),
+                    uri.getFragment());
+        } catch (URISyntaxException ex) {
+            throw new IllegalArgumentException("not a real URI: " + uri, ex);
+        }
+    }
+
 }
