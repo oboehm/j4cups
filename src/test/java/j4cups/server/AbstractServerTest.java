@@ -52,7 +52,7 @@ public abstract class AbstractServerTest {
      */
     @BeforeAll
     static void startServer() {
-        int port = 1024 + (int) System.currentTimeMillis() % 8000;
+        int port = 1024 + (int) (System.currentTimeMillis() % 8000);
         while (isOnline("localhost", port)) {
             port++;
         }

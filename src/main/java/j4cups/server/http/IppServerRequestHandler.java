@@ -91,6 +91,9 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler implement
             response.setStatusCode(HttpStatus.SC_OK);
             try {
                 switch (ippRequest.getOperation()) {
+                    case GET_JOBS:
+                        LOG.info("{} received, but jobs are not (yet) stored.", ippRequest.toShortString());
+                        return;
                     case SEND_DOCUMENT:
                         new SendDocument().validateRequest(ippRequest);
                         break;
