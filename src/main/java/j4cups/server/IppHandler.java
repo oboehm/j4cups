@@ -238,12 +238,13 @@ public final class IppHandler implements AutoCloseable {
      * @throws IOException the io exception
      */
     public CloseableHttpResponse send(IppRequest ippRequest) throws IOException {
-        LOG.info("Sending to {}: {}.", forwardURI, ippRequest);
-        HttpPost httpPost = new HttpPost(forwardURI);
+        URI targetURI = "file".equals(forwardURI.getScheme()) ? getPrinterURI(ippRequest) : forwardURI;
+        LOG.info("Sending to {}: {}.", targetURI, ippRequest);
+        HttpPost httpPost = new HttpPost(targetURI);
         IppEntity entity = new IppEntity(ippRequest);
         httpPost.setEntity(entity);
         CloseableHttpResponse response = client.execute(httpPost);
-        LOG.info("Received from {}: {}", forwardURI, response);
+        LOG.info("Received from {}: {}", targetURI, response);
         return response;
     }
 
@@ -255,12 +256,12 @@ public final class IppHandler implements AutoCloseable {
     private URI getPrinterURI(IppRequest ippRequest) {
         URI printerURI = ippRequest.getPrinterURI();
         if (printerURI.getPort() < 0) {
-            LOG.debug("Port is missing in {} and will be replaced with port of {}.", printerURI, forwardURI);
+            LOG.debug("Port is missing in {} and will be replaced with port 631.", printerURI);
             try {
                 return new URI(printerURI.getScheme(), printerURI.getUserInfo(), printerURI.getHost(),
-                        forwardURI.getPort(), printerURI.getPath(), printerURI.getQuery(), printerURI.getFragment());
+                        631, printerURI.getPath(), printerURI.getQuery(), printerURI.getFragment());
             } catch (URISyntaxException ex) {
-                LOG.warn("Cannot create printer-uri '{}' with port {}:", printerURI, forwardURI.getPort(), ex);
+                LOG.warn("Cannot create printer-uri '{}' with port 631:", printerURI, ex);
             }
         }
         return printerURI;

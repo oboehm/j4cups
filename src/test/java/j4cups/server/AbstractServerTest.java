@@ -21,7 +21,6 @@ package j4cups.server;
 import j4cups.protocol.AbstractIppTest;
 import j4cups.protocol.IppRequest;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,10 +47,9 @@ public abstract class AbstractServerTest {
     protected static CupsServer cupsServer;
 
     /**
-     * For the unit tests we start the server here.
+     * For the unit tests we can start the server here.
      */
-    @BeforeAll
-    static void startServer() {
+    protected static void startServer() {
         int port = 1024 + (int) (System.currentTimeMillis() % 8000);
         while (isOnline("localhost", port)) {
             port++;
@@ -139,9 +137,11 @@ public abstract class AbstractServerTest {
      */
     @AfterAll
     public static void shutdownServer() {
-        cupsServer.shutdown();
-        LOG.info("{} is shut down.", cupsServer);
-        assertFalse(isOnline("localhost", cupsServer.getPort()));
-        LOG.info("{} is offline (as expected).", cupsServer);
+        if (cupsServer != null) {
+            cupsServer.shutdown();
+            LOG.info("{} is shut down.", cupsServer);
+            assertFalse(isOnline("localhost", cupsServer.getPort()));
+            LOG.info("{} is offline (as expected).", cupsServer);
+        }
     }
 }

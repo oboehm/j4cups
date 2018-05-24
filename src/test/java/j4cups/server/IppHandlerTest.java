@@ -60,13 +60,20 @@ class IppHandlerTest extends AbstractServerTest {
     private static final Logger LOG = LoggerFactory.getLogger(IppHandlerTest.class);
     private static URI cupsURI;
     private static IppHandler ippHandler;
-    private static URI testPrinterUri =
-            URI.create(System.getProperty("printerURI", "http://localhost:" + cupsServer.getPort() + "/printers/text"));
+    private static URI testPrinterUri;
 
     @BeforeAll
     static void setUpCupsURI() {
         Path spoolDir = Paths.get("target");
-        cupsURI = URI.create(System.getProperty("cupsURI", spoolDir.toUri().toString()));
+        cupsURI = spoolDir.toUri();
+        String cupsProp = System.getProperty("cupsURI");
+        if (cupsProp == null) {
+            startServer();
+            testPrinterUri = URI.create("http://localhost:" + cupsServer.getPort() + "/printers/text");
+        } else {
+            cupsURI = URI.create(cupsProp);
+            testPrinterUri = URI.create(System.getProperty("printerURI"));
+        }
         ippHandler = new IppHandler(cupsURI);
         LOG.info("{} is used for testing.", ippHandler);
     }
@@ -141,7 +148,10 @@ class IppHandlerTest extends AbstractServerTest {
     }
 
     /**
-     * Test method for {@link IppHandler#sendDocument(URI, Path, int, boolean)}.
+     * Test method for {@link IppHandler#sendDocument(URI, Path, int, boolean)},
+     * where two documents are sent and cancelled immediately afterwards. So if
+     * you want to see the documents on the printer set a breakpoint before the
+     * cancel statement and wait.
      */
     @Test
     void testSendTwoDocuments() {

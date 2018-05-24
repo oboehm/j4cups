@@ -27,6 +27,7 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,9 +45,15 @@ import static org.junit.Assert.*;
 class CupsServerTest extends AbstractServerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(CupsServerTest.class);
-    private static final URI PRINTER_URI = URI.create("http://localhost:" + cupsServer.getPort() + "/printers/text");
+    private static URI printerURI;
     private final HttpPost httpPost = new HttpPost("http://localhost:" + cupsServer.getPort());
 
+    @BeforeAll
+    static void setUpServer() {
+        startServer();
+        printerURI = URI.create("http://localhost:" + cupsServer.getPort() + "/printers/text");
+    }
+    
     /**
      * Test method for {@link CupsServer#start()}.
      */
@@ -76,7 +83,7 @@ class CupsServerTest extends AbstractServerTest {
      */
     @Test
     public void testSendRequest() throws IOException {
-        IppRequest getJobsReqeust = readIppRequest("Get-Jobs.bin", PRINTER_URI);
+        IppRequest getJobsReqeust = readIppRequest("Get-Jobs.bin", printerURI);
         httpPost.setEntity(new IppEntity(getJobsReqeust));
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             CloseableHttpResponse response = client.execute(httpPost);
@@ -93,9 +100,9 @@ class CupsServerTest extends AbstractServerTest {
      */
     @Test
     public void testSendRequestToPrinter() throws IOException {
-        assertTrue(isOnline(PRINTER_URI));
-        HttpPost httpPrinterPost = new HttpPost(PRINTER_URI);
-        IppRequest getJobsRequest = readIppRequest("Get-Jobs.bin", PRINTER_URI);
+        assertTrue(isOnline(printerURI));
+        HttpPost httpPrinterPost = new HttpPost(printerURI);
+        IppRequest getJobsRequest = readIppRequest("Get-Jobs.bin", printerURI);
         httpPrinterPost.setEntity(new IppEntity(getJobsRequest));
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             CloseableHttpResponse response = client.execute(httpPrinterPost);
