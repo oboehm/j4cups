@@ -154,23 +154,37 @@ public abstract class AbstractIpp implements Externalizable {
 
     private void trace(byte[] bytes) {
         if (LOG.isTraceEnabled()) {
-            LOG.trace(DatatypeConverter.printHexBinary(bytes));
-            try {
-                Path logDir = Paths.get(SystemUtils.getJavaIoTmpDir().toString(), "IPP");
-                Files.createDirectories(logDir);
-                Path logFile = Paths.get(logDir.toString(),
-                        Long.toString(System.currentTimeMillis(), Character.MAX_RADIX) + "-" +
-                                this.getClass().getSimpleName() + this.getRequestId() + this.getOpCodeAsString() +
-                                ".bin");
-                Files.write(logFile, bytes);
-                LOG.info("IPP package with {} bytes is recorded to '{}'.", bytes.length, logFile);
-            } catch (IOException ioe) {
-                LOG.debug("Cannot record {} bytes to temporary log file.", ioe);
-                LOG.trace(DatatypeConverter.printHexBinary(bytes));
-            }
+            Path logDir = Paths.get(SystemUtils.getJavaIoTmpDir().toString(), "IPP");
+            recordTo(logDir, bytes);
         } else {
             LOG.debug("{}-{} {} received (use TRACE level to dump it).", getClass().getSimpleName(), requestId,
                     getOpCodeAsString());
+        }
+    }
+
+    /**
+     * This method allows you to record a IPP package into a file. Watcht the
+     * log to see where the file is stored.
+     * 
+     * @param logDir the directory where the file is stored
+     * @since 0.5
+     */
+    public void recordTo(Path logDir) {
+        recordTo(logDir, toByteArray());
+    }
+
+    private void recordTo(Path logDir, byte[] bytes) {
+        try {
+            Files.createDirectories(logDir);
+            Path logFile = Paths.get(logDir.toString(),
+                    Long.toString(System.currentTimeMillis(), Character.MAX_RADIX) + "-" +
+                            this.getClass().getSimpleName() + this.getRequestId() + this.getOpCodeAsString() +
+                            ".bin");
+            Files.write(logFile, bytes);
+            LOG.info("IPP package with {} bytes is recorded to '{}'.", bytes.length, logFile);
+        } catch (IOException ioe) {
+            LOG.debug("Cannot record {} bytes to temporary log file.", ioe);
+            LOG.trace(DatatypeConverter.printHexBinary(bytes));
         }
     }
 

@@ -40,6 +40,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * The IppHandler is reponsible for handling IPP requests. He can do it by
@@ -238,7 +239,23 @@ public final class IppHandler implements AutoCloseable {
      * @throws IOException the io exception
      */
     public CloseableHttpResponse send(IppRequest ippRequest) throws IOException {
-        URI targetURI = "file".equals(forwardURI.getScheme()) ? getPrinterURI(ippRequest) : forwardURI;
+        if ("file".equals(forwardURI.getScheme())) {
+            return record(ippRequest, Paths.get(forwardURI));
+        } else {
+            return sendTo(forwardURI, ippRequest);
+        }
+    }
+
+    private CloseableHttpResponse record(IppRequest ippRequest, Path dir) throws IOException {
+        ippRequest.recordTo(dir);
+        URI printerURI = getPrinterURI(ippRequest);
+        CloseableHttpResponse response = sendTo(printerURI, ippRequest);
+        IppResponse ippResponse = IppEntity.toIppResponse(response);
+        ippResponse.recordTo(dir);
+        return response;
+    }
+
+    private CloseableHttpResponse sendTo(URI targetURI, IppRequest ippRequest) throws IOException {
         LOG.info("Sending to {}: {}.", targetURI, ippRequest);
         HttpPost httpPost = new HttpPost(targetURI);
         IppEntity entity = new IppEntity(ippRequest);
