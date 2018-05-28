@@ -29,6 +29,7 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Class IppEntity.
@@ -44,7 +45,16 @@ public class IppEntity extends ByteArrayEntity {
      * @param ippRequest IPP request or response
      */
     public IppEntity(AbstractIpp ippRequest) {
-        super(ippRequest.toByteArray());
+        this(ippRequest.toByteArray());
+    }
+
+    /**
+     * Instantiates a new entity.
+     *
+     * @param content IPP request or response
+     */
+    public IppEntity(byte[] content) {
+        super(content);
         setContentType("application/ipp");
     }
 
@@ -73,8 +83,9 @@ public class IppEntity extends ByteArrayEntity {
      * @return the {@link IppResponse} inside
      */
     public static IppResponse toIppResponse(HttpResponse response) {
-        try {
-            byte[] content = IOUtils.toByteArray(response.getEntity().getContent());
+        try (InputStream istream = response.getEntity().getContent()) {
+            byte[] content = IOUtils.toByteArray(istream);
+            response.setEntity(new IppEntity(content));
             return new IppResponse(content);
         } catch (IOException ioe) {
             throw new IllegalStateException("cannot read content from " + response, ioe);
