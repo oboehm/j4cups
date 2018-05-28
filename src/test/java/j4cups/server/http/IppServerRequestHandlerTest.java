@@ -19,6 +19,7 @@ package j4cups.server.http;
 
 import j4cups.op.CreateJob;
 import j4cups.protocol.AbstractIppTest;
+import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
 import j4cups.server.AbstractServerTest;
@@ -122,10 +123,25 @@ class IppServerRequestHandlerTest extends AbstractIppRequestHandlerTest {
         assumeTrue(AbstractServerTest.isOnline(printerURI));
         createJob.setPrinterURI(printerURI);
         createJob.setIppRequestId(4711);
-        HttpResponse response = createHttpResponse();
-        requestHandler.handle(createHttpRequest(createJob.getIppRequest()), response);
-        IppResponse ippResponse = IppEntity.toIppResponse(response);
+        IppResponse ippResponse = getIppResponseFor(createJob.getIppRequest());
         assertThat(ippResponse.getJobId(), greaterThan(0));
+    }
+
+    /**
+     * On a get-printers request the handler should return a response with at
+     * least one printer.
+     */
+    @Test
+    void testHandleGetPrinters() throws IOException {
+        assumeTrue(AbstractServerTest.isOnline(URI.create("http://localhost:631/printers")));
+        IppRequest getPrintersRequest = AbstractIppTest.readIppRequest("request", "Get-Printers.bin");
+        IppResponse ippResponse = getIppResponseFor(getPrintersRequest);
+    }
+
+    private IppResponse getIppResponseFor(IppRequest ippRequest) throws IOException {
+        HttpResponse response = createHttpResponse();
+        requestHandler.handle(createHttpRequest(ippRequest), response);
+        return IppEntity.toIppResponse(response);
     }
 
     @AfterEach
