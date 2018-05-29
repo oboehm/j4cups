@@ -64,7 +64,7 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler implement
     }
 
     /**
-     * If the request handler acts as a proxy he need to know ther URI where
+     * If the request handler acts as a proxy he need to know the URI where
      * the request should be forwarded. And for the generated responses it
      * must known the CUPS URI.
      *
