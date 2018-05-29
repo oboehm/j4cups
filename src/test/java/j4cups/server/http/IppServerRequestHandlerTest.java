@@ -17,12 +17,9 @@
  */
 package j4cups.server.http;
 
-import j4cups.op.CreateJob;
 import j4cups.protocol.AbstractIppTest;
-import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
-import j4cups.server.AbstractServerTest;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
@@ -42,9 +39,7 @@ import java.nio.file.Paths;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * Unit tests for {@link IppServerRequestHandler}.
@@ -110,44 +105,7 @@ class IppServerRequestHandlerTest extends AbstractIppRequestHandlerTest {
         assertEquals(StatusCode.CLIENT_ERROR_BAD_REQUEST, ippResponse.getStatusCode());
         assertThat(ippResponse.getStatusMessage(), containsString("job-id"));
     }
-
-    /**
-     * A create-job request should be answered with a response containing a job-id.
-     *
-     * @throws IOException in case of network problems
-     */
-    @Test
-    void testHandleCreateJob() throws IOException {
-        CreateJob createJob = new CreateJob();
-        URI printerURI = URI.create("http://localhost:631/printers/Brother_MFC_J5910DW_2");
-        assumeTrue(AbstractServerTest.isOnline(printerURI));
-        createJob.setPrinterURI(printerURI);
-        createJob.setIppRequestId(4711);
-        IppResponse ippResponse = getIppResponseFor(createJob.getIppRequest());
-        if (ippResponse.getStatusCode() == StatusCode.CLIENT_ERROR_NOT_FOUND) {
-            LOG.warn("Cannot create job for printer {}: {}", printerURI, ippResponse.getStatusMessage());
-        } else {
-            assertThat(ippResponse.getJobId(), greaterThan(0));
-        }
-    }
-
-    /**
-     * On a get-printers request the handler should return a response with at
-     * least one printer.
-     */
-    @Test
-    void testHandleGetPrinters() throws IOException {
-        assumeTrue(AbstractServerTest.isOnline(URI.create("http://localhost:631/printers")));
-        IppRequest getPrintersRequest = AbstractIppTest.readIppRequest("request", "Get-Printers.bin");
-        IppResponse ippResponse = getIppResponseFor(getPrintersRequest);
-    }
-
-    private IppResponse getIppResponseFor(IppRequest ippRequest) throws IOException {
-        HttpResponse response = createHttpResponse();
-        requestHandler.handle(createHttpRequest(ippRequest), response);
-        return IppEntity.toIppResponse(response);
-    }
-
+    
     @AfterEach
     public void closeRequestHandler() throws IOException {
         this.requestHandler.close();
