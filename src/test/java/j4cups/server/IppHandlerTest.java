@@ -55,7 +55,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  *
  * @author oliver (boehm@javatux.de)
  */
-class IppHandlerTest extends AbstractServerTest {
+public class IppHandlerTest extends AbstractServerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppHandlerTest.class);
     private static URI cupsURI;
@@ -179,7 +179,7 @@ class IppHandlerTest extends AbstractServerTest {
         return testFile;
     }
 
-    private static void cancelJob(IppResponse ippResponse) {
+    public static void cancelJob(IppResponse ippResponse) {
         int jobId = ippResponse.getJobId();
         LOG.info("Cancelling job {}...", jobId);
         assertThat(jobId, greaterThan(0));

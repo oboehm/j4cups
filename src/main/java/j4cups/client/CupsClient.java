@@ -17,6 +17,24 @@
  */
 package j4cups.client;
 
+import j4cups.op.CancelJob;
+import j4cups.op.CreateJob;
+import j4cups.op.Operation;
+import j4cups.protocol.IppRequest;
+import j4cups.protocol.IppResponse;
+import j4cups.protocol.StatusCode;
+import j4cups.server.IppHandler;
+import j4cups.server.http.IppEntity;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
@@ -28,7 +46,8 @@ import java.util.List;
  * @since 0.5
  */
 public class CupsClient {
-    
+
+    private static final Logger LOG = LoggerFactory.getLogger(IppHandler.class);
     private final URI cupsURI;
 
     /**
@@ -56,5 +75,63 @@ public class CupsClient {
     public void printTo(URI printerURI, List<Path> files) {
         throw new UnsupportedOperationException("not yet implemented");
     }
-    
+
+    /**
+     * Creates a Job. This is needed if you want to print several documents
+     * as one job.
+     *
+     * @param printerURI where to send the files after creation
+     * @return response from CUPS
+     */
+    public IppResponse createJob(URI printerURI) {
+        CreateJob op = new CreateJob();
+        op.setPrinterURI(printerURI);
+        op.setCupsURI(cupsURI);
+        return send(op);
+    }
+
+    /**
+     * Cancels a job.
+     *
+     * @param jobId the job id which should be cancelled
+     * @return response from CUPS
+     */
+    public IppResponse cancelJob(int jobId) {
+        LOG.info("Cancelling job {}...", jobId);
+        CancelJob op = new CancelJob();
+        op.setJobId(jobId);
+        return send(op);
+    }
+
+    private IppResponse send(Operation op) {
+        IppRequest ippRequest = op.getIppRequest();
+        try {
+            CloseableHttpResponse httpResponse = send(ippRequest);
+            try (InputStream istream = httpResponse.getEntity().getContent()) {
+                return new IppResponse(IOUtils.toByteArray(istream));
+            }
+        } catch (IOException ex) {
+            LOG.warn("Cannot sent {}:", op, ex);
+            IppResponse ippResponse = new IppResponse(ippRequest);
+            ippResponse.setStatusCode(StatusCode.SERVER_ERROR_INTERNAL_ERROR);
+            ippResponse.setStatusMessage(ex.getMessage());
+            return ippResponse;
+        }
+    }
+
+    private CloseableHttpResponse send(IppRequest ippRequest) throws IOException {
+        LOG.info("Sending to {}: {}.", cupsURI, ippRequest);
+        HttpPost httpPost = new HttpPost(cupsURI);
+        IppEntity entity = new IppEntity(ippRequest);
+        httpPost.setEntity(entity);
+        CloseableHttpClient client = HttpClients.custom().build();
+        try {
+            CloseableHttpResponse response = client.execute(httpPost);
+            LOG.info("Received from {}: {}", cupsURI, response);
+            return response;
+        } finally {
+            client.close();
+        }
+    }
+
 }
