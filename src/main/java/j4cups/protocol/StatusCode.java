@@ -480,6 +480,17 @@ public enum StatusCode {
     }
 
     /**
+     * For the constants which represents an succesful state this method
+     * returns true.
+     * 
+     * @return true for the SUCCESFUL_xxx constants, otherwise false
+     * @since 0.5
+     */
+    public boolean isSuccessful() {
+        return toString().startsWith("successful");
+    }
+
+    /**
      * This implementation generates the same representation as described in
      * section RFC-8011 (section 5.4.15).
      *
@@ -504,5 +515,5 @@ public enum StatusCode {
         }
         throw new IllegalArgumentException("invalid id: " + id);
     }
-    
+
 }

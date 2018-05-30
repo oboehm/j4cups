@@ -19,7 +19,9 @@ package j4cups.protocol;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link StatusCode}.
@@ -27,13 +29,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class StatusCodeTest {
 
     @Test
-    public void testOf() {
+    void testOf() {
         assertEquals(StatusCode.SUCCESSFUL_OK, StatusCode.of(0x0000));
     }
     
     @Test
-    public void testToString() {
+    void testToString() {
         assertEquals("client-error-forbidden", StatusCode.CLIENT_ERROR_FORBIDDEN.toString());
+    }
+
+    @Test
+    void testIsSuccessful() {
+        assertTrue(StatusCode.SUCCESSFUL_OK_CONFLICTING_ATTRIBUTES.isSuccessful());
+    }
+
+    @Test
+    void testIsNotSuccessful() {
+        assertFalse(StatusCode.CLIENT_ERROR_BAD_REQUEST.isSuccessful());
     }
 
 }
