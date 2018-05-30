@@ -54,7 +54,7 @@ final class CupsClientIT {
         assumeTrue(printer != null, "specify printer with '-DprinterURI=...'");
         URI printerURI = URI.create(printer);
         IppResponse ippResponse = cupsClient.createJob(printerURI);
-        cupsClient.cancelJob(ippResponse.getJobId());
+        cupsClient.cancelJob(ippResponse.getJobId(), printerURI);
         OperationTest.checkIppResponse(ippResponse, "Create-Jobs.bin");
     }
 

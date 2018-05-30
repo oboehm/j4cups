@@ -54,8 +54,7 @@ public class IppRequestException extends RuntimeException {
     }
     
     private static String asString(IppResponse response) {
-        return response.getStatusCode().getCode() + ": " + response.getStatusMessage() + " (" +
-                response.getPrinterURI() + ')';
+        return response.getStatusCode() + " - " + response.getStatusMessage();
     }
 
 }

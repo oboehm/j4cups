@@ -51,6 +51,7 @@ public class CupsClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppHandler.class);
     private final URI cupsURI;
+    private int requestId = 0;
 
     /**
      * Generates a client for the access to a local CUPS on port 631.
@@ -90,6 +91,7 @@ public class CupsClient {
         CreateJob op = new CreateJob();
         op.setPrinterURI(printerURI);
         op.setCupsURI(cupsURI);
+        setRequestId(op);
         return send(op);
     }
 
@@ -99,11 +101,18 @@ public class CupsClient {
      * @param jobId the job id which should be cancelled
      * @return response from CUPS
      */
-    public IppResponse cancelJob(int jobId) {
+    public IppResponse cancelJob(int jobId, URI printerURI) {
         LOG.info("Job {} will be cancelled.", jobId);
         CancelJob op = new CancelJob();
         op.setJobId(jobId);
+        op.setPrinterURI(printerURI);
+        setRequestId(op);
         return send(op);
+    }
+
+    private void setRequestId(Operation op) {
+        requestId++;
+        op.setIppRequestId(requestId);
     }
 
     private IppResponse send(Operation op) {
