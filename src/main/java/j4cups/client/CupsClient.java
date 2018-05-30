@@ -21,11 +21,13 @@ import j4cups.op.CancelJob;
 import j4cups.op.CreateJob;
 import j4cups.op.Operation;
 import j4cups.protocol.IppRequest;
+import j4cups.protocol.IppRequestException;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
 import j4cups.server.IppHandler;
 import j4cups.server.http.IppEntity;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -73,6 +75,7 @@ public class CupsClient {
      * @param files the files to be printed
      */
     public void printTo(URI printerURI, List<Path> files) {
+        IppResponse createJobResponse = createJob(printerURI);
         throw new UnsupportedOperationException("not yet implemented");
     }
 
@@ -97,40 +100,38 @@ public class CupsClient {
      * @return response from CUPS
      */
     public IppResponse cancelJob(int jobId) {
-        LOG.info("Cancelling job {}...", jobId);
+        LOG.info("Job {} will be cancelled.", jobId);
         CancelJob op = new CancelJob();
         op.setJobId(jobId);
         return send(op);
     }
 
     private IppResponse send(Operation op) {
-        IppRequest ippRequest = op.getIppRequest();
-        try {
-            CloseableHttpResponse httpResponse = send(ippRequest);
+        return send(op.getIppRequest());
+    }
+
+    private IppResponse send(IppRequest ippRequest) {
+        LOG.info("Sending to {}: {}", cupsURI, ippRequest);
+        HttpPost httpPost = new HttpPost(cupsURI);
+        httpPost.setConfig(RequestConfig.custom().setSocketTimeout(10000).setConnectTimeout(10000).build());
+        IppEntity entity = new IppEntity(ippRequest);
+        httpPost.setEntity(entity);
+        try (CloseableHttpClient client = HttpClients.custom().build()) {
+            CloseableHttpResponse httpResponse = client.execute(httpPost);
+            LOG.info("Received from {}: {}", cupsURI, httpResponse);
             try (InputStream istream = httpResponse.getEntity().getContent()) {
-                return new IppResponse(IOUtils.toByteArray(istream));
+                IppResponse ippResponse = new IppResponse(IOUtils.toByteArray(istream));
+                if (!ippResponse.getStatusCode().isSuccessful())  {
+                    throw new IppRequestException(ippResponse);
+                }
+                return ippResponse;
             }
         } catch (IOException ex) {
-            LOG.warn("Cannot sent {}:", op, ex);
+            LOG.warn("Cannot sent {}:", ippRequest, ex);
             IppResponse ippResponse = new IppResponse(ippRequest);
             ippResponse.setStatusCode(StatusCode.SERVER_ERROR_INTERNAL_ERROR);
             ippResponse.setStatusMessage(ex.getMessage());
-            return ippResponse;
-        }
-    }
-
-    private CloseableHttpResponse send(IppRequest ippRequest) throws IOException {
-        LOG.info("Sending to {}: {}.", cupsURI, ippRequest);
-        HttpPost httpPost = new HttpPost(cupsURI);
-        IppEntity entity = new IppEntity(ippRequest);
-        httpPost.setEntity(entity);
-        CloseableHttpClient client = HttpClients.custom().build();
-        try {
-            CloseableHttpResponse response = client.execute(httpPost);
-            LOG.info("Received from {}: {}", cupsURI, response);
-            return response;
-        } finally {
-            client.close();
+            throw new IppRequestException(ippResponse, ex);
         }
     }
 
