@@ -19,43 +19,68 @@ package j4cups.client;
 
 import j4cups.op.OperationTest;
 import j4cups.protocol.IppResponse;
+import j4cups.protocol.StatusCode;
 import j4cups.server.AbstractServerTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
- * Integration tests for {@link CupsClient}.
+ * Integration tests for {@link CupsClient}. To specify a printer for
+ * testing use
+ * <pre>
+ *     -DprinterURI=http://localhost:631/printers/Brother_MFC_J5910DW_2
+ * </pre>
+ * <p>
+ * to set it. Otherwise the tests would be skipped.
+ * </p>
  */
 final class CupsClientIT {
 
     private CupsClient cupsClient;
+    private URI printerURI;
 
     @BeforeEach
     public void setUpCupsClient() {
         cupsClient = getCupsClient();
+        printerURI = getPrinterURI();
     }
 
     /**
-     * Creates a job for a printer. To specify the printer use
-     * <pre>
-     *     -DprinterURI=http://localhost:631/printers/Brother_MFC_J5910DW_2
-     * </pre>
-     * <p>
-     * to set it. Otherwise the tests would be skipped.
-     * </p>
+     * Creates a job for a printer.
      */
     @Test
-    void createJob() {
-        String printer = System.getProperty("printerURI");
-        assumeTrue(printer != null, "specify printer with '-DprinterURI=...'");
-        URI printerURI = URI.create(printer);
+    void testCreateJob() {
         IppResponse ippResponse = cupsClient.createJob(printerURI);
         cupsClient.cancelJob(ippResponse.getJobId(), printerURI);
         OperationTest.checkIppResponse(ippResponse, "Create-Jobs.bin");
+    }
+
+    /**
+     * Tests the send-document operation by sending two documents using the
+     * {@link CupsClient#printTo(URI, Path...)} method.
+     */
+    @Test
+    public void testPrintTo() {
+        Path file = Paths.get("src/test/resources/j4cups/test.txt");
+        assertTrue(Files.exists(file));
+        IppResponse ippResponse = cupsClient.printTo(printerURI, file, file);
+        cupsClient.cancelJob(ippResponse.getJobId(), printerURI);
+        assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
+    }
+
+    private static URI getPrinterURI() {
+        String printer = System.getProperty("printerURI");
+        assumeTrue(printer != null, "specify printer with '-DprinterURI=...'");
+        return URI.create(printer);
     }
 
     /**

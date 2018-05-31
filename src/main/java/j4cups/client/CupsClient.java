@@ -17,9 +17,7 @@
  */
 package j4cups.client;
 
-import j4cups.op.CancelJob;
-import j4cups.op.CreateJob;
-import j4cups.op.Operation;
+import j4cups.op.*;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppRequestException;
 import j4cups.protocol.IppResponse;
@@ -38,8 +36,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
 /**
  * This is a very basic client to access CUPS. It was introduced to simplify
@@ -75,9 +73,42 @@ public class CupsClient {
      * @param printerURI where to send the files
      * @param files the files to be printed
      */
-    public void printTo(URI printerURI, List<Path> files) {
+    public IppResponse printTo(URI printerURI, Path... files) {
         IppResponse createJobResponse = createJob(printerURI);
-        throw new UnsupportedOperationException("not yet implemented");
+        int jobId = createJobResponse.getJobId();
+        for (int i = 0; i < files.length - 1; i++) {
+            sendDocument(printerURI, files[i], jobId);
+        }
+        return sendLastDocument(printerURI, files[files.length-1], jobId);
+    }
+
+    private IppResponse sendDocument(URI printerURI, Path file, int jobId) {
+        return sendDocument(printerURI, file, jobId, false);
+    }
+
+    private IppResponse sendLastDocument(URI printerURI, Path file, int jobId) {
+        return sendDocument(printerURI, file, jobId, true);
+    }
+
+    public IppResponse sendDocument(URI printerURI, Path path, int jobId, boolean lastDocument) {
+        SendDocument op = new SendDocument();
+        op.setPrinterURI(printerURI);
+        op.setJobId(jobId);
+        op.setLastDocument(lastDocument);
+        setPrintJob(op, path);
+        setRequestId(op);
+        return send(op);
+    }
+
+    private void setPrintJob(PrintJob op, Path path) {
+        try {
+            byte[] data = Files.readAllBytes(path);
+            op.setData(data);
+            op.setJobName(path.getFileName() + "-" + requestId);
+            op.setDocumentName(path.toString());
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("cannot read " + path, ex);
+        }
     }
 
     /**
