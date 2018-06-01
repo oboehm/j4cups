@@ -27,7 +27,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.protocol.HttpContext;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,11 +74,9 @@ class IppServerRequestHandlerTest extends AbstractIppRequestHandlerTest {
     /**
      * This is a replay of a send-document request which is invalid because
      * the job-id is missing.
-     *
-     * @throws IOException in case of network problems
      */
     @Test
-    void testHandleInvalidSendDocument() throws IOException {
+    void testHandleInvalidSendDocument() {
         IppServerRequestHandler handler = new IppServerRequestHandler(URI.create("http://localhost:631"));
         sendIncompleteDocument(handler);
     }
@@ -87,15 +84,13 @@ class IppServerRequestHandlerTest extends AbstractIppRequestHandlerTest {
     /**
      * Here we test the {@link IppServerRequestHandler}, if it is created with
      * a file URI.
-     *
-     * @throws IOException in case of network problems
      */
     @Test
-    void testIppServerRequestHandlerFile() throws IOException {
+    void testIppServerRequestHandlerFile() {
         sendIncompleteDocument(requestHandler);
     }
 
-    private static void sendIncompleteDocument(IppServerRequestHandler handler) throws IOException {
+    private static void sendIncompleteDocument(IppServerRequestHandler handler) {
         HttpPost request = createHttpRequest(AbstractIppTest.readIppRequest("op", "send-document-request-invalid.ipp"));
         HttpResponse response = createHttpResponse();
         handler.handle(request, response);
@@ -104,11 +99,6 @@ class IppServerRequestHandlerTest extends AbstractIppRequestHandlerTest {
         LOG.info("Received: {}", ippResponse);
         assertEquals(StatusCode.CLIENT_ERROR_BAD_REQUEST, ippResponse.getStatusCode());
         assertThat(ippResponse.getStatusMessage(), containsString("job-id"));
-    }
-    
-    @AfterEach
-    public void closeRequestHandler() throws IOException {
-        this.requestHandler.close();
     }
 
 }

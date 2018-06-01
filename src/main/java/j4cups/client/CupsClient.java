@@ -168,7 +168,13 @@ public class CupsClient {
         op.setIppRequestId(requestId);
     }
 
-    private IppResponse send(IppRequest ippRequest) {
+    /**
+     * Sends the IPP request to CUPS.
+     * 
+     * @param ippRequest IPP request
+     * @return response from CUPS
+     */
+    public IppResponse send(IppRequest ippRequest) {
         LOG.info("Sending to {}: {}", cupsURI, ippRequest);
         HttpPost httpPost = new HttpPost(cupsURI);
         httpPost.setConfig(RequestConfig.custom().setSocketTimeout(10000).setConnectTimeout(10000).build());

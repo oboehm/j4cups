@@ -17,28 +17,18 @@
  */
 package j4cups.server;
 
-import j4cups.op.*;
+import j4cups.client.CupsClient;
+import j4cups.op.CreateJob;
+import j4cups.op.GetJobs;
+import j4cups.op.GetPrinterAttributes;
+import j4cups.op.Operation;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
-import j4cups.protocol.StatusCode;
-import j4cups.protocol.enums.JobState;
-import j4cups.protocol.enums.JobStateReasons;
-import j4cups.server.http.IppEntity;
-import j4cups.server.http.LogRequestInterceptor;
-import j4cups.server.http.LogResponseInterceptor;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -52,33 +42,18 @@ import java.nio.file.Paths;
  * @author oboehm
  * @since 0.5 (26.04.2018)
  */
-public class IppHandler implements AutoCloseable {
+public class IppHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppHandler.class);
     private final URI forwardURI;
-    private final URI cupsURI;
-    private final CloseableHttpClient client = createHttpClient();
-    private int requestId = 1;
-    private int jobId = 0;
 
     /**
      * Instantiates a new Cups client.
      *
-     * @param cupsURI the cups uri
+     * @param forwardURI the forward uri where to store the requests/responses
      */
-    public IppHandler(URI cupsURI) {
-        this(cupsURI, cupsURI);
-    }
-
-    /**
-     * Instantiates a new Cups client.
-     *
-     * @param forwardURI the forward uri
-     * @param cupsURI    the cups uri
-     */
-    public IppHandler(URI forwardURI, URI cupsURI) {
+    public IppHandler(URI forwardURI) {
         this.forwardURI = forwardURI;
-        this.cupsURI = cupsURI;
     }
 
     /**
@@ -89,9 +64,8 @@ public class IppHandler implements AutoCloseable {
      * @return answer from CUPS
      */
     public IppResponse printJob(URI printerURI, Path path) {
-        PrintJob op = new PrintJob();
-        setPrintJob(op, path);
-        return send(op, printerURI);
+        CupsClient printerClient = new CupsClient(printerURI);
+        return printerClient.print(printerURI, path);
     }
 
     /**
@@ -127,22 +101,8 @@ public class IppHandler implements AutoCloseable {
      * @return answer from CUPS
      */
     public IppResponse sendDocument(URI printerURI, Path path, int jobId, boolean lastDocument) {
-        SendDocument op = new SendDocument();
-        op.setJobId(jobId);
-        op.setLastDocument(lastDocument);
-        setPrintJob(op, path);
-        return send(op, printerURI);
-    }
-
-    private void setPrintJob(PrintJob op, Path path) {
-        try {
-            byte[] data = Files.readAllBytes(path);
-            op.setData(data);
-            op.setJobName(path.getFileName() + "-" + requestId);
-            op.setDocumentName(path.toString());
-        } catch (IOException ex) {
-            throw new IllegalArgumentException("cannot read " + path, ex);
-        }
+        CupsClient printerClient = new CupsClient(printerURI);
+        return printerClient.sendDocument(printerURI, path, jobId, lastDocument);
     }
 
     /**
@@ -153,9 +113,8 @@ public class IppHandler implements AutoCloseable {
      * @return answer from CUPS
      */
     public IppResponse cancelJob(URI printerURI, int jobId) {
-        CancelJob op = new CancelJob();
-        op.setJobId(jobId);
-        return send(op, printerURI);
+        CupsClient printerClient = new CupsClient(printerURI);
+        return printerClient.cancelJob(jobId, printerURI);
     }
 
     /**
@@ -170,63 +129,15 @@ public class IppHandler implements AutoCloseable {
     }
 
     private IppResponse send(Operation op, URI printerURI) {
-        op.setCupsURI(cupsURI);
         op.setPrinterURI(printerURI);
-        return send(op);
-    }
-
-    private IppResponse send(Operation op) {
-        op.setIppRequestId(requestId);
-        requestId++;
-        if ("file".equals(forwardURI.getScheme())) {
-            return handle(op);
-        } else {
-            return send(op, op.getIppRequest());
-        }
+        CupsClient printerClient = new CupsClient(printerURI);
+        return printerClient.send(op);
     }
 
     private IppResponse handle(Operation op) {
         IppRequest ippRequest = op.getIppRequest();
-        switch (ippRequest.getOperation()) {
-            case PRINT_JOB:
-                setJobIdFor(op);
-                op.setJobStateReasons(JobStateReasons.NONE);
-                break;
-            case CREATE_JOB:
-                op.setCupsURI(cupsURI);
-                op.setJobState(JobState.PENDING_HELD);
-                op.setJobStateReasons(JobStateReasons.JOB_INCOMING);
-                setJobIdFor(op);
-                break;
-            case SEND_DOCUMENT:
-                op.setCupsURI(cupsURI);
-                setJobIdFor(op);
-                break;
-            default:
-                op.validateRequest();
-                break;
-        }
+        op.validateRequest();
         return op.getIppResponse();
-    }
-
-    private void setJobIdFor(Operation op) {
-        jobId++;
-        op.setJobId(jobId);
-    }
-
-    private IppResponse send(Operation op, IppRequest ippRequest) {
-        try {
-            CloseableHttpResponse httpResponse = send(ippRequest);
-            try (InputStream istream = httpResponse.getEntity().getContent()) {
-                return new IppResponse(IOUtils.toByteArray(istream));
-            }
-        } catch (IOException ex) {
-            LOG.warn("Cannot sent {}:", op, ex);
-            IppResponse ippResponse = new IppResponse(ippRequest);
-            ippResponse.setStatusCode(StatusCode.SERVER_ERROR_INTERNAL_ERROR);
-            ippResponse.setStatusMessage(ex.getMessage());
-            return ippResponse;
-        }
     }
 
     /**
@@ -236,38 +147,21 @@ public class IppHandler implements AutoCloseable {
      *
      * @param ippRequest the ipp request
      * @return response from CUPS
-     * @throws IOException the io exception
      */
-    public CloseableHttpResponse send(IppRequest ippRequest) throws IOException {
+    public IppResponse send(IppRequest ippRequest) {
         if ("file".equals(forwardURI.getScheme())) {
             return record(ippRequest, Paths.get(forwardURI));
         } else {
-            return sendTo(forwardURI, ippRequest);
+            throw new UnsupportedOperationException("not supported by " + this.getClass());
         }
     }
 
-    private CloseableHttpResponse record(IppRequest ippRequest, Path dir) throws IOException {
+    private IppResponse record(IppRequest ippRequest, Path dir) {
         ippRequest.recordTo(dir);
         URI printerURI = getPrinterURI(ippRequest);
-        CloseableHttpResponse response = sendTo(printerURI, ippRequest);
-        IppResponse ippResponse = IppEntity.toIppResponse(response);
+        IppResponse ippResponse = new IppResponse(ippRequest);
         ippResponse.recordTo(dir);
-        return response;
-    }
-
-    private CloseableHttpResponse sendTo(URI targetURI, IppRequest ippRequest) throws IOException {
-        LOG.info("Sending to {}: {}.", targetURI, ippRequest);
-        HttpPost httpPost = new HttpPost(targetURI);
-        IppEntity entity = new IppEntity(ippRequest);
-        httpPost.setEntity(entity);
-        CloseableHttpResponse response = client.execute(httpPost);
-        LOG.info("Received from {}: {}", targetURI, response);
-        return response;
-    }
-
-    private static CloseableHttpClient createHttpClient() {
-        return HttpClients.custom().addInterceptorFirst(new LogRequestInterceptor("C"))
-                          .addInterceptorLast(new LogResponseInterceptor("C")).build();
+        return ippResponse;
     }
 
     private URI getPrinterURI(IppRequest ippRequest) {
@@ -284,17 +178,6 @@ public class IppHandler implements AutoCloseable {
         return printerURI;
     }
 
-    /**
-     * Closes the HttpClient which used to connect the CUPS server or
-     * printer.
-     *
-     * @throws IOException if this resource cannot be closed
-     */
-    @Override
-    public void close() throws IOException {
-        client.close();
-    }
-    
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + " to " + forwardURI;

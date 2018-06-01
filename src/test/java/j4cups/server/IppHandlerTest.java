@@ -22,15 +22,12 @@ import j4cups.op.OperationTest;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -48,7 +45,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * network.
  * <p>
  * To set a real CUPS server for {@link IppHandlerTest} as forward URI you can
- * use the environment variable "cupsURI":
+ * use the environment variable "forwardURI":
  * </p>
  * <pre>
  *  ... -DcupsURI=http://localhost:631
@@ -59,22 +56,19 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 public class IppHandlerTest extends AbstractServerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppHandlerTest.class);
-    protected static URI cupsURI;
+    protected static URI forwardURI;
     protected static URI testPrinterUri;
     private IppHandler ippHandler;
 
     @BeforeAll
     static void setUpCupsURI() {
         Path spoolDir = Paths.get("target");
-        cupsURI = spoolDir.toUri();
-        String cupsProp = System.getProperty("cupsURI");
-        if (cupsProp == null) {
-            startServer();
-            testPrinterUri = URI.create("http://localhost:" + cupsServer.getPort() + "/printers/text");
-        } else {
-            cupsURI = URI.create(cupsProp);
-            testPrinterUri = URI.create(System.getProperty("printerURI"));
+        forwardURI = spoolDir.toUri();
+        String cupsProp = System.getProperty("forwardURI");
+        if (cupsProp != null) {
+            forwardURI = URI.create(cupsProp);
         }
+        testPrinterUri = URI.create(System.getProperty("printerURI", "http://localhost:631/printers/text"));
     }
     
     @BeforeEach
@@ -84,19 +78,17 @@ public class IppHandlerTest extends AbstractServerTest {
     }
     
     protected IppHandler getIppHandler() {
-        return new IppHandler(cupsURI);
+        return new IppHandler(forwardURI);
     }
 
     /**
      * Unit test for {@link IppHandler#send(IppRequest)}.
-     *
-     * @throws IOException the io exception
      */
     @Test
-    void testSendGetPrinters() throws IOException {
+    void testSendGetPrinters() {
         IppRequest getPrintersRequest = readIppRequest("Get-Printers.bin");
-        CloseableHttpResponse response = ippHandler.send(getPrintersRequest);
-        assertEquals(200, response.getStatusLine().getStatusCode());
+        IppResponse response = ippHandler.send(getPrintersRequest);
+        assertEquals(StatusCode.SUCCESSFUL_OK, response.getStatusCode());
     }
 
     /**
@@ -177,12 +169,12 @@ public class IppHandlerTest extends AbstractServerTest {
     }
 
     private static void assumeCupsAndPrinterAreOnline() {
-        assumeTrue(isOnline(cupsURI), cupsURI + " is not available");
+        assumeTrue(isOnline(forwardURI), forwardURI + " is not available");
         assumeTrue(isOnline(testPrinterUri), testPrinterUri + " is not available");
     }
     
     private static Path readTestFile() {
-        assumeTrue(isOnline(cupsURI), cupsURI + " is not available");
+        assumeTrue(isOnline(forwardURI), forwardURI + " is not available");
         Path testFile = Paths.get("src", "test", "resources", "j4cups", "test.txt");
         assertTrue(Files.exists(testFile));
         return testFile;
@@ -195,11 +187,6 @@ public class IppHandlerTest extends AbstractServerTest {
         IppResponse cancelResponse = ippHandler.cancelJob(testPrinterUri, jobId);
         assertThat(cancelResponse.getStatusCode(),
                 anyOf(equalTo(StatusCode.SUCCESSFUL_OK), equalTo(StatusCode.CLIENT_ERROR_NOT_POSSIBLE)));
-    }
-
-    @AfterEach
-    void closeClient() throws IOException {
-        ippHandler.close();
     }
 
 }

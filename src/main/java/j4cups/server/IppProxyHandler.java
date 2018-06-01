@@ -21,6 +21,7 @@ import j4cups.client.CupsClient;
 import j4cups.op.GetJobs;
 import j4cups.op.GetPrinterAttributes;
 import j4cups.op.Operation;
+import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,6 +123,10 @@ public class IppProxyHandler extends IppHandler {
     private IppResponse send(Operation op, URI printerURI) {
         op.setPrinterURI(printerURI);
         return cupsClient.send(op);
+    }
+    
+    public IppResponse send(IppRequest ippRequest) {
+        return cupsClient.send(ippRequest);
     }
     
     @Override

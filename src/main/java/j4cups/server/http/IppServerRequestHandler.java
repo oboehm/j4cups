@@ -22,15 +22,14 @@ import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
 import j4cups.server.IppHandler;
+import j4cups.server.IppProxyHandler;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.validation.ValidationException;
-import java.io.IOException;
 import java.net.URI;
 import java.nio.BufferUnderflowException;
 
@@ -40,11 +39,10 @@ import java.nio.BufferUnderflowException;
  * @author <a href="ob@aosd.de">oliver</a>
  * @since (15.04.18)
  */
-public class IppServerRequestHandler extends AbstractIppRequestHandler implements AutoCloseable {
+public class IppServerRequestHandler extends AbstractIppRequestHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppServerRequestHandler.class);
     private final IppHandler ippHandler;
-    private final URI forwardURI;
 
     /**
      * The default ctor is mainly intented for testing.
@@ -57,10 +55,10 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler implement
      * If the request handler acts as a proxy he need to know ther URI where
      * the request should be forwarded.
      *
-     * @param forwardURI URI where the request should be forwarded to
+     * @param forwardURI CUPS URI where the request should be forwarded to
      */
     public IppServerRequestHandler(URI forwardURI) {
-        this(forwardURI, forwardURI);
+        this(new IppProxyHandler(forwardURI));
     }
 
     /**
@@ -68,12 +66,10 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler implement
      * the request should be forwarded. And for the generated responses it
      * must known the CUPS URI.
      *
-     * @param forwardURI URI where the request should be forwarded to
-     * @param cupsURI    the cups uri
+     * @param ippHandler the handler used for IPP communication
      */
-    public IppServerRequestHandler(URI forwardURI, URI cupsURI) {
-        this.ippHandler = new IppHandler(forwardURI, cupsURI);
-        this.forwardURI = forwardURI;
+    public IppServerRequestHandler(IppHandler ippHandler) {
+        this.ippHandler = ippHandler;
     }
 
     /**
@@ -82,9 +78,8 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler implement
      *
      * @param request incoming request
      * @param response outgoing response
-     * @throws IOException e.g. network problems
      */
-    protected void handle(HttpEntityEnclosingRequest request, HttpResponse response) throws IOException {
+    protected void handle(HttpEntityEnclosingRequest request, HttpResponse response) {
         try {
             IppRequest ippRequest = IppEntity.toIppRequest(request);
             LOG.info("Received: {}", ippRequest);
@@ -109,12 +104,9 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler implement
         }
     }
 
-    private void send(IppRequest ippRequest, HttpResponse response) throws IOException {
-        CloseableHttpResponse cupsResponse = ippHandler.send(ippRequest);
-        response.setEntity(cupsResponse.getEntity());
-        response.setStatusCode(cupsResponse.getStatusLine().getStatusCode());
-        response.setStatusLine(cupsResponse.getStatusLine());
-        response.setLocale(cupsResponse.getLocale());
+    private void send(IppRequest ippRequest, HttpResponse response) {
+        IppResponse cupsResponse = ippHandler.send(ippRequest);
+        response.setEntity(new IppEntity(cupsResponse));
     }
 
     private static void handleException(IppRequest ippRequest, HttpResponse response, ValidationException ex) {
@@ -125,17 +117,6 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler implement
         ippResponse.setStatusCode(StatusCode.CLIENT_ERROR_BAD_REQUEST);
         ippResponse.setStatusMessage(ex.getMessage());
         response.setEntity(new IppEntity(ippResponse));
-    }
-
-    /**
-     * Closes the IppHandler which used to connect the CUPS server or
-     * printer.
-     *
-     * @throws IOException if this resource cannot be closed
-     */
-    @Override
-    public void close() throws IOException {
-        ippHandler.close();
     }
 
 }

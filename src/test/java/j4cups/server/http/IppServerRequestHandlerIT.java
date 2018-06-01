@@ -24,14 +24,11 @@ import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
 import j4cups.server.AbstractServerTest;
 import org.apache.http.HttpResponse;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Paths;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
@@ -39,7 +36,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
- * Integration tests for {@link IppServerRequestHandler}. For teting you need a
+ * Integration tests for {@link IppServerRequestHandler}. For testing you need a
  * CUPS server in your network. If it is not a local CUPS server on port 631
  * you can use
  * 
@@ -50,20 +47,17 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 class IppServerRequestHandlerIT extends AbstractIppRequestHandlerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppServerRequestHandlerTest.class);
-    private final IppServerRequestHandler requestHandler =
-            new IppServerRequestHandler(Paths.get("target").toUri(), getCupsURI());
+    private final IppServerRequestHandler requestHandler = new IppServerRequestHandler(getCupsURI());
 
     private static URI getCupsURI() {
-        return URI.create(System.getProperty("cupsURI", "http://localhost:631"));
+        return URI.create(System.getProperty("forwardURI", "http://localhost:631"));
     }
 
     /**
      * A create-job request should be answered with a response containing a job-id.
-     *
-     * @throws IOException in case of network problems
      */
     @Test
-    void testHandleCreateJob() throws IOException {
+    void testHandleCreateJob() {
         CreateJob createJob = new CreateJob();
         URI printerURI = URI.create("http://localhost:631/printers/Brother_MFC_J5910DW_2");
         assumeTrue(AbstractServerTest.isOnline(printerURI));
@@ -82,7 +76,7 @@ class IppServerRequestHandlerIT extends AbstractIppRequestHandlerTest {
      * least one printer.
      */
     @Test
-    void testHandleGetPrinters() throws IOException {
+    void testHandleGetPrinters() {
         URI printersURI = getPrintersURI();
         assumeTrue(AbstractServerTest.isOnline(printersURI));
         IppRequest getPrintersRequest = AbstractIppTest.readIppRequest("request", "Get-Printers.bin");
@@ -96,15 +90,10 @@ class IppServerRequestHandlerIT extends AbstractIppRequestHandlerTest {
         return URI.create(getCupsURI() + "/printers");
     }
 
-    private IppResponse getIppResponseFor(IppRequest ippRequest) throws IOException {
+    private IppResponse getIppResponseFor(IppRequest ippRequest) {
         HttpResponse response = createHttpResponse();
         requestHandler.handle(createHttpRequest(ippRequest), response);
         return IppEntity.toIppResponse(response);
-    }
-
-    @AfterEach
-    public void closeRequestHandler() throws IOException {
-        this.requestHandler.close();
     }
 
 }

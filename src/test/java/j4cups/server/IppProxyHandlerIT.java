@@ -23,7 +23,7 @@ package j4cups.server;
  * network.
  * <p>
  * To set a real CUPS server for {@link IppProxyHandlerIT} as forward URI you can
- * use the environment variable "cupsURI":
+ * use the environment variable "forwardURI":
  * </p>
  * <pre>
  *  ... -DcupsURI=http://localhost:631
@@ -35,7 +35,7 @@ public class IppProxyHandlerIT extends IppHandlerTest {
 
     @Override
     protected IppHandler getIppHandler() {
-        return new IppProxyHandler(cupsURI);
+        return new IppProxyHandler(forwardURI);
     }
 
 }

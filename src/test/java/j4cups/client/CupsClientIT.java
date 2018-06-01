@@ -112,13 +112,13 @@ final class CupsClientIT {
 
     /**
      * If you have no CUPS running on your local machine you must set the
-     * envrionment variable 'cupsURI' to your CUPS server in the
+     * envrionment variable 'forwardURI' to your CUPS server in the
      * network. Otherwise the test fails.
      *
      * @return your CupsClient for testing
      */
     public static CupsClient getCupsClient() {
-        URI cupsURI = URI.create(System.getProperty("cupsURI", "http://localhost:631"));
+        URI cupsURI = URI.create(System.getProperty("forwardURI", "http://localhost:631"));
         assumeTrue(AbstractServerTest.isOnline(cupsURI),
                 cupsURI + " is offline - use '-DcupsURI=...' to use another CUPS");
         return new CupsClient(cupsURI);
