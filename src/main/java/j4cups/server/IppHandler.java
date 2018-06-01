@@ -52,7 +52,7 @@ import java.nio.file.Paths;
  * @author oboehm
  * @since 0.5 (26.04.2018)
  */
-public final class IppHandler implements AutoCloseable {
+public class IppHandler implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppHandler.class);
     private final URI forwardURI;

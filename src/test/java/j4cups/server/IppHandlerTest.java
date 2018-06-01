@@ -23,8 +23,9 @@ import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,9 +59,9 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 public class IppHandlerTest extends AbstractServerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppHandlerTest.class);
-    private static URI cupsURI;
-    private static IppHandler ippHandler;
-    private static URI testPrinterUri;
+    protected static URI cupsURI;
+    protected static URI testPrinterUri;
+    private IppHandler ippHandler;
 
     @BeforeAll
     static void setUpCupsURI() {
@@ -74,8 +75,16 @@ public class IppHandlerTest extends AbstractServerTest {
             cupsURI = URI.create(cupsProp);
             testPrinterUri = URI.create(System.getProperty("printerURI"));
         }
-        ippHandler = new IppHandler(cupsURI);
+    }
+    
+    @BeforeEach
+    void setUpIppHandler() {
+        ippHandler = getIppHandler();
         LOG.info("{} is used for testing.", ippHandler);
+    }
+    
+    protected IppHandler getIppHandler() {
+        return new IppHandler(cupsURI);
     }
 
     /**
@@ -179,7 +188,7 @@ public class IppHandlerTest extends AbstractServerTest {
         return testFile;
     }
 
-    public static void cancelJob(IppResponse ippResponse) {
+    public void cancelJob(IppResponse ippResponse) {
         int jobId = ippResponse.getJobId();
         LOG.info("Cancelling job {}...", jobId);
         assertThat(jobId, greaterThan(0));
@@ -188,8 +197,8 @@ public class IppHandlerTest extends AbstractServerTest {
                 anyOf(equalTo(StatusCode.SUCCESSFUL_OK), equalTo(StatusCode.CLIENT_ERROR_NOT_POSSIBLE)));
     }
 
-    @AfterAll
-    static void closeClient() throws IOException {
+    @AfterEach
+    void closeClient() throws IOException {
         ippHandler.close();
     }
 

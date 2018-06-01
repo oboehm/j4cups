@@ -18,11 +18,15 @@
 package j4cups.client;
 
 import j4cups.op.OperationTest;
+import j4cups.protocol.IppRequestException;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
 import j4cups.server.AbstractServerTest;
+import j4cups.server.IppHandlerTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.nio.file.Files;
@@ -45,6 +49,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  */
 final class CupsClientIT {
 
+    private static final Logger LOG = LoggerFactory.getLogger(IppHandlerTest.class);
     private CupsClient cupsClient;
     private URI printerURI;
 
@@ -60,21 +65,43 @@ final class CupsClientIT {
     @Test
     void testCreateJob() {
         IppResponse ippResponse = cupsClient.createJob(printerURI);
-        cupsClient.cancelJob(ippResponse.getJobId(), printerURI);
+        cancelJob(ippResponse);
         OperationTest.checkIppResponse(ippResponse, "Create-Jobs.bin");
     }
 
     /**
-     * Tests the send-document operation by sending two documents using the
-     * {@link CupsClient#printTo(URI, Path...)} method.
+     * Tests the print-job operation by sending one document using the
+     * {@link CupsClient#print(URI, Path)} method.
      */
     @Test
-    public void testPrintTo() {
+    public void testPrintJob() {
         Path file = Paths.get("src/test/resources/j4cups/test.txt");
         assertTrue(Files.exists(file));
-        IppResponse ippResponse = cupsClient.printTo(printerURI, file, file);
-        cupsClient.cancelJob(ippResponse.getJobId(), printerURI);
+        IppResponse ippResponse = cupsClient.print(printerURI, file);
+        cancelJob(ippResponse);
         assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
+    }
+
+    /**
+     * Tests the send-document operation by sending two documents using the
+     * {@link CupsClient#print(URI, Path...)} method.
+     */
+    @Test
+    public void testPrintDocuments() {
+        Path file = Paths.get("src/test/resources/j4cups/test.txt");
+        assertTrue(Files.exists(file));
+        IppResponse ippResponse = cupsClient.print(printerURI, file, file);
+        cancelJob(ippResponse);
+        assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
+    }
+
+    private void cancelJob(IppResponse ippResponse) {
+        int jobId = ippResponse.getJobId();
+        try {
+            cupsClient.cancelJob(jobId, printerURI);
+        } catch (IppRequestException ex) {
+            LOG.warn("Cannot cancel job {}: {}", jobId, ex);
+        }
     }
 
     private static URI getPrinterURI() {

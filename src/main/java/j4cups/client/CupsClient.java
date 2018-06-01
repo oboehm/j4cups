@@ -66,6 +66,20 @@ public class CupsClient {
     public CupsClient(URI cupsURI) {
         this.cupsURI = cupsURI;
     }
+    
+    /**
+     * Sends a print job to the printer.
+     *
+     * @param printerURI printer URI
+     * @param path       file to be printed
+     * @return answer from CUPS
+     */
+    public IppResponse print(URI printerURI, Path path) {
+        PrintJob op = new PrintJob();
+        op.setPrinterURI(printerURI);
+        setPrintJob(op, path);
+        return send(op);
+    }
 
     /**
      * Sends a list of files as one job to the given printer.
@@ -73,7 +87,7 @@ public class CupsClient {
      * @param printerURI where to send the files
      * @param files the files to be printed
      */
-    public IppResponse printTo(URI printerURI, Path... files) {
+    public IppResponse print(URI printerURI, Path... files) {
         IppResponse createJobResponse = createJob(printerURI);
         int jobId = createJobResponse.getJobId();
         for (int i = 0; i < files.length - 1; i++) {
@@ -96,7 +110,6 @@ public class CupsClient {
         op.setJobId(jobId);
         op.setLastDocument(lastDocument);
         setPrintJob(op, path);
-        setRequestId(op);
         return send(op);
     }
 
@@ -121,8 +134,6 @@ public class CupsClient {
     public IppResponse createJob(URI printerURI) {
         CreateJob op = new CreateJob();
         op.setPrinterURI(printerURI);
-        op.setCupsURI(cupsURI);
-        setRequestId(op);
         return send(op);
     }
 
@@ -137,17 +148,24 @@ public class CupsClient {
         CancelJob op = new CancelJob();
         op.setJobId(jobId);
         op.setPrinterURI(printerURI);
-        setRequestId(op);
         return send(op);
+    }
+
+    /**
+     * Sends an IPP operation to CUPS.
+     * 
+     * @param op IPP oeration
+     * @return response from CUPS
+     */
+    public IppResponse send(Operation op) {
+        setRequestId(op);
+        op.setCupsURI(cupsURI);
+        return send(op.getIppRequest());
     }
 
     private void setRequestId(Operation op) {
         requestId++;
         op.setIppRequestId(requestId);
-    }
-
-    private IppResponse send(Operation op) {
-        return send(op.getIppRequest());
     }
 
     private IppResponse send(IppRequest ippRequest) {
