@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -45,15 +44,24 @@ import java.nio.file.Paths;
 public class IppHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppHandler.class);
-    private final URI forwardURI;
+    private final Path recordDir;
 
     /**
-     * Instantiates a new Cups client.
+     * Instantiates a new IPP handler.
      *
      * @param forwardURI the forward uri where to store the requests/responses
      */
     public IppHandler(URI forwardURI) {
-        this.forwardURI = forwardURI;
+        this(Paths.get(forwardURI));
+    }
+
+    /**
+     * Instantiates a new IPP handler.
+     * 
+     * @param recordDir directory where requests and responses are recorded
+     */
+    public IppHandler(Path recordDir) {
+        this.recordDir = recordDir;
     }
 
     /**
@@ -149,38 +157,15 @@ public class IppHandler {
      * @return response from CUPS
      */
     public IppResponse send(IppRequest ippRequest) {
-        if ("file".equals(forwardURI.getScheme())) {
-            return record(ippRequest, Paths.get(forwardURI));
-        } else {
-            throw new UnsupportedOperationException("not supported by " + this.getClass());
-        }
-    }
-
-    private IppResponse record(IppRequest ippRequest, Path dir) {
-        ippRequest.recordTo(dir);
-        URI printerURI = getPrinterURI(ippRequest);
+        ippRequest.recordTo(recordDir);
         IppResponse ippResponse = new IppResponse(ippRequest);
-        ippResponse.recordTo(dir);
+        ippResponse.recordTo(recordDir);
         return ippResponse;
     }
-
-    private URI getPrinterURI(IppRequest ippRequest) {
-        URI printerURI = ippRequest.getPrinterURI();
-        if (printerURI.getPort() < 0) {
-            LOG.debug("Port is missing in {} and will be replaced with port 631.", printerURI);
-            try {
-                return new URI(printerURI.getScheme(), printerURI.getUserInfo(), printerURI.getHost(),
-                        631, printerURI.getPath(), printerURI.getQuery(), printerURI.getFragment());
-            } catch (URISyntaxException ex) {
-                LOG.warn("Cannot create printer-uri '{}' with port 631:", printerURI, ex);
-            }
-        }
-        return printerURI;
-    }
-
+    
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + " to " + forwardURI;
+        return this.getClass().getSimpleName() + " to " + recordDir;
     }
 
 }
