@@ -21,6 +21,7 @@ import j4cups.server.http.IppPrinterRequestHandler;
 import j4cups.server.http.IppServerRequestHandler;
 import j4cups.server.http.LogRequestInterceptor;
 import j4cups.server.http.LogResponseInterceptor;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.http.ConnectionClosedException;
 import org.apache.http.ExceptionLogger;
 import org.apache.http.config.SocketConfig;
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -61,7 +63,16 @@ public class CupsServer implements Runnable {
      * @param port e.g. 631
      */
     public CupsServer(int port) {
-        this(port, URI.create("http://localhost:631"));
+        this(port, getRecordDir());
+    }
+
+    private static URI getRecordDir() {
+        try {
+            return Files.createTempDirectory("CupsServer").toUri();
+        } catch (IOException ex) {
+            LOG.warn("Cannot create tempory directory:", ex);
+            return SystemUtils.getJavaIoTmpDir().toURI();
+        }
     }
 
     /**
@@ -152,16 +163,23 @@ public class CupsServer implements Runnable {
                                                 .setSoTimeout(15000)
                                                 .setTcpNoDelay(true)
                                                 .build();
-        return ServerBootstrap.bootstrap()
-                              .setListenerPort(serverPort)
-                              .setServerInfo("j4CUPS/0.5")
-                              .setSocketConfig(socketConfig)
-                              .setExceptionLogger(new StdErrorExceptionLogger())
-                              .registerHandler("/printers/*", new IppPrinterRequestHandler())
-                              .registerHandler("*", new IppServerRequestHandler(forwardURI))
-                              .addInterceptorFirst(new LogRequestInterceptor("S"))
-                              .addInterceptorLast(new LogResponseInterceptor("S"))
-                              .create();
+        ServerBootstrap sb = ServerBootstrap.bootstrap()
+                       .setListenerPort(serverPort)
+                       .setServerInfo("j4CUPS/0.5")
+                       .setSocketConfig(socketConfig)
+                       .setExceptionLogger(new StdErrorExceptionLogger())
+                       .addInterceptorFirst(new LogRequestInterceptor("S"))
+                       .addInterceptorLast(new LogResponseInterceptor("S"));
+        if ("file".equalsIgnoreCase(forwardURI.getScheme())) {
+            IppHandler ippHandler = new IppHandler(forwardURI);
+            sb.registerHandler("*", new IppServerRequestHandler(new IppHandler(forwardURI)))
+              .registerHandler("/printers/*", new IppPrinterRequestHandler());
+            LOG.info("CupsServer will handle requests and record it to {}.", forwardURI);
+        } else {
+            sb.registerHandler("*", new IppServerRequestHandler(forwardURI));
+            LOG.info("CupsServer will forward requests to {}.", forwardURI);
+        }
+        return sb.create();
     }
 
     /**
