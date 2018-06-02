@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.nio.file.Paths;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -77,8 +76,7 @@ class IppServerRequestHandlerTest extends AbstractIppRequestHandlerTest {
      */
     @Test
     void testHandleInvalidSendDocument() {
-        IppServerRequestHandler handler = new IppServerRequestHandler(URI.create("http://localhost:631"));
-        sendIncompleteDocument(handler);
+        sendIncompleteDocument(requestHandler);
     }
 
     /**
