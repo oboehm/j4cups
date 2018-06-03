@@ -49,9 +49,9 @@ The CI build is started automatically after a commit and push to GitHub.
 |Version |Date |Description
 
 |0.5.0
-|May-2018
+|3-Jun-2018
 |op package with IPP operations added;
-maybe a server part will be provided
+server part provided which can act like a CUPS server or a proxy
 
 |0.3.0
 |24-Mar-2018
