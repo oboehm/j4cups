@@ -193,8 +193,9 @@ public final class Attribute implements Binary {
     /**
      * Creates a multi-value attribute for the given value-tag.
      *
-     * @param tag   the value-tag
-     * @param name  the name of the attribute
+     * @param tag              the value-tag
+     * @param name             the name of the attribute
+     * @param additionalValues the additional values
      * @return the attribute
      */
     public static Attribute of(ValueTags tag, String name, byte[]... additionalValues) {
@@ -226,6 +227,7 @@ public final class Attribute implements Binary {
      *
      * @param tag   the value-tag
      * @param name  the name of the attribute
+     * @param value the value
      * @return the attribute
      */
     public static Attribute of(ValueTags tag, String name, String value) {

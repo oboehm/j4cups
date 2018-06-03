@@ -83,9 +83,10 @@ public class CupsClient {
 
     /**
      * Sends a list of files as one job to the given printer.
-     * 
+     *
      * @param printerURI where to send the files
-     * @param files the files to be printed
+     * @param files      the files to be printed
+     * @return the ipp response
      */
     public IppResponse print(URI printerURI, Path... files) {
         IppResponse createJobResponse = createJob(printerURI);
@@ -140,7 +141,8 @@ public class CupsClient {
     /**
      * Cancels a job.
      *
-     * @param jobId the job id which should be cancelled
+     * @param jobId      the job id which should be cancelled
+     * @param printerURI the printer uri
      * @return response from CUPS
      */
     public IppResponse cancelJob(int jobId, URI printerURI) {

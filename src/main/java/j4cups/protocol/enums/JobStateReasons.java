@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * This REQUIRED attribute provides additional information about the
  * Job's current state. I.e., information that augments the value of the
  * Job's "job-state" attribute.
- * <p></p>
+ * <p>
  * These values MAY be used with any Job state or states for which the
  * reason makes sense.  Some of these value definitions indicate
  * conformance requirements; the rest are OPTIONAL.  Furthermore, when
@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
  * When the Job does not have any reasons for being in its current
  * state, the value of the Job's "job-state-reasons" attribute MUST be
  * 'none'.
+ * </p>
  * 
  * @since 0.5
  */

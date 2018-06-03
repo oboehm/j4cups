@@ -122,6 +122,8 @@ public class CupsServer implements Runnable {
 
     /**
      * This is the method to start the server in the background.
+     *
+     * @return the started thread
      */
     public Thread start() {
         serverThread = new Thread(this, this.toString());
