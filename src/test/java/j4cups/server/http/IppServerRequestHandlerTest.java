@@ -17,7 +17,7 @@
  */
 package j4cups.server.http;
 
-import j4cups.protocol.AbstractIppTest;
+import j4cups.op.OperationTest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
 import org.apache.http.HttpEntity;
@@ -76,22 +76,7 @@ class IppServerRequestHandlerTest extends AbstractIppRequestHandlerTest {
      */
     @Test
     void testHandleInvalidSendDocument() {
-        sendIncompleteDocument(requestHandler);
-    }
-
-    /**
-     * Here we test the {@link IppServerRequestHandler}, if it is created with
-     * a file URI.
-     */
-    @Test
-    void testIppServerRequestHandlerFile() {
-        sendIncompleteDocument(requestHandler);
-    }
-
-    private static void sendIncompleteDocument(IppServerRequestHandler handler) {
-        HttpPost request = createHttpRequest(AbstractIppTest.readIppRequest("op", "send-document-request-invalid.ipp"));
-        HttpResponse response = createHttpResponse();
-        handler.handle(request, response);
+        HttpResponse response = handleRequest("Send-Document-invalid.bin", requestHandler);
         assertEquals(400, response.getStatusLine().getStatusCode());
         IppResponse ippResponse = IppEntity.toIppResponse(response);
         LOG.info("Received: {}", ippResponse);

@@ -18,6 +18,8 @@
 
 package j4cups.server.http;
 
+import j4cups.op.GetPrinterAttributes;
+import j4cups.op.Operation;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -48,6 +50,12 @@ public final class IppPrinterRequestHandler extends AbstractIppRequestHandler {
         IppRequest ippRequest = IppEntity.toIppRequest(request);
         LOG.info("{} received.", ippRequest.toShortString());
         IppResponse ippResponse = new IppResponse(ippRequest);
+        switch (ippRequest.getOperation()) {
+            case GET_PRINTER_ATTRIBUTES:
+                Operation op = new GetPrinterAttributes(ippRequest);
+                ippResponse = op.getIppResponse();
+                break;
+        }
         IppEntity ippEntity = new IppEntity(ippResponse);
         response.setEntity(ippEntity);
         LOG.info("Response {} is filled.", response);

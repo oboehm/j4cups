@@ -66,7 +66,7 @@ class SendDocumentTest {
     @Test
     public void validateRequest() throws IOException {
         byte[] ippRequest = FileUtils
-                .readFileToByteArray(new File("src/test/resources/j4cups/op/send-document-request-invalid.ipp"));
+                .readFileToByteArray(new File("src/test/resources/j4cups/request/Send-Document-invalid.bin"));
         Assertions.assertThrows(ValidationException.class, () -> operation.validateRequest(ippRequest));
     }
 

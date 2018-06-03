@@ -17,20 +17,11 @@
  */
 package j4cups.server.http;
 
-import j4cups.protocol.AbstractIppTest;
-import j4cups.protocol.IppRequest;
-import j4cups.protocol.IppResponse;
-import org.apache.http.HttpException;
+import j4cups.op.OperationTest;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.protocol.HttpClientContext;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link IppPrinterRequestHandler}.
@@ -41,22 +32,12 @@ final class IppPrinterRequestHandlerTest extends AbstractIppRequestHandlerTest {
     private static final IppPrinterRequestHandler handler = new IppPrinterRequestHandler();
 
     /**
-     * A simple test to see if an IPP request is handled.
-     *
-     * @throws IOException   the io exception
-     * @throws HttpException the http exception
+     * Here we test if a get-printer-attributes requests is handled correct.
      */
     @Test
-    void testHandle() throws IOException, HttpException {
-        IppRequest ippRequest = AbstractIppTest.readIppRequest("request", "Get-Printer-Attributes.bin");
-        HttpPost httpRequest = createHttpRequest(
-                ippRequest);
-        HttpResponse httpResponse = createHttpResponse();
-        handler.handle(httpRequest, httpResponse, new HttpClientContext());
-        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
-        LOG.info("httpResponse = {}", httpResponse);
-        IppResponse ippResponse = IppEntity.toIppResponse(httpResponse);
-        assertEquals(ippRequest.getRequestId(), ippResponse.getRequestId());
+    void testHandleGetPrinterAttributes() {
+        HttpResponse response = handleRequest("Get-Printer-Attributes.bin", handler);
+        OperationTest.checkIppResponse(IppEntity.toIppResponse(response), "Get-Printer-Attributes.bin");
     }
 
 }

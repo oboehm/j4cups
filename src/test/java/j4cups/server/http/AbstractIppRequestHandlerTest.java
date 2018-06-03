@@ -17,6 +17,7 @@
  */
 package j4cups.server.http;
 
+import j4cups.protocol.AbstractIppTest;
 import j4cups.protocol.IppRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.ProtocolVersion;
@@ -24,6 +25,8 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
+
+import java.io.IOException;
 
 /**
  * Class AbstractIppRequestHandlerTest.
@@ -54,6 +57,25 @@ public abstract class AbstractIppRequestHandlerTest {
         ProtocolVersion protocolVersion = new ProtocolVersion("HTTP", 1, 0);
         StatusLine statusLine = new BasicStatusLine(protocolVersion, 200, "OK");
         return new BasicHttpResponse(statusLine);
+    }
+
+
+    /**
+     * Loads a recorded request and sends it to the given handler.
+     *
+     * @param requestName name of the recorded request
+     * @param handler request handler
+     * @return response from the handler
+     */
+    protected HttpResponse handleRequest(String requestName, AbstractIppRequestHandler handler) {
+        HttpPost request = createHttpRequest(AbstractIppTest.readIppRequest("request", requestName));
+        HttpResponse response = createHttpResponse();
+        try {
+            handler.handle(request, response);
+            return response;
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("cannot handle request " + requestName, ex);
+        }
     }
 
 }
