@@ -30,15 +30,16 @@ import org.apache.http.impl.bootstrap.ServerBootstrap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
-import java.nio.file.Files;
 import java.util.concurrent.TimeUnit;
 
 /**
  * The CupsServer is a little embedded HTTP server based on Apache's HTTP
  * components. It is based on HTTP/1.1 and a classic (blocking) I/O model.
+ * It can also be used as a proxy to real CUPS server.
  *
  * @author oboehm
  * @since 0.5 (27.03.2018)
@@ -67,17 +68,14 @@ public class CupsServer implements Runnable {
     }
 
     private static URI getRecordDir() {
-        try {
-            return Files.createTempDirectory("CupsServer").toUri();
-        } catch (IOException ex) {
-            LOG.warn("Cannot create tempory directory:", ex);
-            return SystemUtils.getJavaIoTmpDir().toURI();
-        }
+        return new File(SystemUtils.getJavaIoTmpDir(), "IPP").toURI();
     }
 
     /**
      * Instantiates a CUPS server with the given IPP port. The request will be
-     * forwarded to the given forwardURI.
+     * forwarded to the given forwardURI. If the fowardURI is a file URI the
+     * server will handel the requests itself but store the results in the
+     * given directory.
      *
      * @param port e.g. 631
      * @param forwardURI CUPS server where the requests are forwarded to
@@ -108,6 +106,8 @@ public class CupsServer implements Runnable {
             CupsServer cs = new CupsServer(serverPort);
             cs.start();
             System.out.println(cs + " is started.");
+        } else if ("stop".equalsIgnoreCase(command.trim())) {
+            System.out.println("'" + command + "' is not yet supported.");
         }
     }
 
