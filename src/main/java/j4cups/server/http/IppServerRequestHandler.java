@@ -90,11 +90,10 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler {
                     case GET_JOBS:
                         LOG.info("{} received, but jobs are not (yet) stored.", ippRequest.toShortString());
                         break;
-                    case PRINT_JOB:
-                        sendToPrinter(ippRequest, response);
-                        break;
                     case SEND_DOCUMENT:
                         new SendDocument().validateRequest(ippRequest);
+                    case CREATE_JOB:
+                    case PRINT_JOB:
                         sendToPrinter(ippRequest, response);
                         break;
                     default:

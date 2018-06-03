@@ -36,14 +36,22 @@ final class IppPrinterRequestHandlerTest extends AbstractIppRequestHandlerTest {
 
     @Test
     void testHandleGetPrinterAttributes() {
-        HttpResponse response = handleRequest("Get-Printer-Attributes.bin", handler);
-        OperationTest.checkIppResponse(IppEntity.toIppResponse(response), "Get-Printer-Attributes.bin");
+        checkHandle("Get-Printer-Attributes.bin");
     }
 
     @Test
     void testHandlePrintJob() {
-        HttpResponse response = handleRequest("Print-Job.bin", handler);
-        OperationTest.checkIppResponse(IppEntity.toIppResponse(response), "Print-Job.bin");
+        checkHandle("Print-Job.bin");
+    }
+
+    @Test
+    void testHandleSendDocument() {
+        checkHandle("Send-Document.bin");
+    }
+
+    private void checkHandle(String filename) {
+        HttpResponse response = handleRequest(filename, handler);
+        OperationTest.checkIppResponse(IppEntity.toIppResponse(response), filename);
     }
 
 }

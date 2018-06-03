@@ -61,14 +61,9 @@ public class IppHandlerTest extends AbstractServerTest {
     private IppHandler ippHandler;
 
     @BeforeAll
-    static void setUpCupsURI() {
-        Path spoolDir = Paths.get("target");
-        forwardURI = spoolDir.toUri();
-        String cupsProp = System.getProperty("forwardURI");
-        if (cupsProp != null) {
-            forwardURI = URI.create(cupsProp);
-        }
-        testPrinterUri = URI.create(System.getProperty("printerURI", "http://localhost:631/printers/text"));
+    static void setUpURIs() {
+        forwardURI = Paths.get("target", "IPP").toUri();
+        testPrinterUri = URI.create(System.getProperty("printerURI", "http://localhost:80/printers/text"));
     }
     
     @BeforeEach

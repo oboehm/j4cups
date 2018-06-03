@@ -18,9 +18,7 @@
 
 package j4cups.server.http;
 
-import j4cups.op.GetPrinterAttributes;
-import j4cups.op.Operation;
-import j4cups.op.PrintJob;
+import j4cups.op.*;
 import j4cups.protocol.AbstractIpp;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
@@ -84,10 +82,17 @@ public final class IppPrinterRequestHandler extends AbstractIppRequestHandler {
             case GET_PRINTER_ATTRIBUTES:
                 ippResponse = handleGetPrinterAttributes(ippRequest);
                 break;
+            case CREATE_JOB:
+                ippResponse = handleCreateJob(ippRequest);
+                break;
             case PRINT_JOB:
                 ippResponse = handlePrintJob(ippRequest);
                 break;
+            case SEND_DOCUMENT:
+                ippResponse = handleSendDocument(ippRequest);
+                break;
         }
+        ippResponse.setRequestId(ippRequest.getRequestId());
         IppEntity ippEntity = new IppEntity(ippResponse);
         response.setEntity(ippEntity);
         ippResponse.recordTo(recordDir);
@@ -99,9 +104,22 @@ public final class IppPrinterRequestHandler extends AbstractIppRequestHandler {
         return op.getIppResponse();
     }
 
+    private IppResponse handleCreateJob(IppRequest ippRequest) {
+        CreateJob op = new CreateJob(ippRequest);
+        setJobId(op);
+        return op.getIppResponse();
+    }
+
     private IppResponse handlePrintJob(IppRequest ippRequest) {
+        return handle(new PrintJob(), ippRequest);
+    }
+
+    private IppResponse handleSendDocument(IppRequest ippRequest) {
+        return handle(new SendDocument(), ippRequest);
+    }
+
+    private IppResponse handle(Operation op, IppRequest ippRequest) {
         recordData(ippRequest);
-        PrintJob op = new PrintJob();
         setJobId(op);
         URI printerURI = ippRequest.getPrinterURI();
         op.setPrinterURI(printerURI);
@@ -126,9 +144,8 @@ public final class IppPrinterRequestHandler extends AbstractIppRequestHandler {
 
     private void recordData(IppRequest ippRequest) {
         URI printerURI = ippRequest.getPrinterURI();
-        Path dataDir = Paths.get(recordDir.toString(), "data");
-        String filename = StringUtils.substringAfterLast(printerURI.getPath(), "/") + "-"
-                + ippRequest.getAttribute("job-name").getStringValue() + ".data";
+        Path dataDir = Paths.get(recordDir.toString(), "data", StringUtils.substringAfterLast(printerURI.getPath(), "/"));
+        String filename = ippRequest.getAttribute("job-name").getStringValue() + ".data";
         AbstractIpp.recordTo(dataDir, ippRequest.getData(), filename);
     }
 

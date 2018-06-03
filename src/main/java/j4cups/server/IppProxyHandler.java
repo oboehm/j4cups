@@ -23,11 +23,13 @@ import j4cups.op.GetPrinterAttributes;
 import j4cups.op.Operation;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * The class IppProxyHandler forwards the requests to a real CUPS server and
@@ -49,7 +51,7 @@ public class IppProxyHandler extends IppHandler {
      * @param cupsURI the CUPS URI
      */
     public IppProxyHandler(URI cupsURI) {
-        super(cupsURI);
+        super(Paths.get(SystemUtils.getJavaIoTmpDir().toString(), "IPP"));
         this.cupsClient = new CupsClient(cupsURI);
     }
     /**

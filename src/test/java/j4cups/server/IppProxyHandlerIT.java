@@ -17,6 +17,8 @@
  */
 package j4cups.server;
 
+import java.net.URI;
+
 /**
  * Integration tests for {@link IppProxyHandler}. For tests with a real I used
  * http://localhost:631/printers/Brother_MFC_J5910DW_2 in my local home
@@ -35,7 +37,8 @@ public class IppProxyHandlerIT extends IppHandlerTest {
 
     @Override
     protected IppHandler getIppHandler() {
-        return new IppProxyHandler(forwardURI);
+        URI cupsURI = URI.create(System.getProperty("cupsURI", "http://localhost:631"));
+        return new IppProxyHandler(cupsURI);
     }
 
 }

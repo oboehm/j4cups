@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -37,18 +38,25 @@ final class IppPrinterRequestHandlerIT extends AbstractIppRequestHandlerTest {
     private static final Logger LOG = LoggerFactory.getLogger(IppPrinterRequestHandlerIT.class);
     private static CupsServer cupsServer;
     private static CupsClient cupsClient;
+    private static URI printerURI;
 
     @BeforeAll
     static void startCupsServer() {
         cupsServer = AbstractServerTest.startServer();
         LOG.info("{} was started.", cupsServer);
         cupsClient = new CupsClient(URI.create("http://localhost:" + cupsServer.getPort()));
+        printerURI = URI.create("http://localhost:" + cupsServer.getPort() + "/printers/test-printer");
     }
 
     @Test
     void testPrintJob() {
-        URI printerURI = URI.create("http://localhost:" + cupsServer.getPort() + "/printers/test-printer");
         cupsClient.print(printerURI, Paths.get("src", "test", "resources", "j4cups", "test.txt"));
+    }
+
+    @Test
+    void testSendDocuments() {
+        Path testFile = Paths.get("src", "test", "resources", "j4cups", "test.txt");
+        cupsClient.print(printerURI, testFile, testFile);
     }
 
     @AfterAll

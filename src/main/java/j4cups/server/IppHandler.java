@@ -159,6 +159,7 @@ public class IppHandler {
     public IppResponse send(IppRequest ippRequest) {
         ippRequest.recordTo(recordDir);
         IppResponse ippResponse = new IppResponse(ippRequest);
+        ippResponse.setRequestId(ippRequest.getRequestId());
         ippResponse.recordTo(recordDir);
         return ippResponse;
     }
