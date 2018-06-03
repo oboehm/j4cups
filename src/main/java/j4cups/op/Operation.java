@@ -198,6 +198,15 @@ public class Operation {
     }
 
     /**
+     * Sets the given job attribute in the generated IPP request.
+     *
+     * @param attribute operation attribute
+     */
+    public void setJobAttribute(Attribute attribute) {
+        ippRequest.setJobAttribute(attribute);
+    }
+
+    /**
      * Looks if the given bytes represents a valid request. If not an
      * {@link ValidationException} will be thrown
      * 

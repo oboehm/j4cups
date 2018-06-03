@@ -56,6 +56,7 @@ public class PrintJob extends Operation {
         request.setJobAttribute(Attribute.of("copies", 1));
         request.setJobAttribute(Attribute.of(ValueTags.ENUM, "orientation-requested", 3));
         request.setJobAttribute(Attribute.of(ValueTags.KEYWORD, "output-mode", "monochrome"));
+        request.setJobAttribute(Attribute.of(ValueTags.KEYWORD, "job-state-reasons", "none"));
         return request;
     }
 

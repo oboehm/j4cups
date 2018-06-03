@@ -19,9 +19,7 @@ package j4cups.server.http;
 
 import j4cups.protocol.AbstractIppTest;
 import j4cups.protocol.IppRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.StatusLine;
+import org.apache.http.*;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
@@ -43,7 +41,8 @@ public abstract class AbstractIppRequestHandlerTest {
      * @return POST request with IPP data inside
      */
     protected static HttpPost createHttpRequest(IppRequest ippRequest) {
-        HttpPost request = new HttpPost();
+        HttpPost request = new HttpTestRequest();
+        request.setHeader("Host", "localhost:4711");
         request.setEntity(new IppEntity(ippRequest));
         return request;
     }
@@ -75,6 +74,29 @@ public abstract class AbstractIppRequestHandlerTest {
             return response;
         } catch (IOException ex) {
             throw new IllegalArgumentException("cannot handle request " + requestName, ex);
+        }
+    }
+
+    static class HttpTestRequest extends HttpPost {
+        public HttpTestRequest() {
+            super();
+        }
+        @Override
+        public RequestLine getRequestLine() {
+            return new RequestLine() {
+                @Override
+                public String getMethod() {
+                    return "POST";
+                }
+                @Override
+                public ProtocolVersion getProtocolVersion() {
+                    return new HttpVersion(1, 1);
+                }
+                @Override
+                public String getUri() {
+                    return "/printers/test-printer";
+                }
+            };
         }
     }
 

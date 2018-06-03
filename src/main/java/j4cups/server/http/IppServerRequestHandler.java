@@ -17,6 +17,7 @@
  */
 package j4cups.server.http;
 
+import j4cups.client.CupsClient;
 import j4cups.op.SendDocument;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
@@ -88,12 +89,18 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler {
                 switch (ippRequest.getOperation()) {
                     case GET_JOBS:
                         LOG.info("{} received, but jobs are not (yet) stored.", ippRequest.toShortString());
-                        return;
+                        break;
+                    case PRINT_JOB:
+                        sendToPrinter(ippRequest, response);
+                        break;
                     case SEND_DOCUMENT:
                         new SendDocument().validateRequest(ippRequest);
+                        sendToPrinter(ippRequest, response);
+                        break;
+                    default:
+                        send(ippRequest, response);
                         break;
                 }
-                send(ippRequest, response);
             } catch (ValidationException ex) {
                 handleException(ippRequest, response, ex);
             }
@@ -106,6 +113,12 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler {
 
     private void send(IppRequest ippRequest, HttpResponse response) {
         IppResponse cupsResponse = ippHandler.send(ippRequest);
+        response.setEntity(new IppEntity(cupsResponse));
+    }
+
+    private void sendToPrinter(IppRequest ippRequest, HttpResponse response) {
+        CupsClient printerClient = new CupsClient(ippRequest.getPrinterURI());
+        IppResponse cupsResponse = printerClient.send(ippRequest);
         response.setEntity(new IppEntity(cupsResponse));
     }
 

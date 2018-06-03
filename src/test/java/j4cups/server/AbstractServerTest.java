@@ -49,7 +49,7 @@ public abstract class AbstractServerTest {
     /**
      * For the unit tests we can start the server here.
      */
-    protected static void startServer() {
+    public static CupsServer startServer() {
         int port = 1024 + (int) (System.currentTimeMillis() % 8000);
         while (isOnline("localhost", port)) {
             port++;
@@ -58,6 +58,7 @@ public abstract class AbstractServerTest {
         assertFalse(cupsServer.isStarted());
         cupsServer.start();
         LOG.info("{} is started.", cupsServer);
+        return cupsServer;
     }
 
     /**
@@ -144,4 +145,5 @@ public abstract class AbstractServerTest {
             LOG.info("{} is offline (as expected).", cupsServer);
         }
     }
+
 }

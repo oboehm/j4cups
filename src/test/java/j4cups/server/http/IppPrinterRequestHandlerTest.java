@@ -23,21 +23,27 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Paths;
+
 /**
  * Unit tests for {@link IppPrinterRequestHandler}.
  */
 final class IppPrinterRequestHandlerTest extends AbstractIppRequestHandlerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppPrinterRequestHandlerTest.class);
-    private static final IppPrinterRequestHandler handler = new IppPrinterRequestHandler();
+    private static final IppPrinterRequestHandler handler = new IppPrinterRequestHandler(
+            Paths.get("target", "IPP", "printer"));
 
-    /**
-     * Here we test if a get-printer-attributes requests is handled correct.
-     */
     @Test
     void testHandleGetPrinterAttributes() {
         HttpResponse response = handleRequest("Get-Printer-Attributes.bin", handler);
         OperationTest.checkIppResponse(IppEntity.toIppResponse(response), "Get-Printer-Attributes.bin");
+    }
+
+    @Test
+    void testHandlePrintJob() {
+        HttpResponse response = handleRequest("Print-Job.bin", handler);
+        OperationTest.checkIppResponse(IppEntity.toIppResponse(response), "Print-Job.bin");
     }
 
 }

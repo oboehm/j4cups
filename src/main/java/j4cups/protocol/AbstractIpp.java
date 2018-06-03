@@ -174,12 +174,21 @@ public abstract class AbstractIpp implements Externalizable {
     }
 
     private void recordTo(Path logDir, byte[] bytes) {
+        recordTo(logDir, bytes, this.getClass().getSimpleName() + this.getRequestId() + this.getOpCodeAsString() + ".ipp");
+    }
+
+    /**
+     * This method is public because it is used also by other methods.
+     *
+     * @param logDir logging directory
+     * @param bytes  data to be recorded
+     * @param name   suffix, which is used as filename
+     */
+    public static void recordTo(Path logDir, byte[] bytes, String name) {
         try {
             Files.createDirectories(logDir);
             Path logFile = Paths.get(logDir.toString(),
-                    Long.toString(System.currentTimeMillis(), Character.MAX_RADIX) + "-" +
-                            this.getClass().getSimpleName() + this.getRequestId() + this.getOpCodeAsString() +
-                            ".bin");
+                    Long.toString(System.currentTimeMillis(), Character.MAX_RADIX) + "-" + name);
             Files.write(logFile, bytes);
             LOG.info("IPP package with {} bytes is recorded to '{}'.", bytes.length, logFile);
         } catch (IOException ioe) {

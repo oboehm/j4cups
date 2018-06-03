@@ -20,14 +20,20 @@ package j4cups.server.http;
 
 import j4cups.op.GetPrinterAttributes;
 import j4cups.op.Operation;
+import j4cups.op.PrintJob;
+import j4cups.protocol.AbstractIpp;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
+import j4cups.protocol.attr.Attribute;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -42,6 +48,7 @@ public final class IppPrinterRequestHandler extends AbstractIppRequestHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppPrinterRequestHandler.class);
     private final Path recordDir;
+    private int jobId;
 
     /**
      * Instantiates the request handler for the printer emulation. The requests
@@ -75,14 +82,62 @@ public final class IppPrinterRequestHandler extends AbstractIppRequestHandler {
         IppResponse ippResponse = new IppResponse(ippRequest);
         switch (ippRequest.getOperation()) {
             case GET_PRINTER_ATTRIBUTES:
-                Operation op = new GetPrinterAttributes(ippRequest);
-                ippResponse = op.getIppResponse();
+                ippResponse = handleGetPrinterAttributes(ippRequest);
+                break;
+            case PRINT_JOB:
+                ippResponse = handlePrintJob(ippRequest);
                 break;
         }
         IppEntity ippEntity = new IppEntity(ippResponse);
         response.setEntity(ippEntity);
         ippResponse.recordTo(recordDir);
         LOG.info("Response {} is filled.", response);
+    }
+
+    private IppResponse handleGetPrinterAttributes(IppRequest ippRequest) {
+        Operation op = new GetPrinterAttributes(ippRequest);
+        return op.getIppResponse();
+    }
+
+    private IppResponse handlePrintJob(IppRequest ippRequest) {
+        recordData(ippRequest);
+        PrintJob op = new PrintJob();
+        setJobId(op);
+        URI printerURI = ippRequest.getPrinterURI();
+        op.setPrinterURI(printerURI);
+        URI jobURI = getJobUriFrom(printerURI);
+        op.setJobAttribute(Attribute.of("job-uri", jobURI));
+        return op.getIppResponse();
+    }
+
+    private URI getJobUriFrom(URI printerURI) {
+        try {
+            return new URI("ipp", null, printerURI.getHost(), printerURI.getPort(),  "/jobs/" + jobId, null, null);
+        } catch (URISyntaxException ex) {
+            LOG.warn("Cannot build job-URI from {}:", printerURI, ex);
+            return printerURI;
+        }
+    }
+
+    private void setJobId(Operation op) {
+        jobId++;
+        op.setJobId(jobId);
+    }
+
+    private void recordData(IppRequest ippRequest) {
+        URI printerURI = ippRequest.getPrinterURI();
+        Path dataDir = Paths.get(recordDir.toString(), "data");
+        String filename = StringUtils.substringAfterLast(printerURI.getPath(), "/") + "-"
+                + ippRequest.getAttribute("job-name").getStringValue() + ".data";
+        AbstractIpp.recordTo(dataDir, ippRequest.getData(), filename);
+    }
+
+    private void recordData(HttpEntityEnclosingRequest request) {
+        IppRequest ippRequest = IppEntity.toIppRequest(request);
+        URI printerURI = ippRequest.getPrinterURI();
+        Path dataDir = Paths.get(recordDir.toString(), "data");
+        String filename = printerURI.getPath() + "-" + ippRequest.getAttribute("job-name") + ".data";
+        AbstractIpp.recordTo(dataDir, ippRequest.getData(), filename);
     }
 
 }
