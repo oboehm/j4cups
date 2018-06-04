@@ -73,7 +73,7 @@ public class IppProxyHandler extends IppHandler {
      */
     public IppResponse getJobs(URI printerURI) {
         GetJobs op = new GetJobs();
-        return send(op, printerURI);
+        return sendTo(printerURI, op);
     }
 
     /**
@@ -119,10 +119,10 @@ public class IppProxyHandler extends IppHandler {
      */
     public IppResponse getPrinterAttributes(URI printerURI) {
         Operation op = new GetPrinterAttributes();
-        return send(op, printerURI);
+        return sendTo(printerURI, op);
     }
 
-    private IppResponse send(Operation op, URI printerURI) {
+    private IppResponse sendTo(URI printerURI, Operation op) {
         op.setPrinterURI(printerURI);
         return cupsClient.send(op);
     }
