@@ -18,9 +18,7 @@
 package j4cups.client;
 
 import j4cups.op.OperationTest;
-import j4cups.protocol.IppRequestException;
-import j4cups.protocol.IppResponse;
-import j4cups.protocol.StatusCode;
+import j4cups.protocol.*;
 import j4cups.server.AbstractServerTest;
 import j4cups.server.IppHandlerTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -103,6 +101,13 @@ final class CupsClientIT {
             LOG.warn("Cannot cancel job {}: {}", jobId, ex);
         }
     }
+    
+    @Test
+    void testGetPrinters() {
+        IppRequest ippRequest = AbstractIppTest.readIppRequest("request", "Get-Printers.bin");
+        IppResponse ippResponse = cupsClient.send(ippRequest);
+        assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
+    }
 
     private static URI getPrinterURI() {
         String printer = System.getProperty("printerURI");
@@ -118,7 +123,7 @@ final class CupsClientIT {
      * @return your CupsClient for testing
      */
     public static CupsClient getCupsClient() {
-        URI cupsURI = URI.create(System.getProperty("forwardURI", "http://localhost:631"));
+        URI cupsURI = URI.create(System.getProperty("cupsURI", "http://localhost:631"));
         assumeTrue(AbstractServerTest.isOnline(cupsURI),
                 cupsURI + " is offline - use '-DcupsURI=...' to use another CUPS");
         return new CupsClient(cupsURI);

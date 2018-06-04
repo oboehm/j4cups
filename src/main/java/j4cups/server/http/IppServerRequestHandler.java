@@ -18,7 +18,9 @@
 package j4cups.server.http;
 
 import j4cups.client.CupsClient;
+import j4cups.op.Operation;
 import j4cups.op.SendDocument;
+import j4cups.protocol.IppOperations;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
@@ -97,7 +99,8 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler {
                         sendToPrinter(ippRequest, response);
                         break;
                     case GET_PRINTERS:
-                        throw new UnsupportedOperationException(ippRequest.getOperation() + " not yet supported");
+                        handleGetPrinters(ippRequest, response);
+                        break;
                     default:
                         send(ippRequest, response);
                         break;
@@ -110,6 +113,12 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler {
             LOG.warn("Status code is set to {} because too less bytes were received.", HttpStatus.SC_BAD_REQUEST);
             LOG.debug("Details:", ex);
         }
+    }
+
+    private void handleGetPrinters(IppRequest ippRequest, HttpResponse response) {
+        Operation op = new Operation(IppOperations.GET_PRINTERS);
+        op.setIppRequestId(ippRequest.getRequestId());
+        response.setEntity(new IppEntity(op.getIppResponse()));
     }
 
     private void send(IppRequest ippRequest, HttpResponse response) {
