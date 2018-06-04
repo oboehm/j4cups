@@ -174,7 +174,8 @@ public abstract class AbstractIpp implements Externalizable {
     }
 
     private void recordTo(Path logDir, byte[] bytes) {
-        recordTo(logDir, bytes, this.getClass().getSimpleName() + this.getRequestId() + this.getOpCodeAsString() + ".ipp");
+        recordTo(logDir, bytes,
+                this.getClass().getSimpleName() + this.getRequestId() + "-" + this.getOpCodeAsString() + ".ipp");
     }
 
     /**

@@ -96,6 +96,8 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler {
                     case PRINT_JOB:
                         sendToPrinter(ippRequest, response);
                         break;
+                    case GET_PRINTERS:
+                        throw new UnsupportedOperationException(ippRequest.getOperation() + " not yet supported");
                     default:
                         send(ippRequest, response);
                         break;
