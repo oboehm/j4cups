@@ -18,14 +18,14 @@
 package j4cups.server.http;
 
 import j4cups.client.CupsClient;
-import j4cups.op.Operation;
+import j4cups.op.GetPrinters;
 import j4cups.op.SendDocument;
-import j4cups.protocol.IppOperations;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
 import j4cups.server.IppHandler;
 import j4cups.server.IppProxyHandler;
+import org.apache.http.Header;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -99,7 +99,7 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler {
                         sendToPrinter(ippRequest, response);
                         break;
                     case GET_PRINTERS:
-                        handleGetPrinters(ippRequest, response);
+                        handleGetPrinters(request, response);
                         break;
                     default:
                         send(ippRequest, response);
@@ -115,9 +115,13 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler {
         }
     }
 
-    private void handleGetPrinters(IppRequest ippRequest, HttpResponse response) {
-        Operation op = new Operation(IppOperations.GET_PRINTERS);
+    private void handleGetPrinters(HttpEntityEnclosingRequest request, HttpResponse response) {
+        GetPrinters op = new GetPrinters();
+        IppRequest ippRequest = IppEntity.toIppRequest(request);
         op.setIppRequestId(ippRequest.getRequestId());
+        Header[] hosts = request.getHeaders("Host");
+        URI printerSupported = URI.create("http://" + hosts[0].getValue() + "/printers/test-printer");
+        op.addPrinter(printerSupported);
         response.setEntity(new IppEntity(op.getIppResponse()));
     }
 

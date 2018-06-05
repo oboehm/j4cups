@@ -17,6 +17,7 @@
  */
 package j4cups.server.http;
 
+import j4cups.op.OperationTest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
 import org.apache.http.HttpEntity;
@@ -87,6 +88,7 @@ class IppServerRequestHandlerTest extends AbstractIppRequestHandlerTest {
     void testHandleGetPrinters() {
         HttpResponse response = handleRequest("Get-Printers.bin", requestHandler);
         assertEquals(200, response.getStatusLine().getStatusCode());
+        OperationTest.checkIppResponse(IppEntity.toIppResponse(response), "Get-Printers.bin");
     }
 
 }

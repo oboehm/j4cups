@@ -395,6 +395,17 @@ public abstract class AbstractIpp implements Externalizable {
     }
 
     /**
+     * Adds the given group. I.e. group of 'printer-attributs-tag' can be
+     * set several times.
+     *
+     * @param group the group
+     * @since 0.5
+     */
+    public void addAttributeGroup(AttributeGroup group) {
+        attributeGroups.add(group);
+    }
+    
+    /**
      * Returns all attributes of the given delimiter-tag.
      * 
      * @param tag the delimiter-tag
