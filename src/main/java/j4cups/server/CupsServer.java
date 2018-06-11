@@ -146,8 +146,9 @@ public class CupsServer implements Runnable {
      */
     public void run() {
         try {
-            LOG.info("Starting {} on port {}...", server, port);
+            LOG.debug("Starting {} on port {}...", server, port);
             server.start();
+            LOG.info("{} is successful started.", this);
             server.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
             Runtime.getRuntime().addShutdownHook(new Thread(() -> server.shutdown(5, TimeUnit.SECONDS)));
         } catch (IOException ioe) {
