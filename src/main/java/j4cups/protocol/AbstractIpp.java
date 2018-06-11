@@ -193,7 +193,7 @@ public abstract class AbstractIpp implements Externalizable {
             Files.write(logFile, bytes);
             LOG.info("IPP package with {} bytes is recorded to '{}'.", bytes.length, logFile);
         } catch (IOException ioe) {
-            LOG.debug("Cannot record {} bytes to temporary log file.", ioe);
+            LOG.info("Cannot record {} bytes to temporary log file {}.", name, ioe);
             LOG.trace(DatatypeConverter.printHexBinary(bytes));
         }
     }

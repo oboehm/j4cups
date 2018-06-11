@@ -45,7 +45,7 @@ public class GetPrinters extends Operation {
     /**
      * Adds a printer into the response.
      *
-     * @param supported the supported
+     * @param supported the supported printer
      */
     public void addPrinter(URI supported) {
         AttributeGroup printerGroup = new AttributeGroup(DelimiterTags.PRINTER_ATTRIBUTES_TAG);

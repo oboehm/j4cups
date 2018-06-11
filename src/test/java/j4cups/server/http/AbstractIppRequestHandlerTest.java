@@ -67,13 +67,25 @@ public abstract class AbstractIppRequestHandlerTest {
      * @return response from the handler
      */
     protected HttpResponse handleRequest(String requestName, AbstractIppRequestHandler handler) {
-        HttpPost request = createHttpRequest(AbstractIppTest.readIppRequest("request", requestName));
+        IppRequest ippRequest = AbstractIppTest.readIppRequest("request", requestName);
+        return handleRequest(ippRequest, handler);
+    }
+
+    /**
+     * Sends a prepared request to the given handler.
+     *
+     * @param ippRequest prepared request
+     * @param handler request handler
+     * @return response from the handler
+     */
+    protected HttpResponse handleRequest(IppRequest ippRequest, AbstractIppRequestHandler handler) {
+        HttpPost request = createHttpRequest(ippRequest);
         HttpResponse response = createHttpResponse();
         try {
             handler.handle(request, response);
             return response;
         } catch (IOException ex) {
-            throw new IllegalArgumentException("cannot handle request " + requestName, ex);
+            throw new IllegalArgumentException("cannot handle request " + ippRequest, ex);
         }
     }
 

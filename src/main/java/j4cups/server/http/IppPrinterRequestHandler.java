@@ -23,6 +23,7 @@ import j4cups.protocol.AbstractIpp;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.attr.Attribute;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -145,15 +146,8 @@ public final class IppPrinterRequestHandler extends AbstractIppRequestHandler {
     private void recordData(IppRequest ippRequest) {
         URI printerURI = ippRequest.getPrinterURI();
         Path dataDir = Paths.get(recordDir.toString(), "data", StringUtils.substringAfterLast(printerURI.getPath(), "/"));
-        String filename = ippRequest.getAttribute("job-name").getStringValue() + ".data";
-        AbstractIpp.recordTo(dataDir, ippRequest.getData(), filename);
-    }
-
-    private void recordData(HttpEntityEnclosingRequest request) {
-        IppRequest ippRequest = IppEntity.toIppRequest(request);
-        URI printerURI = ippRequest.getPrinterURI();
-        Path dataDir = Paths.get(recordDir.toString(), "data");
-        String filename = printerURI.getPath() + "-" + ippRequest.getAttribute("job-name") + ".data";
+        String filename = FilenameUtils.normalize(ippRequest.getAttribute("job-name").getStringValue() + ".data", true);
+        filename = StringUtils.removeAll(filename, "/");
         AbstractIpp.recordTo(dataDir, ippRequest.getData(), filename);
     }
 

@@ -18,11 +18,14 @@
 package j4cups.server.http;
 
 import j4cups.op.OperationTest;
+import j4cups.protocol.AbstractIppTest;
+import j4cups.protocol.IppRequest;
 import org.apache.http.HttpResponse;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
 /**
@@ -52,6 +55,14 @@ final class IppPrinterRequestHandlerTest extends AbstractIppRequestHandlerTest {
     private void checkHandle(String filename) {
         HttpResponse response = handleRequest(filename, handler);
         OperationTest.checkIppResponse(IppEntity.toIppResponse(response), filename);
+    }
+    
+    @Test
+    void testRecordData() {
+        IppRequest ippRequest = AbstractIppTest.readIppRequest("request", "Send-Document.bin");
+        ippRequest.setAttribute("job-name", "test/PgMz\\G".getBytes(StandardCharsets.UTF_8));
+        HttpResponse response = handleRequest(ippRequest, handler);
+        OperationTest.checkIppResponse(IppEntity.toIppResponse(response), "Send-Document.bin");
     }
 
 }
