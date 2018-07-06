@@ -58,16 +58,37 @@ class SendDocumentTest {
     }
 
     /**
-     * The recorded request which is used for this test results in an 0x0400
-     * status code. So it is not a valid send-document request.
-     * 
-     * @throws IOException may happen
+     * This is a valid request. No Exception should be thrown.
      */
     @Test
-    public void validateRequest() throws IOException {
-        byte[] ippRequest = FileUtils
-                .readFileToByteArray(new File("src/test/resources/j4cups/request/Send-Document-invalid.bin"));
-        Assertions.assertThrows(ValidationException.class, () -> operation.validateRequest(ippRequest));
+    void testValidateRequest() {
+        checkValidateRequest("Send-Document.ipp");
     }
 
+    /**
+     * The recorded request which is used for this test results in an 0x0400
+     * status code. So it is not a valid send-document request.
+     */
+    @Test
+    void testInvalidRequest() {
+        Assertions.assertThrows(ValidationException.class, () -> checkValidateRequest("Send-Document-400.ipp"));
+    }
+
+    /**
+     * The recorded requests causes an 401 error on MacOS.
+     */
+    @Test
+    void testForbiddenRequest() {
+        Assertions.assertThrows(RuntimeException.class, () -> checkValidateRequest("Send-Document-401.ipp"));
+    }
+
+    private void checkValidateRequest(String recorded) {
+        try {
+            byte[] ippRequest = FileUtils.readFileToByteArray(new File("src/test/resources/j4cups/request/" + recorded));
+            operation.validateRequest(ippRequest);
+        } catch (IOException ioe) {
+            throw new IllegalArgumentException("cannot read '" + recorded + "'");
+        }
+    }
+    
 }

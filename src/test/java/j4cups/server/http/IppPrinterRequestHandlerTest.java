@@ -49,7 +49,7 @@ final class IppPrinterRequestHandlerTest extends AbstractIppRequestHandlerTest {
 
     @Test
     void testHandleSendDocument() {
-        checkHandle("Send-Document.bin");
+        checkHandle("Send-Document.ipp");
     }
 
     private void checkHandle(String filename) {
@@ -59,10 +59,10 @@ final class IppPrinterRequestHandlerTest extends AbstractIppRequestHandlerTest {
     
     @Test
     void testRecordData() {
-        IppRequest ippRequest = AbstractIppTest.readIppRequest("request", "Send-Document.bin");
+        IppRequest ippRequest = AbstractIppTest.readIppRequest("request", "Send-Document.ipp");
         ippRequest.setAttribute("job-name", "test/PgMz\\G".getBytes(StandardCharsets.UTF_8));
         HttpResponse response = handleRequest(ippRequest, handler);
-        OperationTest.checkIppResponse(IppEntity.toIppResponse(response), "Send-Document.bin");
+        OperationTest.checkIppResponse(IppEntity.toIppResponse(response), "Send-Document.ipp");
     }
 
 }

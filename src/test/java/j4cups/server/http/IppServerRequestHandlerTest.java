@@ -77,7 +77,7 @@ class IppServerRequestHandlerTest extends AbstractIppRequestHandlerTest {
      */
     @Test
     void testHandleInvalidSendDocument() {
-        HttpResponse response = handleRequest("Send-Document-invalid.bin", requestHandler);
+        HttpResponse response = handleRequest("Send-Document-400.ipp", requestHandler);
         assertEquals(400, response.getStatusLine().getStatusCode());
         IppResponse ippResponse = IppEntity.toIppResponse(response);
         LOG.info("Received: {}", ippResponse);

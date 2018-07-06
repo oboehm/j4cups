@@ -26,6 +26,7 @@ import j4cups.protocol.attr.PrinterResolution;
 import j4cups.protocol.enums.JobState;
 import j4cups.protocol.enums.JobStateReasons;
 import j4cups.protocol.enums.PrintQuality;
+import j4cups.protocol.tags.DelimiterTags;
 import j4cups.protocol.tags.ValueTags;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -37,7 +38,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * This is the common super class of all IPP operations.
@@ -282,6 +285,14 @@ public class Operation {
     public void validateRequest(IppRequest request) {
         if (request.getOperation() != id) {
             throw new ValidationException("not a " + id + " request:" + request);
+        }
+        Set<DelimiterTags> tags = new HashSet<>();
+        for (AttributeGroup group : request.getAttributeGroups()) {
+            DelimiterTags beginTag = group.getBeginTag();
+            if (tags.contains(beginTag)) {
+                throw new ValidationException("multiple '" + beginTag + "' in request: " + request);
+            }
+            tags.add(beginTag);
         }
     }
 
