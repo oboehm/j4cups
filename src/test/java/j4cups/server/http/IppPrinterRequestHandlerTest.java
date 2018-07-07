@@ -37,6 +37,11 @@ final class IppPrinterRequestHandlerTest extends AbstractIppRequestHandlerTest {
     private static final IppPrinterRequestHandler handler = new IppPrinterRequestHandler(
             Paths.get("target", "IPP", "printer"));
 
+    @Override
+    protected AbstractIppRequestHandler getRequestHandler() {
+        return handler;
+    }
+    
     @Test
     void testHandleGetPrinterAttributes() {
         checkHandle("Get-Printer-Attributes.bin");
@@ -56,7 +61,7 @@ final class IppPrinterRequestHandlerTest extends AbstractIppRequestHandlerTest {
         HttpResponse response = handleRequest(filename, handler);
         OperationTest.checkIppResponse(IppEntity.toIppResponse(response), filename);
     }
-    
+
     @Test
     void testRecordData() {
         IppRequest ippRequest = AbstractIppTest.readIppRequest("request", "Send-Document.ipp");

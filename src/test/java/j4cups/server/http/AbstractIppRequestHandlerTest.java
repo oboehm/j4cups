@@ -19,12 +19,21 @@ package j4cups.server.http;
 
 import j4cups.protocol.AbstractIppTest;
 import j4cups.protocol.IppRequest;
+import j4cups.protocol.IppResponse;
+import j4cups.protocol.StatusCode;
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Class AbstractIppRequestHandlerTest.
@@ -33,6 +42,35 @@ import java.io.IOException;
  * @since 01.05.18
  */
 public abstract class AbstractIppRequestHandlerTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractIppRequestHandlerTest.class);
+    
+    /**
+     * This method should be overridden by subclass to get the request handler
+     * for testing.
+     * 
+     * @return request handler for testing
+     */
+    protected abstract AbstractIppRequestHandler getRequestHandler();
+
+    /**
+     * This is a replay of a send-document request with a duplicate
+     * operation-attribute-groups section.
+     */
+    @Test
+    void testHandleSendDocumentWithDuplicateGroup() {
+        IppResponse ippResponse = checkHandleRequest400("Send-Document-401.ipp");
+        assertThat(ippResponse.getStatusMessage(), containsString("operation-attributes-tag"));
+    }
+
+    protected IppResponse checkHandleRequest400(String requestName) {
+        HttpResponse response = handleRequest(requestName, getRequestHandler());
+        assertEquals(400, response.getStatusLine().getStatusCode());
+        IppResponse ippResponse = IppEntity.toIppResponse(response);
+        LOG.info("Received: {}", ippResponse);
+        assertEquals(StatusCode.CLIENT_ERROR_BAD_REQUEST, ippResponse.getStatusCode());
+        return ippResponse;
+    }
 
     /**
      * Creates an POST request for testing.

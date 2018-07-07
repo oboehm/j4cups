@@ -19,7 +19,6 @@ package j4cups.server.http;
 
 import j4cups.op.OperationTest;
 import j4cups.protocol.IppResponse;
-import j4cups.protocol.StatusCode;
 import j4cups.protocol.attr.Attribute;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
@@ -47,6 +46,11 @@ class IppServerRequestHandlerTest extends AbstractIppRequestHandlerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppServerRequestHandlerTest.class);
     private final IppServerRequestHandler requestHandler = new IppServerRequestHandler(Paths.get("target").toUri());
+
+    @Override
+    protected AbstractIppRequestHandler getRequestHandler() {
+        return requestHandler;
+    }
 
     /**
      * For a first simple test we just call the handle method with an invalid
@@ -80,26 +84,7 @@ class IppServerRequestHandlerTest extends AbstractIppRequestHandlerTest {
         IppResponse ippResponse = checkHandleRequest400("Send-Document-400.ipp");
         assertThat(ippResponse.getStatusMessage(), containsString("job-id"));
     }
-
-    /**
-     * This is a replay of a send-document request with a duplicate
-     * operation-attribute-groups section.
-     */
-    @Test
-    void testHandleSendDocumentWithDuplicateGroup() {
-        IppResponse ippResponse = checkHandleRequest400("Send-Document-401.ipp");
-        assertThat(ippResponse.getStatusMessage(), containsString("operation-attributes-tag"));
-    }
-
-    private IppResponse checkHandleRequest400(String requestName) {
-        HttpResponse response = handleRequest(requestName, requestHandler);
-        assertEquals(400, response.getStatusLine().getStatusCode());
-        IppResponse ippResponse = IppEntity.toIppResponse(response);
-        LOG.info("Received: {}", ippResponse);
-        assertEquals(StatusCode.CLIENT_ERROR_BAD_REQUEST, ippResponse.getStatusCode());
-        return ippResponse;
-    }
-
+    
     @Test
     void testHandleGetPrinters() {
         HttpResponse response = handleRequest("Get-Printers.bin", requestHandler);

@@ -31,6 +31,7 @@ import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.ValidationException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -77,27 +78,32 @@ public final class IppPrinterRequestHandler extends AbstractIppRequestHandler {
     public void handle(HttpEntityEnclosingRequest request, HttpResponse response) {
         IppRequest ippRequest = IppEntity.toIppRequest(request);
         LOG.info("{} received.", ippRequest.toShortString());
-        ippRequest.recordTo(recordDir);
-        IppResponse ippResponse = new IppResponse(ippRequest);
-        switch (ippRequest.getOperation()) {
-            case GET_PRINTER_ATTRIBUTES:
-                ippResponse = handleGetPrinterAttributes(ippRequest);
-                break;
-            case CREATE_JOB:
-                ippResponse = handleCreateJob(ippRequest);
-                break;
-            case PRINT_JOB:
-                ippResponse = handlePrintJob(ippRequest);
-                break;
-            case SEND_DOCUMENT:
-                ippResponse = handleSendDocument(ippRequest);
-                break;
+        try {
+            ippRequest.validate();
+            ippRequest.recordTo(recordDir);
+            IppResponse ippResponse = new IppResponse(ippRequest);
+            switch (ippRequest.getOperation()) {
+                case GET_PRINTER_ATTRIBUTES:
+                    ippResponse = handleGetPrinterAttributes(ippRequest);
+                    break;
+                case CREATE_JOB:
+                    ippResponse = handleCreateJob(ippRequest);
+                    break;
+                case PRINT_JOB:
+                    ippResponse = handlePrintJob(ippRequest);
+                    break;
+                case SEND_DOCUMENT:
+                    ippResponse = handleSendDocument(ippRequest);
+                    break;
+            }
+            ippResponse.setRequestId(ippRequest.getRequestId());
+            IppEntity ippEntity = new IppEntity(ippResponse);
+            response.setEntity(ippEntity);
+            ippResponse.recordTo(recordDir);
+            LOG.info("Response {} is filled.", response);
+        } catch (ValidationException ex) {
+            handleException(ippRequest, response, ex);
         }
-        ippResponse.setRequestId(ippRequest.getRequestId());
-        IppEntity ippEntity = new IppEntity(ippResponse);
-        response.setEntity(ippEntity);
-        ippResponse.recordTo(recordDir);
-        LOG.info("Response {} is filled.", response);
     }
 
     private IppResponse handleGetPrinterAttributes(IppRequest ippRequest) {

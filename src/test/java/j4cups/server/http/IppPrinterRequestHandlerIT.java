@@ -33,7 +33,7 @@ import java.nio.file.Paths;
 /**
  * Integration tests for {@link IppPrinterRequestHandler}.
  */
-final class IppPrinterRequestHandlerIT extends AbstractIppRequestHandlerTest {
+final class IppPrinterRequestHandlerIT {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppPrinterRequestHandlerIT.class);
     private static CupsServer cupsServer;

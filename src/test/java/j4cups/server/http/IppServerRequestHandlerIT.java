@@ -53,6 +53,11 @@ class IppServerRequestHandlerIT extends AbstractIppRequestHandlerTest {
         return URI.create(System.getProperty("forwardURI", "http://localhost:631"));
     }
 
+    @Override
+    protected AbstractIppRequestHandler getRequestHandler() {
+        return requestHandler;
+    }
+
     /**
      * A create-job request should be answered with a response containing a job-id.
      */

@@ -17,6 +17,9 @@
  */
 package j4cups.server.http;
 
+import j4cups.protocol.IppRequest;
+import j4cups.protocol.IppResponse;
+import j4cups.protocol.StatusCode;
 import org.apache.http.*;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -25,6 +28,7 @@ import org.apache.http.protocol.HttpRequestHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.ValidationException;
 import java.io.IOException;
 import java.util.Locale;
 
@@ -75,5 +79,23 @@ public abstract class AbstractIppRequestHandler implements HttpRequestHandler {
      * @throws IOException e.g. network problems
      */
     protected abstract void handle(HttpEntityEnclosingRequest request, HttpResponse response) throws IOException;
+
+    /**
+     * If a {@link ValidationException} happens the response is filled with
+     * the error message.
+     * 
+     * @param ippRequest incoming request
+     * @param response filled response
+     * @param ex cause
+     */
+    protected static void handleException(IppRequest ippRequest, HttpResponse response, ValidationException ex) {
+        IppResponse ippResponse = new IppResponse(ippRequest);
+        LOG.info("{} is not valid ({}).", ippRequest, ex.getMessage());
+        LOG.debug("Details:", ex);
+        response.setStatusCode(HttpStatus.SC_BAD_REQUEST);
+        ippResponse.setStatusCode(StatusCode.CLIENT_ERROR_BAD_REQUEST);
+        ippResponse.setStatusMessage(ex.getMessage());
+        response.setEntity(new IppEntity(ippResponse));
+    }
 
 }

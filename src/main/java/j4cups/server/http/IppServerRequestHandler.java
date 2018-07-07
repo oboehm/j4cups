@@ -136,14 +136,4 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler {
         response.setEntity(new IppEntity(cupsResponse));
     }
 
-    private static void handleException(IppRequest ippRequest, HttpResponse response, ValidationException ex) {
-        IppResponse ippResponse = new IppResponse(ippRequest);
-        LOG.info("{} is not valid ({}).", ippRequest, ex.getMessage());
-        LOG.debug("Details:", ex);
-        response.setStatusCode(HttpStatus.SC_BAD_REQUEST);
-        ippResponse.setStatusCode(StatusCode.CLIENT_ERROR_BAD_REQUEST);
-        ippResponse.setStatusMessage(ex.getMessage());
-        response.setEntity(new IppEntity(ippResponse));
-    }
-
 }
