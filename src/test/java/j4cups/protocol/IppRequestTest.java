@@ -149,7 +149,13 @@ public final class IppRequestTest extends AbstractIppTest {
         assertEquals(0x4002, getPrintersRequest.getOpCode());
         assertThat(getPrintersRequest.getOpCodeAsString(), not(containsString("Reserved-For-Vendor-Extensions")));
     }
-    
+
+    @Test
+    public void testValidate() {
+        IppRequest valid = readIppRequest("request", "Send-Document.ipp");
+        valid.validate();
+    }
+
     @Test
     public void testValidateInvalid() {
         IppRequest invalid = readIppRequest("request", "Send-Document-401.ipp");

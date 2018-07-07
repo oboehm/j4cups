@@ -37,10 +37,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * The class AbstractIpp is the common super class of {@link IppRequest} and
@@ -779,7 +776,14 @@ public abstract class AbstractIpp implements Externalizable {
      * @since 0.5.1
      */
     public void validate() {
-        throw new ValidationException("not yet implemented");
+        Set<DelimiterTags> tags = new HashSet<>();
+        for (AttributeGroup group : attributeGroups) {
+            DelimiterTags beginTag = group.getBeginTag();
+            if (tags.contains(beginTag)) {
+                throw new ValidationException("duplicate '" + beginTag + "' in " + toShortString());
+            }
+            tags.add(beginTag);
+        }
     }
     
     /**
