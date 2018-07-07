@@ -28,6 +28,7 @@ import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.ValidationException;
 import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.net.URI;
@@ -771,6 +772,17 @@ public abstract class AbstractIpp implements Externalizable {
     }
 
     /**
+     * Validates an request. If it is not valid (e.g. if it has several
+     * attribute-groups of the same type) a {@link ValidationException}
+     * will be thrown.
+     *
+     * @since 0.5.1
+     */
+    public void validate() {
+        throw new ValidationException("not yet implemented");
+    }
+    
+    /**
      * The binary representation of this class is used to compare to request
      * or respone objects. I.e. for two objects the attributes must be defined
      * not only with same values but also in the same order to be equal.
@@ -792,6 +804,8 @@ public abstract class AbstractIpp implements Externalizable {
         return Arrays.hashCode(getData()) + this.requestId + this.opCode;
     }
 
+    
+    
     /**
      * Container for the version information.
      */

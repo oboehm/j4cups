@@ -20,12 +20,14 @@ package j4cups.protocol;
 import j4cups.protocol.attr.Attribute;
 import j4cups.protocol.attr.AttributeGroup;
 import j4cups.protocol.tags.DelimiterTags;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import patterntesting.runtime.junit.ArrayTester;
 
+import javax.validation.ValidationException;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -146,6 +148,12 @@ public final class IppRequestTest extends AbstractIppTest {
         LOG.info("getPrintersRequest = {}", getPrintersRequest);
         assertEquals(0x4002, getPrintersRequest.getOpCode());
         assertThat(getPrintersRequest.getOpCodeAsString(), not(containsString("Reserved-For-Vendor-Extensions")));
+    }
+    
+    @Test
+    public void testValidateInvalid() {
+        IppRequest invalid = readIppRequest("request", "Send-Document-401.ipp");
+        Assertions.assertThrows(ValidationException.class, invalid::validate);
     }
 
 }
