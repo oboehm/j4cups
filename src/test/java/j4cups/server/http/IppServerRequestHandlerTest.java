@@ -76,15 +76,30 @@ class IppServerRequestHandlerTest extends AbstractIppRequestHandlerTest {
      * the job-id is missing.
      */
     @Test
-    void testHandleInvalidSendDocument() {
-        HttpResponse response = handleRequest("Send-Document-400.ipp", requestHandler);
+    void testHandleSendDocumentWithoutJobId() {
+        IppResponse ippResponse = checkHandleRequest400("Send-Document-400.ipp");
+        assertThat(ippResponse.getStatusMessage(), containsString("job-id"));
+    }
+
+    /**
+     * This is a replay of a send-document request with a duplicate
+     * operation-attribute-groups section.
+     */
+    @Test
+    void testHandleSendDocumentWithDuplicateGroup() {
+        IppResponse ippResponse = checkHandleRequest400("Send-Document-401.ipp");
+        assertThat(ippResponse.getStatusMessage(), containsString("operation-attributes-tag"));
+    }
+
+    private IppResponse checkHandleRequest400(String requestName) {
+        HttpResponse response = handleRequest(requestName, requestHandler);
         assertEquals(400, response.getStatusLine().getStatusCode());
         IppResponse ippResponse = IppEntity.toIppResponse(response);
         LOG.info("Received: {}", ippResponse);
         assertEquals(StatusCode.CLIENT_ERROR_BAD_REQUEST, ippResponse.getStatusCode());
-        assertThat(ippResponse.getStatusMessage(), containsString("job-id"));
+        return ippResponse;
     }
-    
+
     @Test
     void testHandleGetPrinters() {
         HttpResponse response = handleRequest("Get-Printers.bin", requestHandler);
