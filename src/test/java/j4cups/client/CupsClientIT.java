@@ -114,10 +114,19 @@ final class CupsClientIT {
         assumeTrue(printer != null, "specify printer with '-DprinterURI=...'");
         return URI.create(printer);
     }
+    
+    @Test
+    void testReplay() {
+        Path dir = Paths.get("src", "test", "resources", "j4cups", "recorded");
+        assertTrue(Files.isDirectory(dir), dir + " is not a directory");
+        assumeTrue(AbstractServerTest.isOnline(URI.create("http://localhost:80")),
+                "http://localhost is offline - start 'CupsServer.main start 80'");
+        cupsClient.replay(dir);
+    }
 
     /**
      * If you have no CUPS running on your local machine you must set the
-     * envrionment variable 'forwardURI' to your CUPS server in the
+     * envrionment variable 'cupsURI' to your CUPS server in the
      * network. Otherwise the test fails.
      *
      * @return your CupsClient for testing

@@ -201,4 +201,35 @@ public class CupsClient {
         }
     }
 
+    /**
+     * {@link j4cups.server.CupsServer} allows you to record IPP requests.
+     * This method allows you to replay these recorded IPP requests. 
+     * 
+     * @param dir directory where the requests are recorded
+     */
+    public void replay(Path dir) {
+        if (Files.isDirectory(dir)) {
+            try {
+                Files.list(dir).sorted(Path::compareTo).filter(path -> Files.isRegularFile(path))
+                     .filter(path -> path.toString().contains("IppRequest"))
+                     .forEach(this::replayFile);
+            } catch (IOException ioe) {
+                throw new IllegalArgumentException("cannot read dir " + dir);
+            }
+        } else {
+            replayFile(dir);
+        }
+    }
+    
+    private void replayFile(Path file) {
+        try {
+            LOG.info("Sending file {}...", file);
+            IppRequest ippRequest = new IppRequest(Files.readAllBytes(file));
+            IppResponse ippResponse = send(ippRequest);
+            LOG.info("Sending file {} finished with {}", file, ippResponse);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("cannot read file " + file);
+        }
+    }
+
 }
