@@ -227,8 +227,10 @@ public class CupsClient {
             IppRequest ippRequest = new IppRequest(Files.readAllBytes(file));
             IppResponse ippResponse = send(ippRequest);
             LOG.info("Sending file {} finished with {}", file, ippResponse);
-        } catch (IOException e) {
-            throw new IllegalArgumentException("cannot read file " + file);
+        } catch (IOException ioe) {
+            throw new IllegalArgumentException("cannot read file " + file, ioe);
+        } catch (IppRequestException ex) {
+            LOG.warn("Sending file {} failed:", file, ex);
         }
     }
 
