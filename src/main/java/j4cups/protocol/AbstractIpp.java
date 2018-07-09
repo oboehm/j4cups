@@ -776,6 +776,11 @@ public abstract class AbstractIpp implements Externalizable {
      * @since 0.5.1
      */
     public void validate() {
+        validateAttributeGroups();
+        validateAttributes();
+    }
+
+    private void validateAttributeGroups() {
         Set<DelimiterTags> tags = new HashSet<>();
         for (AttributeGroup group : attributeGroups) {
             DelimiterTags beginTag = group.getBeginTag();
@@ -783,6 +788,15 @@ public abstract class AbstractIpp implements Externalizable {
                 throw new ValidationException("duplicate '" + beginTag + "' in " + toShortString());
             }
             tags.add(beginTag);
+        }
+    }
+
+    private void validateAttributes() {
+        for (Attribute attr : getAttributes()) {
+            byte[] value = attr.getValue();
+            if (value.length == 0) {
+                throw new ValidationException("empty value: " + attr);
+            }
         }
     }
     

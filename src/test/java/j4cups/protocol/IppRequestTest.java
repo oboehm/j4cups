@@ -158,7 +158,16 @@ public final class IppRequestTest extends AbstractIppTest {
 
     @Test
     public void testValidateInvalid() {
-        IppRequest invalid = readIppRequest("request", "Send-Document-401.ipp");
+        checkValidationException("Send-Document-401.ipp");
+    }
+    
+    @Test
+    public void testValidateEmptyAttribute() {
+        checkValidationException("Create-Job-401.ipp");
+    }
+
+    private void checkValidationException(String name) {
+        IppRequest invalid = readIppRequest("request", name);
         Assertions.assertThrows(ValidationException.class, invalid::validate);
     }
 
