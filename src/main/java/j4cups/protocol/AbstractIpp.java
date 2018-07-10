@@ -777,7 +777,9 @@ public abstract class AbstractIpp implements Externalizable {
      */
     public void validate() {
         validateAttributeGroups();
-        validateAttributes();
+        if (getOpCode() != IppOperations.GET_PRINTERS.getCode()) {
+            validateAttributes();
+        }
     }
 
     private void validateAttributeGroups() {

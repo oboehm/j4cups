@@ -18,7 +18,6 @@
 package j4cups.op;
 
 import j4cups.protocol.IppOperations;
-import j4cups.protocol.IppRequest;
 import j4cups.protocol.attr.Attribute;
 import j4cups.protocol.attr.AttributeGroup;
 import j4cups.protocol.tags.DelimiterTags;
@@ -62,16 +61,7 @@ public class GetPrinters extends Operation {
                 "internal (/tmp/IPP/printer/" + printername + ")"));
         printerGroup.addAttribute(Attribute.of(ValueTags.TEXT_WITHOUT_LANGUAGE, "printer-info", "virtual printer"));
         getIppResponse().addAttributeGroup(printerGroup);
-    }
-
-    /**
-     * The validation is disarmed to allow empty ettributes.
-     *
-     * @param request IPP reqeust
-     */
-    @Override
-    public void validateRequest(IppRequest request) {
-        LOG.debug("{} is not validated.", request);
+        LOG.debug("Printer {} is added.", supported);
     }
 
 }
