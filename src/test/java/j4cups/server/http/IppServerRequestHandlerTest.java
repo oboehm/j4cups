@@ -87,10 +87,10 @@ class IppServerRequestHandlerTest extends AbstractIppRequestHandlerTest {
     
     @Test
     void testHandleGetPrinters() {
-        HttpResponse response = handleRequest("Get-Printers.bin", requestHandler);
+        HttpResponse response = handleRequest("Get-Printers.ipp", requestHandler);
         assertEquals(200, response.getStatusLine().getStatusCode());
         IppResponse ippResponse = IppEntity.toIppResponse(response);
-        OperationTest.checkIppResponse(ippResponse, "Get-Printers.bin");
+        OperationTest.checkIppResponse(ippResponse, "Get-Printers.ipp");
         Attribute printername = ippResponse.getAttribute("printer-name");
         assertEquals("test-printer", printername.getStringValue());
     }

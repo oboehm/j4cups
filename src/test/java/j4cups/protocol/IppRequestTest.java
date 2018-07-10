@@ -144,7 +144,7 @@ public final class IppRequestTest extends AbstractIppTest {
 
     @Test
     public void testGetPrintersRequest() {
-        IppRequest getPrintersRequest = readIppRequest("request", "Get-Printers.bin");
+        IppRequest getPrintersRequest = readIppRequest("request", "Get-Printers.ipp");
         LOG.info("getPrintersRequest = {}", getPrintersRequest);
         assertEquals(0x4002, getPrintersRequest.getOpCode());
         assertThat(getPrintersRequest.getOpCodeAsString(), not(containsString("Reserved-For-Vendor-Extensions")));

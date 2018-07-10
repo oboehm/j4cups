@@ -81,7 +81,7 @@ public class IppHandlerTest extends AbstractServerTest {
      */
     @Test
     void testSendGetPrinters() {
-        IppRequest getPrintersRequest = readIppRequest("Get-Printers.bin");
+        IppRequest getPrintersRequest = readIppRequest("Get-Printers.ipp");
         IppResponse response = ippHandler.send(getPrintersRequest);
         assertEquals(StatusCode.SUCCESSFUL_OK, response.getStatusCode());
     }

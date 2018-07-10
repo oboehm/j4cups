@@ -18,13 +18,10 @@
 package j4cups.op;
 
 import j4cups.protocol.attr.Attribute;
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.validation.ValidationException;
-import java.io.File;
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -34,17 +31,27 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  *
  * @author oboehm
  */
-class SendDocumentTest {
+class SendDocumentTest extends OperationTest {
     
-    private final SendDocument operation = new SendDocument();
+    private final SendDocument sendDocument = new SendDocument();
 
+    /**
+     * Returns the send-document operation for testing.
+     *
+     * @return the Operation for testing
+     */
+    @Override
+    protected SendDocument getOperation() {
+        return new SendDocument();
+    }
+    
     /**
      * If {@link SendDocument} is created the generated IPP request should
      * contain the last-document attribute.
      */
     @Test
     void testLastDocument() {
-        Attribute attr = operation.getAttribute("last-document");
+        Attribute attr = sendDocument.getAttribute("last-document");
         assertNotNull(attr);
     }
 
@@ -53,8 +60,8 @@ class SendDocumentTest {
      */
     @Test
     void testSetLastDocument() {
-        operation.setLastDocument(false);
-        assertFalse(operation.isLastDocument());
+        sendDocument.setLastDocument(false);
+        assertFalse(sendDocument.isLastDocument());
     }
 
     /**
@@ -82,13 +89,4 @@ class SendDocumentTest {
         Assertions.assertThrows(RuntimeException.class, () -> checkValidateRequest("Send-Document-401.ipp"));
     }
 
-    private void checkValidateRequest(String recorded) {
-        try {
-            byte[] ippRequest = FileUtils.readFileToByteArray(new File("src/test/resources/j4cups/request/" + recorded));
-            operation.validateRequest(ippRequest);
-        } catch (IOException ioe) {
-            throw new IllegalArgumentException("cannot read '" + recorded + "'");
-        }
-    }
-    
 }

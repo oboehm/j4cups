@@ -84,7 +84,7 @@ class IppServerRequestHandlerIT extends AbstractIppRequestHandlerTest {
     void testHandleGetPrinters() {
         URI printersURI = getPrintersURI();
         assumeTrue(AbstractServerTest.isOnline(printersURI));
-        IppRequest getPrintersRequest = AbstractIppTest.readIppRequest("request", "Get-Printers.bin");
+        IppRequest getPrintersRequest = AbstractIppTest.readIppRequest("request", "Get-Printers.ipp");
         getPrintersRequest.setPrinterURI(printersURI);
         IppResponse ippResponse = getIppResponseFor(getPrintersRequest);
         LOG.info("ippResponse = {}", ippResponse);

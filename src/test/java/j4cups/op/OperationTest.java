@@ -22,8 +22,11 @@ import j4cups.protocol.IppOperations;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.attr.Attribute;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -35,7 +38,17 @@ import static patterntesting.runtime.junit.ObjectTester.assertEquals;
  */
 public class OperationTest {
     
-    private final Operation operation = new Operation(IppOperations.GET_JOBS);
+    private final Operation operation = getOperation();
+
+    /**
+     * Returns the operation for testing. This method should be overridden by
+     * subclasses.
+     * 
+     * @return the Operation for testing
+     */
+    protected Operation getOperation() {
+        return new Operation(IppOperations.GET_JOBS);
+    }
 
     @Test
     void testSetJobId() {
@@ -71,5 +84,20 @@ public class OperationTest {
             assertThat("missing attribute: " + attr, ippResponse.hasAttribute(attr.getName()), is(true));
         }
     }
-    
+
+    /**
+     * Can be used by subclasses to check the method 
+     * {@link Operation#validateRequest()} with an IPP request.
+     * 
+     * @param recorded a recorded IPP requst
+     */
+    protected final void checkValidateRequest(String recorded) {
+        try {
+            byte[] ippRequest = FileUtils.readFileToByteArray(new File("src/test/resources/j4cups/request/" + recorded));
+            operation.validateRequest(ippRequest);
+        } catch (IOException ioe) {
+            throw new IllegalArgumentException("cannot read '" + recorded + "'");
+        }
+    }
+
 }

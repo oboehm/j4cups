@@ -117,7 +117,7 @@ class CupsServerTest extends AbstractServerTest {
      */
     @Test
     public void testSendGetPrinters() throws IOException {
-        IppRequest getPrintersRequest = readIppRequest("Get-Printers.bin");
+        IppRequest getPrintersRequest = readIppRequest("Get-Printers.ipp");
         httpPost.setEntity(new ByteArrayEntity(getPrintersRequest.toByteArray()));
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             CloseableHttpResponse response = client.execute(httpPost);

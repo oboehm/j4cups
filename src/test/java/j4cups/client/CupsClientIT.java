@@ -104,7 +104,7 @@ final class CupsClientIT {
     
     @Test
     void testGetPrinters() {
-        IppRequest ippRequest = AbstractIppTest.readIppRequest("request", "Get-Printers.bin");
+        IppRequest ippRequest = AbstractIppTest.readIppRequest("request", "Get-Printers.ipp");
         IppResponse ippResponse = cupsClient.send(ippRequest);
         assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
     }
@@ -114,13 +114,29 @@ final class CupsClientIT {
         assumeTrue(printer != null, "specify printer with '-DprinterURI=...'");
         return URI.create(printer);
     }
-    
+
+    /**
+     * This is a replay of 2 documents which were successful sent to a printer
+     * using the send-document operation.
+     */
     @Test
     void testReplay() {
-        Path dir = Paths.get("src", "test", "resources", "j4cups", "recorded");
+        checkReplay("send-document");
+    }
+
+    /**
+     * This is a replay of 2 documents which were not successful sent to a 
+     * printer using the send-document operation. Nevertheless the replay
+     * should not break but should log the problematic requests.
+     */
+    @Test
+    void testReplay400() {
+        checkReplay("send-document-400");
+    }
+
+    private void checkReplay(String filename) {
+        Path dir = Paths.get("src", "test", "resources", "j4cups", "recorded", filename);
         assertTrue(Files.isDirectory(dir), dir + " is not a directory");
-        assumeTrue(AbstractServerTest.isOnline(URI.create("http://localhost:80")),
-                "http://localhost is offline - start 'CupsServer.main start 80'");
         cupsClient.replay(dir);
     }
 
