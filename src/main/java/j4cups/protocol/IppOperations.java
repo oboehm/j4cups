@@ -165,6 +165,9 @@ public enum IppOperations {
     /* Additional registered operations (0x0013-0x3fff, see Section 7.8 of RFC-8011). */
     ADDITIONAL_REGISTERED_OPERATIONS(0x3fff),
 
+    /* Get the default printer. */
+    GET_DEFAULT(0x4001),
+
     /* Get the printer list from CUPS. */
     GET_PRINTERS(0x4002),
     
