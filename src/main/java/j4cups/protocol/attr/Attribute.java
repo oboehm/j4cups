@@ -359,9 +359,10 @@ public final class Attribute implements Binary {
     public String toString() {
         StringBuilder buffer = new StringBuilder(getName());
         buffer.append("=");
-        getValueAsString(buffer);
         if (isMultiValue()) {
-            buffer.append(",...");
+            buffer.append("...");
+        } else {
+            getSingleValueAsString(buffer);
         }
         return buffer.toString();
     }
@@ -387,7 +388,7 @@ public final class Attribute implements Binary {
         return buffer.toString();
     }
 
-    private void getValueAsString(StringBuilder buffer) {
+    private void getSingleValueAsString(StringBuilder buffer) {
         ValueTags tag = getValueTag();
         if (tag.isIntegerValue()) {
             buffer.append(getIntValue());

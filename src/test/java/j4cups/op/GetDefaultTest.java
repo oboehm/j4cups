@@ -35,10 +35,16 @@ class GetDefaultTest extends OperationTest {
     protected GetDefault getOperation() {
         return new GetDefault();
     }
-    
+
     @Test
-    void testGetRequest() {
+    void testGetIppRequest() {
         checkIppRequest(op.getIppRequest(), "Get-Default.ipp");
+    }
+
+    @Test
+    void testGetIppResponse() {
+        op.setPrinterName("test-printer");
+        checkIppResponse(op.getIppResponse(), "Get-Default.ipp");
     }
 
 }

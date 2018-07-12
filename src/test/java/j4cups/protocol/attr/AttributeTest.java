@@ -27,9 +27,7 @@ import java.nio.ByteBuffer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link Attribute}. The DATA for this tests are recorded
@@ -79,6 +77,20 @@ final class AttributeTest {
         assertThat(numberAttribute.toString(), containsString("4711"));
     }
     
+    @Test
+    public void testToStringMulitValue() {
+        Attribute attr = Attribute
+                .of(ValueTags.ENUM, "orientation-requested-supported", toByteArray(3), toByteArray(4), toByteArray(5),
+                        toByteArray(6));
+        LOG.info("attr = {}", attr.toString());
+    }
+
+    private static byte[] toByteArray(int x) {
+        byte[] array = new byte[4];
+        ByteBuffer.wrap(array).putInt(x);
+        return array;
+    }
+
     @Test
     public void testIsMultiValue() {
         assertThat(ATTRIBUTE.isMultiValue(), is(false));

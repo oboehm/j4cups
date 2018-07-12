@@ -19,7 +19,10 @@ package j4cups.op;
 
 import j4cups.protocol.IppOperations;
 import j4cups.protocol.IppRequest;
+import j4cups.protocol.IppResponse;
 import j4cups.protocol.attr.Attribute;
+import j4cups.protocol.attr.AttributeGroup;
+import j4cups.protocol.tags.DelimiterTags;
 import j4cups.protocol.tags.ValueTags;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,23 +44,49 @@ public class GetDefault extends Operation {
      * Instantiates a new Get printers.
      */
     public GetDefault() {
-        super(IppOperations.GET_DEFAULT);
+        super(IppOperations.GET_DEFAULT, initIppRequest());
         setPrinterURI(URI.create("http://localhost:631/printers"));
     }
 
-    /**
-     * Gets the IPP request which belongs to this operation.
-     *
-     * @return IPP request
-     */
-    @Override
-    public IppRequest getIppRequest() {
-        IppRequest request = super.getIppRequest();
+    private static IppRequest initIppRequest() {
+        IppRequest request = createIppRequest(IppOperations.GET_DEFAULT);
         Attribute attr = Attribute
                 .of(ValueTags.KEYWORD, "requested-attributes", "printer-name", "printer-uri-supported",
                         "printer-location");
         request.setOperationAttribute(attr);
         return request;
+    }
+
+    /**
+     * Gets the IPP response for the stored IPP request.
+     *
+     * @return IPP response
+     */
+    @Override
+    public IppResponse getIppResponse() {
+        IppResponse response = super.getIppResponse();
+        response.setPrinterURI(getPrinterURI());
+        Attribute requestedAttributes = getAttribute("requested-attributes");
+        response.setOperationAttribute(requestedAttributes);
+        return response;
+    }
+
+    /**
+     * Sets the default printer.
+     *
+     * @param printername the name of the default printer
+     */
+    public void setPrinterName(String printername) {
+        AttributeGroup printerGroup = new AttributeGroup(DelimiterTags.PRINTER_ATTRIBUTES_TAG);
+        initPrinterAttributes(printerGroup);
+        URI supported = URI.create(getPrinterURI() + "/" + printername);
+        printerGroup.addAttribute(Attribute.of("printer-uri-supported", supported));
+        printerGroup.addAttribute(Attribute.of(ValueTags.NAME_WITHOUT_LANGUAGE, "printer-name", printername));
+        printerGroup.addAttribute(Attribute.of(ValueTags.TEXT_WITHOUT_LANGUAGE, "printer-location",
+                "internal (/tmp/IPP/printer/" + printername + ")"));
+        printerGroup.addAttribute(Attribute.of(ValueTags.TEXT_WITHOUT_LANGUAGE, "printer-info", "virtual printer"));
+        getIppResponse().addAttributeGroup(printerGroup);
+        LOG.debug("Printer {} with URI {} is set as default.", printername, supported);
     }
 
 }

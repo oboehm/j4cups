@@ -18,11 +18,11 @@
 package j4cups.server.http;
 
 import j4cups.client.CupsClient;
+import j4cups.op.GetDefault;
 import j4cups.op.GetPrinters;
 import j4cups.op.SendDocument;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
-import j4cups.protocol.StatusCode;
 import j4cups.server.IppHandler;
 import j4cups.server.IppProxyHandler;
 import org.apache.http.Header;
@@ -55,7 +55,7 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler {
     }
 
     /**
-     * If the request handler acts as a proxy he need to know ther URI where
+     * If the request handler acts as a proxy qe need to know the URI where
      * the request should be forwarded.
      *
      * @param forwardURI CUPS URI where the request should be forwarded to
@@ -65,7 +65,7 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler {
     }
 
     /**
-     * If the request handler acts as a proxy he need to know the URI where
+     * If the request handler acts as a proxy we need to know the URI where
      * the request should be forwarded. And for the generated responses it
      * must known the CUPS URI.
      *
@@ -99,6 +99,9 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler {
                     case PRINT_JOB:
                         sendToPrinter(ippRequest, response);
                         break;
+                    case GET_DEFAULT:
+                        handleGetDefault(response, ippRequest.getRequestId());
+                        break;
                     case GET_PRINTERS:
                         handleGetPrinters(request, response, ippRequest.getRequestId());
                         break;
@@ -114,6 +117,13 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler {
             LOG.warn("Status code is set to {} because too less bytes were received.", HttpStatus.SC_BAD_REQUEST);
             LOG.debug("Details:", ex);
         }
+    }
+
+    private void handleGetDefault(HttpResponse response, int requestId) {
+        GetDefault op = new GetDefault();
+        op.setIppRequestId(requestId);
+        op.setPrinterName("test-printer");
+        response.setEntity(new IppEntity(op.getIppResponse()));
     }
 
     private void handleGetPrinters(HttpEntityEnclosingRequest request, HttpResponse response, int requestId) {
