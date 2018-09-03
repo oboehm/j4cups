@@ -58,6 +58,11 @@ final class IppPrinterRequestHandlerTest extends AbstractIppRequestHandlerTest {
     }
 
     @Test
+    void testHandleCreateJob() {
+        checkHandle("Create-Job.ipp");
+    }
+
+    @Test
     void testHandleCancleJob() {
         checkHandle("Cancel-Job.ipp");
     }

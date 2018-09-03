@@ -106,7 +106,7 @@ public class IppHandlerTest extends AbstractServerTest {
         assumeCupsAndPrinterAreOnline();
         IppResponse ippResponse = ippHandler.createJob(testPrinterUri);
         cancelJob(ippResponse);
-        OperationTest.checkIppResponse(ippResponse, "Create-Jobs.bin");
+        OperationTest.checkIppResponse(ippResponse, "Create-Job.ipp");
     }
     /**
      * Test method for {@link IppHandler#printJob(URI, Path)}.
