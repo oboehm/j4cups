@@ -57,6 +57,11 @@ final class IppPrinterRequestHandlerTest extends AbstractIppRequestHandlerTest {
         checkHandle("Send-Document.ipp");
     }
 
+    @Test
+    void testHandleCancleJob() {
+        checkHandle("Cancel-Job.ipp");
+    }
+
     private void checkHandle(String filename) {
         HttpResponse response = handleRequest(filename, handler);
         OperationTest.checkIppResponse(IppEntity.toIppResponse(response), filename);

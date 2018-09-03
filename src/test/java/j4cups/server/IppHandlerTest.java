@@ -63,7 +63,7 @@ public class IppHandlerTest extends AbstractServerTest {
     @BeforeAll
     static void setUpURIs() {
         forwardURI = Paths.get("target", "IPP").toUri();
-        testPrinterUri = URI.create(System.getProperty("printerURI", "http://localhost:80/printers/text"));
+        testPrinterUri = URI.create(System.getProperty("printerURI", "http://localhost:631/printers/text"));
     }
     
     @BeforeEach
