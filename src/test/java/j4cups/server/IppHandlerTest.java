@@ -163,9 +163,11 @@ public class IppHandlerTest extends AbstractServerTest {
         }
     }
 
-    private static void assumeCupsAndPrinterAreOnline() {
+    private void assumeCupsAndPrinterAreOnline() {
         assumeTrue(isOnline(forwardURI), forwardURI + " is not available");
         assumeTrue(isOnline(testPrinterUri), testPrinterUri + " is not available");
+        assumeTrue(ippHandler.getJobs(testPrinterUri).getStatusCode().isSuccessful(),
+                testPrinterUri + " has not usable");
     }
     
     private static Path readTestFile() {
