@@ -20,6 +20,7 @@ package j4cups.server;
 
 import j4cups.op.OperationTest;
 import j4cups.protocol.IppRequest;
+import j4cups.protocol.IppRequestException;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
 import org.junit.jupiter.api.BeforeAll;
@@ -166,8 +167,14 @@ public class IppHandlerTest extends AbstractServerTest {
     private void assumeCupsAndPrinterAreOnline() {
         assumeTrue(isOnline(forwardURI), forwardURI + " is not available");
         assumeTrue(isOnline(testPrinterUri), testPrinterUri + " is not available");
-        assumeTrue(ippHandler.getJobs(testPrinterUri).getStatusCode().isSuccessful(),
-                testPrinterUri + " has not usable");
+        StatusCode statusCode = StatusCode.CLIENT_ERROR_BAD_REQUEST;
+        try {
+            statusCode = ippHandler.getJobs(testPrinterUri).getStatusCode();
+        } catch (IppRequestException ex) {
+            LOG.info("{} is not usable ({]).", testPrinterUri, ex.getLocalizedMessage());
+            LOG.debug("Details:", ex);
+        }
+        assumeTrue(statusCode.isSuccessful(), testPrinterUri + " causes problems");
     }
     
     private static Path readTestFile() {
