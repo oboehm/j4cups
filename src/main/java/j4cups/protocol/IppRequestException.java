@@ -26,6 +26,8 @@ package j4cups.protocol;
  */
 public class IppRequestException extends RuntimeException {
 
+    private final IppResponse response;
+
     /**
      * Constructs a new runtime exception with the specified IPP response.
      * The cause is not initialized, and may subsequently be initialized by a
@@ -36,6 +38,7 @@ public class IppRequestException extends RuntimeException {
      */
     public IppRequestException(IppResponse ippResponse) {
         super(asString(ippResponse));
+        this.response = ippResponse;
     }
 
     /**
@@ -51,10 +54,19 @@ public class IppRequestException extends RuntimeException {
      */
     public IppRequestException(IppResponse ippResponse, Throwable cause) {
         super(asString(ippResponse), cause);
+        this.response = ippResponse;
     }
     
     private static String asString(IppResponse response) {
         return response.getStatusCode() + " - " + response.getStatusMessage();
     }
 
+    /**
+     * Gets the error response of the request
+     *
+     * @return the IPP response
+     */
+    public IppResponse getResponse() {
+        return this.response;
+    }
 }
