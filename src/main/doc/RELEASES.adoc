@@ -17,8 +17,8 @@ Other infos are present in the top link:../../../README.md[README].
 |s. link:../.travis.yml[.travis.yml]
 
 |https://sonarcloud.io/projects[sonarcloud.io]
-|https://sonarcloud.io/dashboard?id=de.javatux%3Aj4cups[image:https://sonarcloud.io/api/badges/gate?key=de.javatux:j4cups[Q-Gate]]
-|https://sonarcloud.io/dashboard?id=de.javatux%3Aj4cups%3Adevelop[image:https://sonarcloud.io/api/badges/gate?key=de.javatux:j4cups:develop[Q-Gate]]
+|https://sonarcloud.io/dashboard?id=de.javatux%3Aj4cups[image:https://sonarcloud.io/api/project_badges/measure?metric=alert_status&project=de.javatux:j4cups[Q-Gate]]
+|https://sonarcloud.io/dashboard?id=de.javatux%3Aj4cups%3Adevelop[image:https://sonarcloud.io/api/project_badges/measure?metric=alert_status&project=de.javatux:j4cups:develop[Q-Gate]]
 |`sonar:sonar`
 
 |
