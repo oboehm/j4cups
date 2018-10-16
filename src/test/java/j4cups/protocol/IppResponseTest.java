@@ -158,7 +158,7 @@ public final class IppResponseTest extends AbstractIppTest {
      */
     @Test
     public void testGetJobId() {
-        IppResponse response = readIppResponse("response", "Create-Jobs.bin");
+        IppResponse response = readIppResponse("response", "Create-Job.ipp");
         assertEquals(101, response.getJobId());
     }
     

@@ -20,6 +20,7 @@ package j4cups.server;
 
 import j4cups.op.OperationTest;
 import j4cups.protocol.IppRequest;
+import j4cups.protocol.IppRequestException;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
 import org.junit.jupiter.api.BeforeAll;
@@ -63,7 +64,7 @@ public class IppHandlerTest extends AbstractServerTest {
     @BeforeAll
     static void setUpURIs() {
         forwardURI = Paths.get("target", "IPP").toUri();
-        testPrinterUri = URI.create(System.getProperty("printerURI", "http://localhost:80/printers/text"));
+        testPrinterUri = URI.create(System.getProperty("printerURI", "http://localhost:631/printers/text"));
     }
     
     @BeforeEach
@@ -105,7 +106,7 @@ public class IppHandlerTest extends AbstractServerTest {
         assumeCupsAndPrinterAreOnline();
         IppResponse ippResponse = ippHandler.createJob(testPrinterUri);
         cancelJob(ippResponse);
-        OperationTest.checkIppResponse(ippResponse, "Create-Jobs.bin");
+        OperationTest.checkIppResponse(ippResponse, "Create-Job.ipp");
     }
     /**
      * Test method for {@link IppHandler#printJob(URI, Path)}.
@@ -163,9 +164,17 @@ public class IppHandlerTest extends AbstractServerTest {
         }
     }
 
-    private static void assumeCupsAndPrinterAreOnline() {
+    private void assumeCupsAndPrinterAreOnline() {
         assumeTrue(isOnline(forwardURI), forwardURI + " is not available");
         assumeTrue(isOnline(testPrinterUri), testPrinterUri + " is not available");
+        StatusCode statusCode = StatusCode.CLIENT_ERROR_BAD_REQUEST;
+        try {
+            statusCode = ippHandler.getJobs(testPrinterUri).getStatusCode();
+        } catch (IppRequestException ex) {
+            LOG.info("{} is not usable ({]).", testPrinterUri, ex.getLocalizedMessage());
+            LOG.debug("Details:", ex);
+        }
+        assumeTrue(statusCode.isSuccessful(), testPrinterUri + " causes problems");
     }
     
     private static Path readTestFile() {

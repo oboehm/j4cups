@@ -20,9 +20,12 @@ package j4cups.server.http;
 
 import j4cups.op.*;
 import j4cups.protocol.AbstractIpp;
+import j4cups.protocol.IppOperations;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.attr.Attribute;
+import j4cups.protocol.enums.JobState;
+import j4cups.protocol.enums.JobStateReasons;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -82,7 +85,8 @@ public final class IppPrinterRequestHandler extends AbstractIppRequestHandler {
             ippRequest.validate();
             ippRequest.recordTo(recordDir);
             IppResponse ippResponse = new IppResponse(ippRequest);
-            switch (ippRequest.getOperation()) {
+            IppOperations ippOperation = ippRequest.getOperation();
+            switch (ippOperation) {
                 case GET_PRINTER_ATTRIBUTES:
                     ippResponse = handleGetPrinterAttributes(ippRequest);
                     break;
@@ -94,6 +98,9 @@ public final class IppPrinterRequestHandler extends AbstractIppRequestHandler {
                     break;
                 case SEND_DOCUMENT:
                     ippResponse = handleSendDocument(ippRequest);
+                    break;
+                default:
+                    LOG.info("No special handling for {} is foreseen.", ippOperation);
                     break;
             }
             ippResponse.setRequestId(ippRequest.getRequestId());
@@ -114,6 +121,8 @@ public final class IppPrinterRequestHandler extends AbstractIppRequestHandler {
     private IppResponse handleCreateJob(IppRequest ippRequest) {
         CreateJob op = new CreateJob(ippRequest);
         setJobId(op);
+        op.setJobState(JobState.PENDING_HELD);
+        op.setJobStateReasons(JobStateReasons.JOB_INCOMING);
         return op.getIppResponse();
     }
 

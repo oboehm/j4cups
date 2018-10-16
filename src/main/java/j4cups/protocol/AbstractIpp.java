@@ -146,7 +146,6 @@ public abstract class AbstractIpp implements Externalizable {
         for (DelimiterTags tag : requiredTags) {
             AttributeGroup group = new AttributeGroup(tag);
             values.add(group);
-            LOG.trace("Empty {} added.", group);
         }
     }
 

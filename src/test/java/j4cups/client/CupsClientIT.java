@@ -64,7 +64,7 @@ final class CupsClientIT {
     void testCreateJob() {
         IppResponse ippResponse = cupsClient.createJob(printerURI);
         cancelJob(ippResponse);
-        OperationTest.checkIppResponse(ippResponse, "Create-Jobs.bin");
+        OperationTest.checkIppResponse(ippResponse, "Create-Job.ipp");
     }
 
     /**
