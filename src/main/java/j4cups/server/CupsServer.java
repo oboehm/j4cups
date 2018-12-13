@@ -17,11 +17,11 @@
  */
 package j4cups.server;
 
+import j4cups.Config;
 import j4cups.server.http.IppPrinterRequestHandler;
 import j4cups.server.http.IppServerRequestHandler;
 import j4cups.server.http.LogRequestInterceptor;
 import j4cups.server.http.LogResponseInterceptor;
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.http.ConnectionClosedException;
 import org.apache.http.ExceptionLogger;
 import org.apache.http.config.SocketConfig;
@@ -30,7 +30,6 @@ import org.apache.http.impl.bootstrap.ServerBootstrap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
@@ -64,11 +63,7 @@ public class CupsServer implements Runnable {
      * @param port e.g. 631
      */
     public CupsServer(int port) {
-        this(port, getRecordDir());
-    }
-
-    private static URI getRecordDir() {
-        return new File(SystemUtils.getJavaIoTmpDir(), "IPP").toURI();
+        this(new Config().withServerPort(port));
     }
 
     /**
@@ -81,8 +76,12 @@ public class CupsServer implements Runnable {
      * @param forwardURI CUPS server where the requests are forwarded to
      */
     public CupsServer(int port, URI forwardURI) {
-        this.port = port;
-        this.server = createServer(port, forwardURI);
+        this(new Config().withServerPort(port).withProperty("j4cups.server.forwardURI", forwardURI.toString()));
+    }
+    
+    private CupsServer(Config config) {
+        this.port = config.getServerPort();
+        this.server = createServer(config.getServerPort(), config.getServerForwardURI());
     }
 
     /**
