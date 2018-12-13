@@ -46,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 public class CupsServer implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(CupsServer.class);
-    private final int port;
+    private final Config config;
     private final HttpServer server;
     private Thread serverThread;
 
@@ -80,8 +80,8 @@ public class CupsServer implements Runnable {
     }
     
     private CupsServer(Config config) {
-        this.port = config.getServerPort();
-        this.server = createServer(config.getServerPort(), config.getServerForwardURI());
+        this.config = config;
+        this.server = createServer(config);
     }
 
     /**
@@ -116,7 +116,7 @@ public class CupsServer implements Runnable {
      * @return port, e.g. 631
      */
     public int getPort() {
-        return port;
+        return this.config.getServerPort();
     }
 
     /**
@@ -134,9 +134,9 @@ public class CupsServer implements Runnable {
      * This is the command to shut down the server.
      */
     public void shutdown() {
-        LOG.info("Shutting down {} on port {} ...", server, port);
+        LOG.info("Shutting down {} on port {} ...", server, getPort());
         server.shutdown(5, TimeUnit.SECONDS);
-        LOG.info("Shutting down {} on port {} was successful.", server, port);
+        LOG.info("Shutting down {} on port {} was successful.", server, getPort());
     }
     
     /**
@@ -145,7 +145,7 @@ public class CupsServer implements Runnable {
      */
     public void run() {
         try {
-            LOG.debug("Starting {} on port {}...", server, port);
+            LOG.debug("Starting {} on port {}...", server, getPort());
             server.start();
             LOG.info("{} is successful started.", this);
             server.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
@@ -160,18 +160,19 @@ public class CupsServer implements Runnable {
         }
     }
 
-    private static HttpServer createServer(int serverPort, URI forwardURI) {
+    private static HttpServer createServer(Config cfg) {
         SocketConfig socketConfig = SocketConfig.custom()
                                                 .setSoTimeout(15000)
                                                 .setTcpNoDelay(true)
                                                 .build();
         ServerBootstrap sb = ServerBootstrap.bootstrap()
-                       .setListenerPort(serverPort)
+                       .setListenerPort(cfg.getServerPort())
                        .setServerInfo("j4CUPS/0.5")
                        .setSocketConfig(socketConfig)
                        .setExceptionLogger(new StdErrorExceptionLogger())
                        .addInterceptorFirst(new LogRequestInterceptor("S"))
                        .addInterceptorLast(new LogResponseInterceptor("S"));
+        URI forwardURI = cfg.getServerForwardURI();
         if ("file".equalsIgnoreCase(forwardURI.getScheme())) {
             IppHandler ippHandler = new IppHandler(forwardURI);
             sb.registerHandler("*", new IppServerRequestHandler(new IppHandler(forwardURI)))
