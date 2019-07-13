@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -98,25 +99,23 @@ public class CupsServer implements Runnable {
         CommandLineParser parser = new DefaultParser();
         try {
             CommandLine line = parser.parse(options, args);
-            if ((args.length < 1) || line.hasOption("help"))  {
+            List<String> argList = line.getArgList();
+            if ((argList.size() != 1) || line.hasOption("help"))  {
                 HelpFormatter formatter = new HelpFormatter();
                 formatter.printHelp( CupsServer.class.getName() + " [OPTIONS] start | stop", options );
                 return;
             }
+            int serverPort = Integer.parseInt(line.getOptionValue("port", "631"));
+            String command = argList.get(0);
+            if ("start".equalsIgnoreCase(command.trim())) {
+                CupsServer cs = new CupsServer(serverPort);
+                cs.start();
+                System.out.println(cs + " is started.");
+            } else if ("stop".equalsIgnoreCase(command.trim())) {
+                System.out.println("'" + command + "' is not yet supported.");
+            }
         } catch (ParseException e) {
             System.err.println("Cannot parse " + Arrays.toString(args));
-        }
-        String command = args[0];
-        int serverPort = 631;
-        if (args.length > 1) {
-            serverPort = Integer.parseInt(args[1]);
-        }
-        if ("start".equalsIgnoreCase(command.trim())) {
-            CupsServer cs = new CupsServer(serverPort);
-            cs.start();
-            System.out.println(cs + " is started.");
-        } else if ("stop".equalsIgnoreCase(command.trim())) {
-            System.out.println("'" + command + "' is not yet supported.");
         }
     }
 
