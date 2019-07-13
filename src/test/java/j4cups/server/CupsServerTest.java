@@ -32,7 +32,10 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URI;
 
 import static org.hamcrest.Matchers.containsString;
@@ -40,7 +43,7 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.*;
 
 /**
- * Unit tests for {@link CupsServer}.
+ * Unit and ntegration tests for {@link CupsServer}.
  */
 class CupsServerTest extends AbstractServerTest {
 
@@ -52,6 +55,32 @@ class CupsServerTest extends AbstractServerTest {
     static void setUpServer() {
         startServer();
         printerURI = URI.create("http://localhost:" + cupsServer.getPort() + "/printers/text");
+    }
+
+    @Test
+    void testMain() throws IOException {
+        String output = recordMainOutput();
+        assertThat(output, containsString("usage"));
+        LOG.info(output);
+    }
+
+    @Test
+    void testMainHelp() throws IOException {
+        String output = recordMainOutput("-help");
+        assertThat(output, containsString("usage"));
+    }
+
+    private static String recordMainOutput(String... args) throws IOException{
+        PrintStream sysout = System.out;
+        try (ByteArrayOutputStream recorder = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(recorder));
+            CupsServer.main(args);
+            recorder.flush();
+            return recorder.toString("UTF-8").trim();
+        } finally {
+            System.setOut(sysout);
+            LOG.info("System.out is resetted to {}.", sysout);
+        }
     }
     
     /**

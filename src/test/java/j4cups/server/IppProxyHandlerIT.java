@@ -20,8 +20,8 @@ package j4cups.server;
 import java.net.URI;
 
 /**
- * Integration tests for {@link IppProxyHandler}. For tests with a real I used
- * http://localhost:631/printers/Brother_MFC_J5910DW_2 in my local home
+ * Integration tests for {@link IppProxyHandler}. For tests with a real CUPS I
+ * used http://localhost:631/printers/Brother_MFC_J5910DW_2 in my local home
  * network.
  * <p>
  * To set a real CUPS server for {@link IppProxyHandlerIT} as forward URI you can

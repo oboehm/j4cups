@@ -22,6 +22,7 @@ import j4cups.server.http.IppPrinterRequestHandler;
 import j4cups.server.http.IppServerRequestHandler;
 import j4cups.server.http.LogRequestInterceptor;
 import j4cups.server.http.LogResponseInterceptor;
+import org.apache.commons.cli.*;
 import org.apache.http.ConnectionClosedException;
 import org.apache.http.ExceptionLogger;
 import org.apache.http.config.SocketConfig;
@@ -33,12 +34,13 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 /**
  * The CupsServer is a little embedded HTTP server based on Apache's HTTP
  * components. It is based on HTTP/1.1 and a classic (blocking) I/O model.
- * It can also be used as a proxy to real CUPS server.
+ * It can also be used as a proxy to a real CUPS server.
  *
  * @author oboehm
  * @since 0.5 (27.03.2018)
@@ -92,9 +94,17 @@ public class CupsServer implements Runnable {
      * @param args "start", "631"
      */
     public static void main(String... args) {
-        if (args.length < 1) {
-            System.out.println("Usage: " + CupsServer.class.getName() + " start [port]");
-            return;
+        Options options = createOptions();
+        CommandLineParser parser = new DefaultParser();
+        try {
+            CommandLine line = parser.parse(options, args);
+            if ((args.length < 1) || line.hasOption("help"))  {
+                HelpFormatter formatter = new HelpFormatter();
+                formatter.printHelp( CupsServer.class.getName() + " [OPTIONS] start | stop", options );
+                return;
+            }
+        } catch (ParseException e) {
+            System.err.println("Cannot parse " + Arrays.toString(args));
         }
         String command = args[0];
         int serverPort = 631;
@@ -108,6 +118,14 @@ public class CupsServer implements Runnable {
         } else if ("stop".equalsIgnoreCase(command.trim())) {
             System.out.println("'" + command + "' is not yet supported.");
         }
+    }
+
+    private static Options createOptions() {
+        Options options = new Options();
+        options.addOption(new Option("help", "print this message"));
+        options.addOption(new Option("port", true, "port nummber"));
+        options.addOption(new Option("proxy", true, "act like a proxy"));
+        return options;
     }
 
     /**
