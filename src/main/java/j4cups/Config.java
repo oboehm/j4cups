@@ -102,6 +102,18 @@ public final class Config {
     }
 
     /**
+     * If the server acts like a proxy you set the URI to the forwardded
+     * CUPS server here.
+     *
+     * @param uri the URI where requests are forwarded
+     * @return the config
+     */
+    public Config withServerForwardURI(String uri) {
+        this.properties.setProperty("j4cups.server.forwardURI", uri);
+        return this;
+    }
+
+    /**
      * Gets server forward URI.
      *
      * @return the server forward uri

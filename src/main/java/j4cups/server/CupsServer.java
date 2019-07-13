@@ -105,10 +105,13 @@ public class CupsServer implements Runnable {
                 formatter.printHelp( CupsServer.class.getName() + " [OPTIONS] start | stop", options );
                 return;
             }
-            int serverPort = Integer.parseInt(line.getOptionValue("port", "631"));
+            Config config = new Config().withServerPort(Integer.parseInt(line.getOptionValue("port", "631")));
+            if (line.hasOption("proxy")) {
+                config = config.withServerForwardURI(line.getOptionValue("proxy"));
+            }
             String command = argList.get(0);
             if ("start".equalsIgnoreCase(command.trim())) {
-                CupsServer cs = new CupsServer(serverPort);
+                CupsServer cs = new CupsServer(config);
                 cs.start();
                 System.out.println(cs + " is started.");
             } else if ("stop".equalsIgnoreCase(command.trim())) {
