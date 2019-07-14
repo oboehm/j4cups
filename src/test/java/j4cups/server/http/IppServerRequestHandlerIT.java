@@ -23,16 +23,23 @@ import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.protocol.StatusCode;
 import j4cups.server.AbstractServerTest;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
+import org.apache.http.message.BasicHttpRequest;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.protocol.HttpCoreContext;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
@@ -64,7 +71,7 @@ class IppServerRequestHandlerIT extends AbstractIppRequestHandlerTest {
     @Test
     void testHandleCreateJob() {
         CreateJob createJob = new CreateJob();
-        URI printerURI = URI.create("http://localhost:631/printers/Brother_MFC_J5910DW_2");
+        URI printerURI = URI.create("http://localhost:631/printers/Brother_MFC_J5910DW");
         assumeTrue(AbstractServerTest.isOnline(printerURI));
         createJob.setPrinterURI(printerURI);
         createJob.setIppRequestId(4711);
@@ -99,6 +106,24 @@ class IppServerRequestHandlerIT extends AbstractIppRequestHandlerTest {
         HttpResponse response = createHttpResponse();
         requestHandler.handle(createHttpRequest(ippRequest), response);
         return IppEntity.toIppResponse(response);
+    }
+
+    /**
+     * Here we call the web page of a CUPS server.
+     *
+     * @throws IOException   the io exception
+     * @throws HttpException the http exception
+     */
+    @Test
+    void testHandleBasicHttpRequest() throws IOException, HttpException {
+        BasicHttpRequest request = new BasicHttpRequest("GET", "/");
+        HttpResponse response = createHttpResponse();
+        HttpContext context = new HttpCoreContext();
+        requestHandler.handle(request, response, context);
+        try (InputStream istream = response.getEntity().getContent()) {
+            String content = IOUtils.toString(istream, StandardCharsets.UTF_8);
+            assertThat(content, containsString("Printers"));
+        }
     }
 
 }
