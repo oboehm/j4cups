@@ -19,16 +19,18 @@ package j4cups;
 
 import org.junit.jupiter.api.Test;
 
+import java.net.URI;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link Config}.
  */
 class ConfigTest {
     
-    private final Config config = new Config();
+    private Config config = new Config();
 
     @Test
     void getServerPort() {
@@ -38,6 +40,13 @@ class ConfigTest {
     @Test
     void getServerForwardURI() {
         assertThat(config.getServerForwardURI().toString(), startsWith("file:/"));
+    }
+
+    @Test
+    void withServerForwardURI() {
+        URI uri = URI.create("ipp://test:123");
+        config = config.withServerForwardURI(uri.toString());
+        assertEquals(uri, config.getServerForwardURI());
     }
 
 }
