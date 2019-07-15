@@ -126,6 +126,10 @@ public final class Config {
             return URI.create(uri);
         }
     }
+
+    public String getServerInfo() {
+        return this.properties.getProperty("j4cups.server.info");
+    }
     
     private void setIntProperty(String key, int value) {
         this.properties.setProperty(key, Integer.toString(value));

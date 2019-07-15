@@ -18,18 +18,21 @@
 package j4cups;
 
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link Config}.
  */
 class ConfigTest {
-    
+
+    private static final Logger LOG = LoggerFactory.getLogger(ConfigTest.class);
     private Config config = new Config();
 
     @Test
@@ -47,6 +50,14 @@ class ConfigTest {
         URI uri = URI.create("ipp://test:123");
         config = config.withServerForwardURI(uri.toString());
         assertEquals(uri, config.getServerForwardURI());
+    }
+
+    @Test
+    void getServerInfo() {
+        String info = config.getServerInfo();
+        assertThat(info, not(isEmptyString()));
+        assertThat(info, not(containsString("$")));
+        LOG.info("info={}", info);
     }
 
 }

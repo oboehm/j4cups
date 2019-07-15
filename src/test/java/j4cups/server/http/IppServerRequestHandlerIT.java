@@ -116,6 +116,7 @@ class IppServerRequestHandlerIT extends AbstractIppRequestHandlerTest {
      */
     @Test
     void testHandleBasicHttpRequest() throws IOException, HttpException {
+        assumeTrue(AbstractServerTest.isOnline(getCupsURI()));
         BasicHttpRequest request = new BasicHttpRequest("GET", "/");
         HttpResponse response = createHttpResponse();
         HttpContext context = new HttpCoreContext();

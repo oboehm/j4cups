@@ -187,7 +187,7 @@ public class CupsServer implements Runnable {
                                                 .build();
         ServerBootstrap sb = ServerBootstrap.bootstrap()
                        .setListenerPort(cfg.getServerPort())
-                       .setServerInfo("j4CUPS/0.5")
+                       .setServerInfo(cfg.getServerInfo())
                        .setSocketConfig(socketConfig)
                        .setExceptionLogger(new StdErrorExceptionLogger())
                        .addInterceptorFirst(new LogRequestInterceptor("S"))
