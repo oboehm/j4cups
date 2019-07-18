@@ -234,4 +234,9 @@ public class CupsClient {
         }
     }
 
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "-" + requestId + " to " + cupsURI;
+    }
+
 }

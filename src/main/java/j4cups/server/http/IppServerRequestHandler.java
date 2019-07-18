@@ -25,16 +25,19 @@ import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
 import j4cups.server.IppHandler;
 import j4cups.server.IppProxyHandler;
-import org.apache.http.Header;
-import org.apache.http.HttpEntityEnclosingRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
+import org.apache.http.*;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.message.BasicHttpRequest;
+import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.validation.ValidationException;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.BufferUnderflowException;
+import java.util.Locale;
 
 /**
  * The class IppServerRequestHandler handles the IPP requests.
@@ -73,6 +76,29 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler {
      */
     public IppServerRequestHandler(IppHandler ippHandler) {
         this.ippHandler = ippHandler;
+    }
+
+    /**
+     * Handles the incomming HTTP request.
+     *
+     * @param request incoming request
+     * @param response outgoing response
+     * @param context context
+     * @throws HttpException in case of HTTP problems
+     * @throws IOException e.g. network problems
+     */
+    @Override
+    public void handle(HttpRequest request, HttpResponse response, HttpContext context)
+            throws HttpException, IOException {
+        if (request instanceof BasicHttpRequest) {
+            handle((BasicHttpRequest) request, response);
+        } else {
+            super.handle(request, response, context);
+        }
+    }
+
+    private void handle(BasicHttpRequest request, HttpResponse response) {
+        throw new UnsupportedOperationException("not yet implemented");
     }
 
     /**

@@ -47,9 +47,10 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * CUPS server in your network. If it is not a local CUPS server on port 631
  * you can use
  * 
- *      -DcupsURI=http://localhost:631
+ *      -DforwardURI=http://localhost:631
+ *      -DprinterURI=http://localhost:631/printers/Brother_MFC_J5910DW
  * 
- * to specify your CUPS server.
+ * to specify your CUPS server and your printer.
  */
 class IppServerRequestHandlerIT extends AbstractIppRequestHandlerTest {
 
@@ -58,6 +59,10 @@ class IppServerRequestHandlerIT extends AbstractIppRequestHandlerTest {
 
     private static URI getCupsURI() {
         return URI.create(System.getProperty("forwardURI", "http://localhost:631"));
+    }
+
+    private static URI getPrinterURI() {
+        return URI.create(System.getProperty("printerURI", "http://localhost:631/printers/Brother_MFC_J5910DW"));
     }
 
     @Override
@@ -71,7 +76,7 @@ class IppServerRequestHandlerIT extends AbstractIppRequestHandlerTest {
     @Test
     void testHandleCreateJob() {
         CreateJob createJob = new CreateJob();
-        URI printerURI = URI.create("http://localhost:631/printers/Brother_MFC_J5910DW");
+        URI printerURI = getPrinterURI();
         assumeTrue(AbstractServerTest.isOnline(printerURI));
         createJob.setPrinterURI(printerURI);
         createJob.setIppRequestId(4711);
@@ -89,7 +94,7 @@ class IppServerRequestHandlerIT extends AbstractIppRequestHandlerTest {
      */
     @Test
     void testHandleGetPrinters() {
-        URI printersURI = getPrintersURI();
+        URI printersURI = getCupsPrintersURI();
         assumeTrue(AbstractServerTest.isOnline(printersURI));
         IppRequest getPrintersRequest = AbstractIppTest.readIppRequest("request", "Get-Printers.ipp");
         getPrintersRequest.setPrinterURI(printersURI);
@@ -98,7 +103,7 @@ class IppServerRequestHandlerIT extends AbstractIppRequestHandlerTest {
         assertThat(ippResponse.hasAttribute("printer-uri-supported"), is(Boolean.TRUE));
     }
 
-    private static URI getPrintersURI() {
+    private static URI getCupsPrintersURI() {
         return URI.create(getCupsURI() + "/printers");
     }
 
