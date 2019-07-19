@@ -23,11 +23,11 @@ import j4cups.op.GetPrinters;
 import j4cups.op.SendDocument;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
+import j4cups.server.HttpHandler;
+import j4cups.server.HttpProxyHandler;
 import j4cups.server.IppHandler;
 import j4cups.server.IppProxyHandler;
 import org.apache.http.*;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHttpRequest;
 import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
@@ -37,7 +37,6 @@ import javax.validation.ValidationException;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.BufferUnderflowException;
-import java.util.Locale;
 
 /**
  * The class IppServerRequestHandler handles the IPP requests.
@@ -49,6 +48,7 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(IppServerRequestHandler.class);
     private final IppHandler ippHandler;
+    private final HttpHandler httpHandler;
 
     /**
      * The default ctor is mainly intented for testing.
@@ -64,7 +64,7 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler {
      * @param forwardURI CUPS URI where the request should be forwarded to
      */
     public IppServerRequestHandler(URI forwardURI) {
-        this(new IppProxyHandler(forwardURI));
+        this(new IppProxyHandler(forwardURI), new HttpProxyHandler(forwardURI));
     }
 
     /**
@@ -74,8 +74,9 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler {
      *
      * @param ippHandler the handler used for IPP communication
      */
-    public IppServerRequestHandler(IppHandler ippHandler) {
+    public IppServerRequestHandler(IppHandler ippHandler, HttpHandler httpHandler) {
         this.ippHandler = ippHandler;
+        this.httpHandler = httpHandler;
     }
 
     /**
@@ -97,8 +98,8 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler {
         }
     }
 
-    private void handle(BasicHttpRequest request, HttpResponse response) {
-        throw new UnsupportedOperationException("not yet implemented");
+    private void handle(BasicHttpRequest request, HttpResponse response) throws IOException {
+        httpHandler.handle(request, response);
     }
 
     /**

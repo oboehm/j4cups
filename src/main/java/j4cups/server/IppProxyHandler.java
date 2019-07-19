@@ -32,8 +32,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * The class IppProxyHandler forwards the requests to a real CUPS server and
- * like a proxy. It can be used as template for additional tasks like
+ * The class IppProxyHandler forwards IPP requests to a real CUPS server and
+ * acts like a proxy. It can be used as template for additional tasks like
  * filtering, accounting, logging or other things which are not part
  * of a normal CUPS server.
  *

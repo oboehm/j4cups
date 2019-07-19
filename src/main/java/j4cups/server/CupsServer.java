@@ -195,7 +195,7 @@ public class CupsServer implements Runnable {
         URI forwardURI = cfg.getServerForwardURI();
         if ("file".equalsIgnoreCase(forwardURI.getScheme())) {
             IppHandler ippHandler = new IppHandler(forwardURI);
-            sb.registerHandler("*", new IppServerRequestHandler(new IppHandler(forwardURI)))
+            sb.registerHandler("*", new IppServerRequestHandler(new IppHandler(forwardURI), new HttpHandler()))
               .registerHandler("/printers/*", new IppPrinterRequestHandler());
             LOG.info("CupsServer will handle requests and record it to {}.", forwardURI);
         } else {
