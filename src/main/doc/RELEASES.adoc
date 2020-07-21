@@ -1,6 +1,6 @@
-= Releases
+= How To Release
 
-This document contains some information about the CI build, release notes and deployment.
+This document contains some information about the CI build and deployment.
 Other infos are present in the top link:../../../README.md[README].
 
 
@@ -43,44 +43,7 @@ The CI build is started automatically after a commit and push to GitHub.
 
 == Release Notes
 
-[cols="1,1,3"]
-.Release Notes
-|===
-|Version |Date |Description
-
-|0.5.0
-|3-Jun-2018
-|op package with IPP operations added;
-server part provided which can act like a CUPS server or a proxy
-
-|0.3.0
-|24-Mar-2018
-|IPP response to Get-Jobs and Get-Printer-Attributes request implemented;
-request and response are now Serializable.
-
-|0.2.1
-|22-Feb-2018
-|IPP response are pre-filled with attributes from IPP request
-
-|0.2.0
-|18-Feb-2018
-|IPP response to Print-Job request implemented
-
-|0.1.0
-|14-Feb-2018
-|successful reading of IPP requests,
-logging introduced (SLF4J)
-
-|0.0.2
-|11-Feb-2018
-|tags and attributes added, successful parsing of IPP request
-
-|0.0.1
-|09-Feb-2018
-|created with https://issues.sonatype.org/browse/OSSRH-37762[OSSRH-37762]
-and protocol package (IppOperations, IppRequest and IppResponse)
-|===
-
+see link:../../../CHANGELOG.md[CHANGELOG].
 
 
 
