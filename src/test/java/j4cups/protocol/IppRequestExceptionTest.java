@@ -17,9 +17,10 @@
  */
 package j4cups.protocol;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit-Tests fuer {@link IppRequestException}.
@@ -29,13 +30,25 @@ import static org.junit.Assert.*;
  */
 public final class IppRequestExceptionTest {
 
+    private static final IppResponse IPP_RESPONSE = new IppResponse();
+
+    @BeforeAll
+    static void setUpIppResponse() {
+        IPP_RESPONSE.setStatusCode(StatusCode.CLIENT_ERROR_BAD_REQUEST);
+        IPP_RESPONSE.setStatusMessage("oh no");
+    }
+
     @Test
     public void testGetResponse() {
-        IppResponse response = new IppResponse();
-        response.setStatusCode(StatusCode.CLIENT_ERROR_BAD_REQUEST);
-        response.setStatusMessage("oh no");
-        IppRequestException ex = new IppRequestException(response);
-        assertEquals(response, ex.getResponse());
+        IppRequestException ex = new IppRequestException(IPP_RESPONSE);
+        assertEquals(IPP_RESPONSE, ex.getResponse());
+    }
+
+    @Test
+    public void testGetCause() {
+        Throwable cause = new IllegalArgumentException("illegal ikea regal");
+        IppRequestException ex = new IppRequestException(IPP_RESPONSE, cause);
+        assertEquals(cause, ex.getCause());
     }
 
 }
