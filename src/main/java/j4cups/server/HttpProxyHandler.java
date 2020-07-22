@@ -45,6 +45,10 @@ public class HttpProxyHandler extends HttpHandler {
         this.forwardURI = forwardURI;
     }
 
+    public URI getForwardURI() {
+        return this.forwardURI;
+    }
+
     public void handle(BasicHttpRequest request, HttpResponse response) throws IOException {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         HttpGet httpGet = new HttpGet(forwardURI + request.getRequestLine().getUri());

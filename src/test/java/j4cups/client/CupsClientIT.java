@@ -43,7 +43,11 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * </pre>
  * <p>
  * to set it. Otherwise the tests would be skipped.
+ * If you are on a Mac and your local CUPS is not running try
  * </p>
+ * <pre>
+ *     cupsctl WebInterface=yes
+ * </pre>
  */
 final class CupsClientIT {
 

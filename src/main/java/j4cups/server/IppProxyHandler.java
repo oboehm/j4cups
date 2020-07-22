@@ -54,6 +54,11 @@ public class IppProxyHandler extends IppHandler {
         super(Paths.get(SystemUtils.getJavaIoTmpDir().toString(), "IPP"));
         this.cupsClient = new CupsClient(cupsURI);
     }
+
+    public URI getForwardURI() {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+
     /**
      * Sends a print job to the printer.
      *
