@@ -25,6 +25,8 @@ import j4cups.protocol.StatusCode;
 import j4cups.server.IppHandler;
 import j4cups.server.http.IppEntity;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -183,21 +185,25 @@ public class CupsClient {
         IppEntity entity = new IppEntity(ippRequest);
         httpPost.setEntity(entity);
         try (CloseableHttpClient client = HttpClients.custom().build()) {
-            CloseableHttpResponse httpResponse = client.execute(httpPost);
-            LOG.info("Received from {}: {}", cupsURI, httpResponse);
-            try (InputStream istream = httpResponse.getEntity().getContent()) {
-                IppResponse ippResponse = new IppResponse(IOUtils.toByteArray(istream));
-                if (!ippResponse.getStatusCode().isSuccessful())  {
-                    throw new IppRequestException(ippResponse);
-                }
-                return ippResponse;
-            }
+            return send(httpPost, client);
         } catch (IOException ex) {
             LOG.warn("Cannot sent {}:", ippRequest, ex);
             IppResponse ippResponse = new IppResponse(ippRequest);
             ippResponse.setStatusCode(StatusCode.SERVER_ERROR_INTERNAL_ERROR);
             ippResponse.setStatusMessage(ex.getMessage());
             throw new IppRequestException(ippResponse, ex);
+        }
+    }
+
+    private static IppResponse send(HttpPost httpPost, HttpClient client) throws IOException {
+        HttpResponse httpResponse = client.execute(httpPost);
+        LOG.info("Received from {}: {}", httpPost, httpResponse);
+        try (InputStream istream = httpResponse.getEntity().getContent()) {
+            IppResponse ippResponse = new IppResponse(IOUtils.toByteArray(istream));
+            if (!ippResponse.getStatusCode().isSuccessful())  {
+                throw new IppRequestException(ippResponse);
+            }
+            return ippResponse;
         }
     }
 
