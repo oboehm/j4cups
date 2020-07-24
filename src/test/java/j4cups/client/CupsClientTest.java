@@ -1,6 +1,7 @@
 package j4cups.client;
 
 import j4cups.protocol.IppResponse;
+import j4cups.protocol.StatusCode;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -8,6 +9,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -16,10 +18,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -44,6 +48,7 @@ import static org.mockito.Mockito.when;
 class CupsClientTest {
 
     private static Logger LOG = LoggerFactory.getLogger(CupsClientTest.class);
+    private static URI PRINTER_URI = URI.create("http://test-printer:4711/");
     private static MockedStatic<HttpClientBuilder> mockedStaticBuilder = Mockito.mockStatic(HttpClientBuilder.class);
     private static CloseableHttpClient mockedHttpClient = mock(CloseableHttpClient.class);
     private final CupsClient cupsClient = new CupsClient();
@@ -56,31 +61,92 @@ class CupsClientTest {
         LOG.info("{}.create() is set up and will return {}.", mockedStaticBuilder, mockedBuilder);
     }
 
-    @Test
-    void testCreateJob() throws IOException {
-        setUpHttpClient();
-        URI printerURI = URI.create("http://test-printer:4711/");
-        IppResponse response = cupsClient.createJob(printerURI);
-        assertNotNull(response);
+    @BeforeEach
+    void setUpHttpClient() throws IOException {
+        setUpHttpClientWith(new IppResponse());
     }
 
-    private static void setUpHttpClient() throws IOException  {
+    private static void setUpHttpClientWith(IppResponse response) throws IOException {
         CloseableHttpResponse mockedHttpResponse = mock(CloseableHttpResponse.class);
         when(mockedHttpClient.execute(any(HttpPost.class))).thenReturn(mockedHttpResponse);
         HttpEntity mockedHttpEntity = mock(HttpEntity.class);
-        when(mockedHttpEntity.getContent()).thenReturn(createIppResponseInputStream());
+        when(mockedHttpEntity.getContent()).thenReturn(new ReopenableByteStream(response.toByteArray()));
         when(mockedHttpResponse.getEntity()).thenReturn(mockedHttpEntity);
     }
 
-    private static InputStream createIppResponseInputStream() {
+    @Test
+    void testCreateJob() {
+        IppResponse response = cupsClient.createJob(PRINTER_URI);
+        assertNotNull(response);
+    }
+
+    @Test
+    void testCancelJob() {
+        IppResponse response = cupsClient.cancelJob(4711, PRINTER_URI);
+        assertNotNull(response);
+    }
+
+    @Test
+    void testPrintJob() {
+        Path file = Paths.get("src/test/resources/j4cups/test.txt");
+        IppResponse ippResponse = cupsClient.print(PRINTER_URI, file);
+        assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
+    }
+
+    @Test
+    void testPrintDocuments() throws IOException {
         IppResponse response = new IppResponse();
-        return new ByteArrayInputStream(response.toByteArray());
+        response.setJobId(4711);
+        setUpHttpClientWith(response);
+        Path file = Paths.get("src/test/resources/j4cups/test.txt");
+        IppResponse ippResponse = cupsClient.print(URI.create("http://testprinter:777"), file, file);
+        assertEquals(StatusCode.SUCCESSFUL_OK, ippResponse.getStatusCode());
+    }
+
+    /**
+     * This is a replay of 2 documents which were successful sent to a printer
+     * using the send-document operation.
+     */
+    @Test
+    void testReplay() {
+        checkReplay("send-document");
+    }
+
+    /**
+     * This is a replay of 2 documents which were not successful sent to a
+     * printer using the send-document operation. Nevertheless the replay
+     * should not break but should log the problematic requests.
+     */
+    @Test
+    void testReplay400() {
+        checkReplay("send-document-400");
+    }
+
+    private void checkReplay(String filename) {
+        Path dir = Paths.get("src", "test", "resources", "j4cups", "recorded", filename);
+        assertTrue(Files.isDirectory(dir), dir + " is not a directory");
+        cupsClient.replay(dir);
     }
 
     @AfterAll
     static void resetHttpBuilder() {
         mockedStaticBuilder.when(HttpClientBuilder::create).thenCallRealMethod();
         LOG.info("{} is resetted.", mockedStaticBuilder);
+    }
+
+
+
+    static class ReopenableByteStream extends ByteArrayInputStream {
+
+        public ReopenableByteStream(byte[] buf) {
+            super(buf);
+        }
+
+        @Override
+        public void close() {
+            reset();
+        }
+
     }
 
 }
