@@ -129,7 +129,7 @@ public final class IppResponseTest extends AbstractIppTest {
     private void checkAttribute(IppResponse response, String name) {
         Attribute attribute = response.getAttribute(name);
         String value = attribute.getStringValue();
-        assertThat(value, not(isEmptyString()));
+        assertThat(value, not(emptyString()));
         LOG.info("Attribute {} checked.", attribute);
     }
 
@@ -167,6 +167,12 @@ public final class IppResponseTest extends AbstractIppTest {
         IppResponse response = new IppResponse(REQUEST_PRINT_JOB);
         List<AttributeGroup> attributeGroups = response.getAttributeGroups();
         assertEquals(4, attributeGroups.size());
+    }
+
+    @Test
+    public void testGetStatusMessage() {
+        IppResponse empty = new IppResponse();
+        assertEquals("unknown", empty.getStatusMessage());
     }
 
 }

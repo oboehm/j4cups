@@ -125,7 +125,13 @@ public class IppResponse extends AbstractIpp {
      * @since 0.5
      */
     public String getStatusMessage() {
-        return getAttribute("status-message").getStringValue();
+        String name = "status-message";
+        if (hasAttribute(name)) {
+            return getAttribute(name).getStringValue();
+        } else {
+            LOG.info("{} has no attribute '{}'.", this, name);
+            return "unknown";
+        }
     }
 
     /**
