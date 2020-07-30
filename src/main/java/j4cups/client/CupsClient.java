@@ -67,6 +67,15 @@ public class CupsClient {
     public CupsClient(URI cupsURI) {
         this.cupsURI = cupsURI;
     }
+
+    /**
+     * Gets the URI of the CUPS server.
+     *
+     * @return the CUPS URI
+     */
+    public URI getCupsURI() {
+        return this.cupsURI;
+    }
     
     /**
      * Sends a print job to the printer.
@@ -215,7 +224,7 @@ public class CupsClient {
     public void replay(Path dir) {
         if (Files.isDirectory(dir)) {
             try {
-                Files.list(dir).sorted(Path::compareTo).filter(path -> Files.isRegularFile(path))
+                Files.list(dir).sorted(Path::compareTo).filter(Files::isRegularFile)
                      .filter(path -> path.toString().contains("IppRequest"))
                      .forEach(this::replayFile);
             } catch (IOException ioe) {

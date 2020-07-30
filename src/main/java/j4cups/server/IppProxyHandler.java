@@ -23,6 +23,7 @@ import j4cups.op.GetPrinterAttributes;
 import j4cups.op.Operation;
 import j4cups.protocol.IppRequest;
 import j4cups.protocol.IppResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,11 +53,21 @@ public class IppProxyHandler extends IppHandler {
      */
     public IppProxyHandler(URI cupsURI) {
         super(Paths.get(SystemUtils.getJavaIoTmpDir().toString(), "IPP"));
-        this.cupsClient = new CupsClient(cupsURI);
+        this.cupsClient = new CupsClient(toIPP(cupsURI));
     }
 
+    private static URI toIPP(URI uri) {
+        String ippURI = StringUtils.replaceFirst(uri.toString(), "http:", "ipp:");
+        return URI.create(ippURI);
+    }
+
+    /**
+     * Gets the URI to which the requests are forwared to..
+     *
+     * @return the forward URI
+     */
     public URI getForwardURI() {
-        throw new UnsupportedOperationException("not yet implemented");
+        return cupsClient.getCupsURI();
     }
 
     /**
