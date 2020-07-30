@@ -28,7 +28,7 @@ import j4cups.server.HttpProxyHandler;
 import j4cups.server.IppHandler;
 import j4cups.server.IppProxyHandler;
 import org.apache.http.*;
-import org.apache.http.message.BasicHttpRequest;
+import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,15 +91,20 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler {
     @Override
     public void handle(HttpRequest request, HttpResponse response, HttpContext context)
             throws HttpException, IOException {
-        if (request instanceof BasicHttpRequest) {
-            handle((BasicHttpRequest) request, response);
+        if (request instanceof BasicHttpEntityEnclosingRequest) {
+            handle((BasicHttpEntityEnclosingRequest) request, response);
         } else {
             super.handle(request, response, context);
         }
     }
 
-    private void handle(BasicHttpRequest request, HttpResponse response) throws IOException {
-        httpHandler.handle(request, response);
+    private void handle(BasicHttpEntityEnclosingRequest request, HttpResponse response) throws IOException {
+        Header contentType = request.getEntity().getContentType();
+        if ("application/ipp".equalsIgnoreCase(contentType.getValue())) {
+            handle((HttpEntityEnclosingRequest) request, response);
+        } else {
+            httpHandler.handle(request, response);
+        }
     }
 
     /**

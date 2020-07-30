@@ -101,7 +101,7 @@ class CupsServerTest extends AbstractServerTest {
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             httpPost.setEntity(new StringEntity("hello"));
             CloseableHttpResponse response = client.execute(httpPost);
-            assertEquals(400, response.getStatusLine().getStatusCode());
+            assertThat(response.getStatusLine().getStatusCode(), greaterThan(399));
         }
     }
 
