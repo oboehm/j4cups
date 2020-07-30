@@ -43,7 +43,7 @@ public abstract class AbstractIppRequestHandler implements HttpRequestHandler {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractIppRequestHandler.class);
 
     /**
-     * Handles the incomming HTTP request and converts it to a
+     * Handles the incoming HTTP request and converts it to a
      * {@link HttpEntityEnclosingRequest} (if possible).
      *
      * @param request incoming request

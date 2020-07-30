@@ -42,13 +42,22 @@ public class HttpProxyHandler extends HttpHandler {
     private final URI forwardURI;
 
     public HttpProxyHandler(URI forwardURI) {
-        this.forwardURI = forwardURI;
+        this.forwardURI = asHTTP(forwardURI);
+    }
+
+    private URI asHTTP(URI forwardURI) {
+        if (forwardURI.getScheme().equalsIgnoreCase("ipp")) {
+            return URI.create("http:" + forwardURI.toASCIIString().substring(4));
+        } else {
+            return forwardURI;
+        }
     }
 
     public URI getForwardURI() {
         return this.forwardURI;
     }
 
+    @Override
     public void handle(BasicHttpRequest request, HttpResponse response) throws IOException {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         HttpGet httpGet = new HttpGet(forwardURI + request.getRequestLine().getUri());
