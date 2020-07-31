@@ -60,7 +60,7 @@ public final class XProperties extends Properties {
      * @return the object
      */
     @Override
-    public Object put(Object key, Object value) {
+    synchronized public Object put(Object key, Object value) {
         if (value == null) {
             LOG.info("Put of '{}=null' is ignored.", key);
             return null;

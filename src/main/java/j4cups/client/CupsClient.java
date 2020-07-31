@@ -39,6 +39,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 /**
  * This is a very basic client to access CUPS. It was introduced to simplify
@@ -217,18 +218,19 @@ public class CupsClient {
 
     /**
      * {@link j4cups.server.CupsServer} allows you to record IPP requests.
-     * This method allows you to replay these recorded IPP requests. 
-     * 
+     * This method allows you to replay these recorded IPP requests.
+     *
      * @param dir directory where the requests are recorded
+     * @throws IOException the io exception
+     * @since 0.6
      */
-    public void replay(Path dir) {
+    public void replay(Path dir) throws IOException {
         if (Files.isDirectory(dir)) {
-            try {
-                Files.list(dir).sorted(Path::compareTo).filter(Files::isRegularFile)
-                     .filter(path -> path.toString().contains("IppRequest"))
-                     .forEach(this::replayFile);
-            } catch (IOException ioe) {
-                throw new IllegalArgumentException("cannot read dir " + dir);
+            try (Stream<Path> stream = Files.list(dir)) {
+                stream.sorted(Path::compareTo)
+                        .filter(Files::isRegularFile)
+                        .filter(path -> path.toString().contains("IppRequest"))
+                        .forEach(this::replayFile);
             }
         } else {
             replayFile(dir);

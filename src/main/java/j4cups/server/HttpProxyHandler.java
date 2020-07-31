@@ -59,10 +59,11 @@ public class HttpProxyHandler extends HttpHandler {
 
     @Override
     public void handle(BasicHttpRequest request, HttpResponse response) throws IOException {
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        HttpGet httpGet = new HttpGet(forwardURI + request.getRequestLine().getUri());
-        CloseableHttpResponse cupsResponse = httpclient.execute(httpGet);
-        response.setEntity(cupsResponse.getEntity());
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            HttpGet httpGet = new HttpGet(forwardURI + request.getRequestLine().getUri());
+            CloseableHttpResponse cupsResponse = httpclient.execute(httpGet);
+            response.setEntity(cupsResponse.getEntity());
+        }
     }
 
 }

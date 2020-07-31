@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -122,23 +123,27 @@ final class CupsClientIT {
     /**
      * This is a replay of 2 documents which were successful sent to a printer
      * using the send-document operation.
+     *
+     * @throws IOException the io exception
      */
     @Test
-    void testReplay() {
+    void testReplay() throws IOException {
         checkReplay("send-document");
     }
 
     /**
-     * This is a replay of 2 documents which were not successful sent to a 
+     * This is a replay of 2 documents which were not successful sent to a
      * printer using the send-document operation. Nevertheless the replay
      * should not break but should log the problematic requests.
+     *
+     * @throws IOException the io exception
      */
     @Test
-    void testReplay400() {
+    void testReplay400() throws IOException {
         checkReplay("send-document-400");
     }
 
-    private void checkReplay(String filename) {
+    private void checkReplay(String filename) throws IOException {
         Path dir = Paths.get("src", "test", "resources", "j4cups", "recorded", filename);
         assertTrue(Files.isDirectory(dir), dir + " is not a directory");
         cupsClient.replay(dir);
