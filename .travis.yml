@@ -9,6 +9,9 @@ addons:
     organization: "oboehm-github"
     token:
       secure: "jpc4jdsDMgS7EBjCyNCyl3qLqQ3M/7xcjFqt1LgQItPQWKY2R0QQaxTbO9b0LR8URz5X0s44pD/bcHrexqM/vqhcciH2Zyu2BNx/iWcKPtehHb8mp8N1O6uL8YnnbgY3DQ10j3OjcfDvvaHKJNBwTF4OJbtl0poma2oIhQtwfcG786XzVJdw2hpwYkXiUUKTCWkfRt70lHdSlxh97s5taBjXOcvHrHqD6YHeELUkDoYAw03mbZ0WWC1VcqE8gQoOgho1aNm5YHLAoVDXMvxx/hewbjpgbtzl3ntgWBS6xoDXhJFf7qFiNjvOx4Qgy1N4KkzgNpdAaNYYeTJm9HDJ4jfeI9vaVHxzi1lf83bcVQqSQbbrrK/vSIySolM7GeVUr1wSie9Ln1EU7hll9GSdbXcykDzJFqKbcFUvKHn7mRwI/2Uy5IaNDDXfHAk1Y85OHdGLox5hNbVZUvmMkefGgBTY4S/Q5U+qDZt4fAlybs0bt+AXT4cl0Qrr1Py4E67aPzFvBBlCIvf6jZs0Ptgeg0aj5rrNi3P4ENzSxtfLzYc8Hx0Tbv4QvYmwNhoMTIh/TS+Dsq7Kio8wOc+NsUgkgAvWqxRygkJPl0xFn7N1x2ioe3I5UyWZMAKsXoofG4N4dOSWXTjE7klqrp5WOh9I21qgOJtHAlx7sYBbpA14KyQ="
+    branches:
+      - master
+      - develop
 
 script:
   - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -B

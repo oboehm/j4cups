@@ -23,6 +23,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -126,6 +129,13 @@ class CupsClientTest {
         Path dir = Paths.get("src", "test", "resources", "j4cups", "recorded", filename);
         assertTrue(Files.isDirectory(dir), dir + " is not a directory");
         cupsClient.replay(dir);
+    }
+
+    @Test
+    void testToString() {
+        String s = cupsClient.toString();
+        assertThat(s, not(containsString("@")));
+        LOG.info("s = \"{}\"", s);
     }
 
     @AfterAll
