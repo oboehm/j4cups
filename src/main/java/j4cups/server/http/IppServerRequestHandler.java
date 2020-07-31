@@ -99,8 +99,9 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler {
     }
 
     private void handle(BasicHttpEntityEnclosingRequest request, HttpResponse response) throws IOException {
-        Header contentType = request.getEntity().getContentType();
-        if ("application/ipp".equalsIgnoreCase(contentType.getValue())) {
+        Header headerContentType = request.getEntity().getContentType();
+        String contentType = (headerContentType == null) ? "application/ipp" : headerContentType.getValue();
+        if ("application/ipp".equalsIgnoreCase(contentType)) {
             handle((HttpEntityEnclosingRequest) request, response);
         } else {
             httpHandler.handle(request, response);

@@ -18,6 +18,7 @@
 package j4cups.server;
 
 
+import j4cups.protocol.AbstractIppTest;
 import j4cups.protocol.IppRequest;
 import j4cups.server.http.IppEntity;
 import org.apache.commons.io.IOUtils;
@@ -40,7 +41,8 @@ import java.net.URI;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit and ntegration tests for {@link CupsServer}.
@@ -146,7 +148,7 @@ class CupsServerTest extends AbstractServerTest {
      */
     @Test
     public void testSendGetPrinters() throws IOException {
-        IppRequest getPrintersRequest = readIppRequest("Get-Printers.ipp");
+        IppRequest getPrintersRequest = AbstractIppTest.readIppRequest("request", "Get-Printers.ipp");
         httpPost.setEntity(new ByteArrayEntity(getPrintersRequest.toByteArray()));
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             CloseableHttpResponse response = client.execute(httpPost);
