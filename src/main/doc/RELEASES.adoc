@@ -18,21 +18,19 @@ Other infos are present in the top link:../../../README.md[README].
 
 |https://sonarcloud.io/projects[sonarcloud.io]
 |https://sonarcloud.io/dashboard?id=de.javatux%3Aj4cups[image:https://sonarcloud.io/api/project_badges/measure?metric=alert_status&project=de.javatux:j4cups[Q-Gate]]
-|https://sonarcloud.io/dashboard?id=de.javatux%3Aj4cups%3Adevelop[image:https://sonarcloud.io/api/project_badges/measure?metric=alert_status&project=de.javatux:j4cups:develop[Q-Gate]]
+|https://sonarcloud.io/dashboard?id=de.javatux%3Aj4cups&branch=develop[image:https://sonarcloud.io/images/project_badges/sonarcloud-white.svg[Q-Gate]]
 |`sonar:sonar`
 
 |
 |https://sonarcloud.io/dashboard?id=de.javatux%3Aj4cups[image:https://sonarcloud.io/api/project_badges/measure?project=de.javatux%3Aj4cups&metric=coverage[Coverage]]
-|https://sonarcloud.io/dashboard?id=de.javatux%3Aj4cups%3Adevelop[image:https://sonarcloud.io/api/project_badges/measure?project=de.javatux%3Aj4cups%3Adevelop&metric=coverage[Coverage]]
+|
 |
 
 |
 |https://sonarcloud.io/dashboard?id=de.javatux%3Aj4cups[image:https://sonarcloud.io/api/project_badges/measure?project=de.javatux%3Aj4cups&metric=sqale_rating[Maintenance]]
  https://sonarcloud.io/dashboard?id=de.javatux%3Aj4cups[image:https://sonarcloud.io/api/project_badges/measure?project=de.javatux%3Aj4cups&metric=reliability_rating[Reliability]]
  https://sonarcloud.io/dashboard?id=de.javatux%3Aj4cups[image:https://sonarcloud.io/api/project_badges/measure?project=de.javatux%3Aj4cups&metric=security_rating[Security]]
-|https://sonarcloud.io/dashboard?id=de.javatux%3Aj4cups%3Adevelop[image:https://sonarcloud.io/api/project_badges/measure?project=de.javatux%3Aj4cups%3Adevelop&metric=sqale_rating[Maintenance]]
- https://sonarcloud.io/dashboard?id=de.javatux%3Aj4cups%3Adevelop[image:https://sonarcloud.io/api/project_badges/measure?project=de.javatux%3Aj4cups%3Adevelop&metric=reliability_rating[Reliability]]
- https://sonarcloud.io/dashboard?id=de.javatux%3Aj4cups%3Adevelop[image:https://sonarcloud.io/api/project_badges/measure?project=de.javatux%3Aj4cups%3Adevelop&metric=security_rating[Security]]
+|
 |
 
 |===
@@ -61,7 +59,7 @@ This is a little checklist for the next release:
 . after upload to the staging repository https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide#SonatypeOSSMavenRepositoryUsageGuide-8.ReleaseIt[release it]:
   select "Staging Repositories" on oss.sonatype.org, press "Refresh" and then "Close" and "Release".
 . build the Javadoc (`mvn javadoc:javadoc`) and transfer `target/apidoc` to http://javatux.de/j4cups/
-. checkin the pom.xml (if not already done), label the sources, e.g. with "j4cups-0.2.0" and push it (`git push --tags`)
+. checkin the pom.xml (if not already done), label the sources, e.g. with "j4cups-0.6.0" and push it (`git push --tags`)
 . merge the release branch to master and develop branch
 . change to develop branch and start next SNAPSHOT
 . after a few days: check j4cups with http://search.maven.org/#search%7Cga%7C1%7Cj4cups[search.maven.org]
