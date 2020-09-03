@@ -56,8 +56,8 @@ This is a little checklist for the next release:
   `mvn -B clean install source:jar javadoc:jar gpg:sign -Dgpg.passphrase=xx`
 . use the script `src/script/deploy.sh` to upload bundles to https://oss.sonatype.org/
   (but don't forget to update the VERSION variable inside this script).
-. after upload to the staging repository https://docs.sonatype.org/display/Repository/Sonatype+OSS+Maven+Repository+Usage+Guide#SonatypeOSSMavenRepositoryUsageGuide-8.ReleaseIt[release it]:
-  select "Staging Repositories" on oss.sonatype.org, press "Refresh" and then "Close" and "Release".
+. after upload to the staging repository https://central.sonatype.org/pages/ossrh-guide.html[release it]:
+  select https://oss.sonatype.org/#stagingRepositories[Staging Repositories] on https://oss.sonatype.org/[oss.sonatype.org], press "Refresh" and then "Close" and "Release".
 . build the Javadoc (`mvn javadoc:javadoc`) and transfer `target/apidoc` to http://javatux.de/j4cups/
 . checkin the pom.xml (if not already done), label the sources, e.g. with "j4cups-0.6.0" and push it (`git push --tags`)
 . merge the release branch to master and develop branch

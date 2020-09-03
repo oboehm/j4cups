@@ -72,7 +72,8 @@ public class IppServerRequestHandler extends AbstractIppRequestHandler {
      * the request should be forwarded. And for the generated responses it
      * must known the CUPS URI.
      *
-     * @param ippHandler the handler used for IPP communication
+     * @param ippHandler  the handler used for IPP communication
+     * @param httpHandler the http handler
      */
     public IppServerRequestHandler(IppHandler ippHandler, HttpHandler httpHandler) {
         this.ippHandler = ippHandler;

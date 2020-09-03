@@ -48,7 +48,7 @@ public class IppRequestException extends RuntimeException {
      * @param ippResponse the response which was received with a problematic
      *                    {@link IppRequest}
      * @param cause   the cause (which is saved for later retrieval by the
-     *                {@link #getCause()} method).  (A <tt>null</tt> value is
+     *                {@link #getCause()} method).  (A null value is
      *                permitted, and indicates that the cause is nonexistent or
      *                unknown.)
      */
