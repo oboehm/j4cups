@@ -17,6 +17,7 @@
  */
 package j4cups;
 
+import org.hamcrest.text.IsEmptyString;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ import java.net.URI;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit tests for {@link Config}.
@@ -53,11 +55,22 @@ class ConfigTest {
     }
 
     @Test
+    void withServerPort() {
+        config = config.withServerPort(42);
+        assertEquals(42, config.getServerPort());
+    }
+
+    @Test
     void getServerInfo() {
         String info = config.getServerInfo();
-        assertThat(info, not(isEmptyString()));
+        assertThat(info, not(IsEmptyString.emptyString()));
         assertThat(info, not(containsString("$")));
         LOG.info("info={}", info);
+    }
+
+    @Test
+    void createInvalidConfig() {
+        assertThrows(IllegalArgumentException.class, () -> new Config("nirwana"));
     }
 
 }

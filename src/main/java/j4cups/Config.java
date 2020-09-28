@@ -88,8 +88,7 @@ public final class Config {
      * @return the config
      */
     public Config withServerPort(int port) {
-        this.setIntProperty("j4cups.server.port", port);
-        return this;
+        return this.withProperty("j4cups.server.port", Integer.toString(port));
     }
 
     /**
@@ -109,8 +108,7 @@ public final class Config {
      * @return the config
      */
     public Config withServerForwardURI(String uri) {
-        this.properties.setProperty("j4cups.server.forwardURI", uri);
-        return this;
+        return this.withProperty("j4cups.server.forwardURI", uri);
     }
 
     /**
@@ -130,11 +128,7 @@ public final class Config {
     public String getServerInfo() {
         return this.properties.getProperty("j4cups.server.info");
     }
-    
-    private void setIntProperty(String key, int value) {
-        this.properties.setProperty(key, Integer.toString(value));
-    }
-    
+
     private int getIntProperty(String key) {
         return Integer.parseInt(this.properties.getProperty(key));
     }
