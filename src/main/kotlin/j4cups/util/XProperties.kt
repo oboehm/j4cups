@@ -15,13 +15,11 @@
  *
  * (c)reated 13.12.2018 by oboehm (ob@oasd.de)
  */
-package j4cups.util;
+package j4cups.util
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Properties;
+import org.apache.commons.lang3.StringUtils
+import org.slf4j.LoggerFactory
+import java.util.*
 
 /**
  * The eXtended Properties (or XProperties) is a extension of the normal
@@ -31,9 +29,7 @@ import java.util.Properties;
  * @author oboehm
  * @since 0.6 (13.12.2018)
  */
-public final class XProperties extends Properties {
-
-    private static final Logger LOG = LoggerFactory.getLogger(XProperties.class);
+class XProperties : Properties() {
 
     /**
      * If the property is unset the value of the system property will be taken
@@ -42,57 +38,51 @@ public final class XProperties extends Properties {
      * @param key the key
      * @return the property
      */
-    @Override
-    public String getProperty(String key) {
-        String value = super.getProperty(key);
+    override fun getProperty(key: String): String? {
+        var value = super.getProperty(key)
         if (value == null) {
-            value = System.getProperty(key);
+            value = System.getProperty(key)
         }
-        return value;
+        return value
     }
 
     /**
      * If there is a reference to another value the value will replaced
-     * accordingly.
+     * accordingly. Values like '{java.io.tmpdir}' will be substituted.
      *
      * @param key the key
      * @param value the value
      * @return the object
      */
-    @Override
-    synchronized public Object put(Object key, Object value) {
-        if (value == null) {
-            LOG.info("Put of '{}=null' is ignored.", key);
-            return null;
+    @Synchronized
+    override fun put(key: Any, value: Any): Any? {
+        return super.put(key, substitute(value as String))
+    }
+
+    private fun substitute(s: String): String {
+        return if (StringUtils.contains(s, "{")) {
+            val tokens = s.split("[{,}]".toRegex()).toTypedArray()
+            substitute(tokens)
         } else {
-            return super.put(key, substitute((String) value));
+            s
         }
     }
 
-    /**
-     * Variables like '{java.io.tmpdir}' will be substituted.
-     *
-     * @param s the value
-     * @return the string
-     */
-    private String substitute(String s) {
-        if (StringUtils.contains(s, "{")) {
-            String[] tokens = s.split("[{,}]");
-            return substitute(tokens);
-        } else {
-            return s;
-        }
-    }
-
-    private String substitute(String[] tokens) {
-        StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < tokens.length; i += 2) {
-            buf.append(tokens[i]);
-            if (i+1 < tokens.length) {
-                buf.append(this.getProperty(tokens[i+1]));
+    private fun substitute(tokens: Array<String>): String {
+        val buf = StringBuilder()
+        var i = 0
+        while (i < tokens.size) {
+            buf.append(tokens[i])
+            if (i + 1 < tokens.size) {
+                buf.append(this.getProperty(tokens[i + 1]))
             }
+            i += 2
         }
-        return buf.toString();
+        return buf.toString()
+    }
+
+    companion object {
+        private val LOG = LoggerFactory.getLogger(XProperties::class.java)
     }
 
 }
