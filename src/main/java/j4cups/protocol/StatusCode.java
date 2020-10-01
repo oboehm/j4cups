@@ -513,7 +513,7 @@ public enum StatusCode {
                 return op;
             }
         }
-        throw new IllegalArgumentException("invalid id: " + id);
+        throw new IllegalArgumentException(String.format("invalid id: %d (0x%04x)", id, id));
     }
 
 }
