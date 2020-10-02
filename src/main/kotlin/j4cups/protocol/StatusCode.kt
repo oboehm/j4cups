@@ -15,33 +15,31 @@
  *
  * (c)reated 14.02.2018 by oboehm (ob@oasd.de)
  */
-package j4cups.protocol;
+package j4cups.protocol
 
 /**
  * The status-code values range from 0x0000 to 0x7fff. The value ranges
  * for each status-code class are as follows (see RFC-8011
- * <a href="https://tools.ietf.org/html/rfc8011#appendix-B">Appendix B</a>):
- * <ul>
- *     <li>"successful" - 0x0000 to 0x00ff</li>
- *     <li>"informational" - 0x0100 to 0x01ff</li>
- *     <li>"redirection" - 0x0300 to 0x03ff</li>
- *     <li>client-error" - 0x0400 to 0x04ff</li>
- *     <li>server-error" - 0x0500 to 0x05ff</li>
- * </ul>
- * <p>
+ * [Appendix B](https://tools.ietf.org/html/rfc8011#appendix-B)):
+ *
+ *  * "successful" - 0x0000 to 0x00ff
+ *  * "informational" - 0x0100 to 0x01ff
+ *  * "redirection" - 0x0300 to 0x03ff
+ *  * client-error" - 0x0400 to 0x04ff
+ *  * server-error" - 0x0500 to 0x05ff
+ *
  * The top half (128 values) of each range (0x0n80 to 0x0nff, for n = 0
  * to 5) is reserved for vendor use within each status-code class.
  * Values 0x0600 to 0x7fff are reserved for future assignment by
  * Standards Track documents and MUST NOT be used.
- * </p>
- * 
+ *
  * @author oboehm
  * @since 0.2 (14.02.2018)
  */
-public enum StatusCode {
+enum class StatusCode(value: Int) {
 
     // B.1.2.  Successful Status-Code Values
-    
+
     /**
      * The request has succeeded, and no request attributes were substituted
      * or ignored.  In the case of a response to a Job Creation request, the
@@ -51,8 +49,8 @@ public enum StatusCode {
      * transition of the Job object into the 'completed' state is the only
      * indicator that the Job has been printed.
      */
-    SUCCESSFUL_OK (0x0000),
-    
+    SUCCESSFUL_OK(0x0000),
+
     /**
      * The request has succeeded, but some supplied (1) attributes were
      * ignored or (2) unsupported values were substituted with supported
@@ -68,7 +66,7 @@ public enum StatusCode {
      * Unsupported Attributes group of the response (with the unsupported
      * values only).
      */
-    SUCCESSFUL_OK_IGNORED_OR_SUBSTITUTED_ATTRIBUTES (0x0001),
+    SUCCESSFUL_OK_IGNORED_OR_SUBSTITUTED_ATTRIBUTES(0x0001),
 
     /**
      * The request has succeeded, but some supplied attribute values
@@ -80,18 +78,16 @@ public enum StatusCode {
      * the Unsupported Attributes group of the response for all operations
      * as supplied by the Client.
      */
-    SUCCESSFUL_OK_CONFLICTING_ATTRIBUTES (0x0002),
-    
-    // B.1.4.  Client Error Status-Code Values
+    SUCCESSFUL_OK_CONFLICTING_ATTRIBUTES(0x0002),  // B.1.4.  Client Error Status-Code Values
 
     /**
      * The request could not be understood by the IPP object due to
      * malformed syntax (such as the value of a fixed-length attribute whose
      * length does not match the prescribed length for that attribute -- see
-     * the Implementor's Guides [RFC3196] [PWG5100.19]).  The IPP
+     * the Implementor's Guides RFC3196 PWG5100.19). The IPP
      * application SHOULD NOT repeat the request without modifications.
      */
-    CLIENT_ERROR_BAD_REQUEST (0X0400),
+    CLIENT_ERROR_BAD_REQUEST(0X0400),
 
     /**
      * The IPP object understood the request but is refusing to fulfill it.
@@ -101,7 +97,7 @@ public enum StatusCode {
      * reveal exactly why the request has been refused or when no other
      * response is applicable.
      */
-    CLIENT_ERROR_FORBIDDEN (0X0401),
+    CLIENT_ERROR_FORBIDDEN(0X0401),
 
     /**
      * The request requires user authentication.  The IPP Client can repeat
@@ -114,7 +110,7 @@ public enum StatusCode {
      * information.  This status-code reveals more information than
      * 'client-error-forbidden'.
      */
-    CLIENT_ERROR_NOT_AUTHENTICATED (0X0402),
+    CLIENT_ERROR_NOT_AUTHENTICATED(0X0402),
 
     /**
      * The requester is not authorized to perform the request.  Additional
@@ -126,7 +122,7 @@ public enum StatusCode {
      * information than 'client-error-forbidden' and
      * 'client-error-not-authenticated'.
      */
-    CLIENT_ERROR_NOT_AUTHORIZED (0X0403),
+    CLIENT_ERROR_NOT_AUTHORIZED(0X0403),
 
     /**
      * This status-code is used when the request is for something that
@@ -134,8 +130,8 @@ public enum StatusCode {
      * that has already been canceled or aborted by the system.  The IPP
      * Client SHOULD NOT repeat the request.
      */
-    CLIENT_ERROR_NOT_POSSIBLE (0X0404),
-    
+    CLIENT_ERROR_NOT_POSSIBLE(0X0404),
+
     /**
      * The Client did not produce a request within the time that the IPP
      * object was prepared to wait.  For example, a Client issued a
@@ -147,7 +143,7 @@ public enum StatusCode {
      * to close the Job, since the Client took too long.  The Client
      * SHOULD NOT repeat the request without modifications.
      */
-    CLIENT_ERROR_TIMEOUT (0x0405),
+    CLIENT_ERROR_TIMEOUT(0x0405),
 
     /**
      * The IPP object has not found anything matching the request URI.  No
@@ -160,13 +156,12 @@ public enum StatusCode {
      * error status-code is also used when a Client supplies a URI as a
      * reference to the Document data in either a Print-URI or Send-URI
      * operation but the Document cannot be found.
-     * <p>
+     *
      * In practice, an IPP application should avoid a "not found" situation
      * by first querying and presenting a list of valid Printer URIs and Job
      * URIs to the End User.
-     * </p>
      */
-    CLIENT_ERROR_NOT_FOUND (0x0406),
+    CLIENT_ERROR_NOT_FOUND(0x0406),
 
     /**
      * The requested object is no longer available, and no forwarding
@@ -176,7 +171,7 @@ public enum StatusCode {
      * or has no facility to determine whether or not the condition is
      * permanent, the status-code 'client-error-not-found' should be used
      * instead.
-     * <p>
+     *
      * This response is primarily intended to assist the task of maintenance
      * by notifying the recipient that the resource is intentionally
      * unavailable and that the IPP object Administrator desires that remote
@@ -184,9 +179,9 @@ public enum StatusCode {
      * permanently unavailable resources as "gone" or to keep the mark for
      * any length of time -- that is left to the discretion of the IPP
      * object Administrator and/or Printer implementation.
-     * </p>
+     *
      */
-    CLIENT_ERROR_GONE (0x0407),
+    CLIENT_ERROR_GONE(0x0407),
 
     /**
      * The IPP object is refusing to process a request because the request
@@ -196,7 +191,7 @@ public enum StatusCode {
      * when the attributes are so many that their encoding causes the
      * request entity to exceed IPP object capacity.
      */
-    CLIENT_ERROR_REQUEST_ENTITY_TOO_LARGE (0x0408),
+    CLIENT_ERROR_REQUEST_ENTITY_TOO_LARGE(0x0408),
 
     /**
      * The IPP object is refusing to service the request because one or more
@@ -209,8 +204,8 @@ public enum StatusCode {
      * less than the maximum length, but during the processing of the
      * request as a whole, the object can pass the value onto some other
      * system component that is not able to accept the large value.  For
-     * more details, see the Implementor's Guides [RFC3196] [PWG5100.19].
-     * <p>
+     * more details, see the Implementor's Guides RFC3196 PWG5100.19.
+     *
      * Note: For attribute values that are URIs, this rare condition is only
      * likely to occur when a Client has improperly submitted a request with
      * long query information (e.g., an IPP application allows an End User
@@ -220,9 +215,8 @@ public enum StatusCode {
      * by a Client attempting to exploit security holes present in some IPP
      * objects using fixed-length buffers for reading or manipulating the
      * request URI.
-     * </p>
      */
-    CLIENT_ERROR_REQUEST_VALUE_TOO_LONG (0x0409),
+    CLIENT_ERROR_REQUEST_VALUE_TOO_LONG(0x0409),
 
     /**
      * The IPP object is refusing to service the request because the
@@ -234,10 +228,9 @@ public enum StatusCode {
      * not supported as well, since this error is a bigger problem than with
      * Job Template attributes.  See Sections 4.1.6.1, 4.1.7, and 4.2.1.1.
      */
-    CLIENT_ERROR_DOCUMENT_FORMAT_NOT_SUPPORTED (0x040a),
-        
+    CLIENT_ERROR_DOCUMENT_FORMAT_NOT_SUPPORTED(0x040a),
+
     /**
-     * 
      * In a Job Creation request, if the Printer does not support one or
      * more attributes, attribute syntaxes, or attribute values supplied in
      * the request and the Client supplied the "ipp-attribute-fidelity"
@@ -252,7 +245,7 @@ public enum StatusCode {
      * Printer MUST ignore or substitute values for unsupported Job Template
      * attributes and values rather than reject the request and return this
      * status-code.
-     * <p>
+     *
      * For any operation where a Client requests attributes (such as a
      * Get-Jobs, Get-Printer-Attributes, or Get-Job-Attributes operation),
      * if the IPP object does not support one or more of the requested
@@ -264,25 +257,24 @@ public enum StatusCode {
      * SHOULD return the unsupported attributes as values of the
      * "requested-attributes" operation attribute in the Unsupported
      * Attributes group (see Appendix B.1.2.2).
-     * </p>
      */
-    CLIENT_ERROR_ATTRIBUTES_OR_VALUES_NOT_SUPPORTED (0x040b),
-        
+    CLIENT_ERROR_ATTRIBUTES_OR_VALUES_NOT_SUPPORTED(0x040b),
+
     /**
      * The scheme of the Client-supplied URI in a Print-URI or a Send-URI
      * operation is not supported.  See Sections 4.1.6.1 and 4.1.7.
      */
-    CLIENT_ERROR_URI_SCHEME_NOT_SUPPORTED (0x040c),
-    
+    CLIENT_ERROR_URI_SCHEME_NOT_SUPPORTED(0x040c),
+
     /**
-     * 
      * For any operation, if the IPP Printer does not support the charset
      * supplied by the Client in the "attributes-charset" operation
      * attribute, the Printer MUST reject the operation and return this
      * status-code, and any 'text' or 'name' attributes using the 'utf-8'
      * charset (Section 4.1.4.1).  See Sections 4.1.6.1 and 4.1.7.
      */
-    CLIENT_ERROR_CHARSET_NOT_SUPPORTED (0x040d),
+    CLIENT_ERROR_CHARSET_NOT_SUPPORTED(0x040d),
+
     /**
      * The request is rejected because some attribute values conflicted with
      * the values of other attributes that this document does not permit to
@@ -290,8 +282,8 @@ public enum StatusCode {
      * Unsupported Attributes group the conflicting attributes supplied by
      * the Client.  See Sections 4.1.7 and 4.2.1.2.
      */
-    CLIENT_ERROR_CONFLICTING_ATTRIBUTES (0x040e),
-    
+    CLIENT_ERROR_CONFLICTING_ATTRIBUTES(0x040e),
+
     /**
      * The IPP object is refusing to service the request because the
      * Document data, as specified in the "compression" operation attribute,
@@ -302,7 +294,7 @@ public enum StatusCode {
      * not supported as well, since this error is a bigger problem than with
      * Job Template attributes.  See Sections 4.1.6.1, 4.1.7, and 4.2.1.1.
      */
-    CLIENT_ERROR_COMPRESSION_NOT_SUPPORTED (0x040f),
+    CLIENT_ERROR_COMPRESSION_NOT_SUPPORTED(0x040f),
 
     /**
      * The IPP object is refusing to service the request because the
@@ -314,8 +306,8 @@ public enum StatusCode {
      * this error is a bigger problem than with Job Template attributes.
      * See Sections 4.1.7 and 4.2.1.1.
      */
-    CLIENT_ERROR_COMPRESSION_ERROR (0x0410),
-   
+    CLIENT_ERROR_COMPRESSION_ERROR(0x0410),
+
     /**
      * The IPP object is refusing to service the request because the Printer
      * encountered an error in the Document data while interpreting it.
@@ -325,10 +317,10 @@ public enum StatusCode {
      * supported as well, since this error is a bigger problem than with Job
      * Template attributes.  See Sections 4.1.7 and 4.2.1.1.
      */
-    CLIENT_ERROR_DOCUMENT_FORMAT_ERROR (0x0411),
-    
+    CLIENT_ERROR_DOCUMENT_FORMAT_ERROR(0x0411),
+
     /**
-     * 
+     *
      * The IPP object is refusing to service the Print-URI or Send-URI
      * request because the Printer encountered an access error while
      * attempting to validate the accessibility of, or access to, the
@@ -336,9 +328,7 @@ public enum StatusCode {
      * The Printer MAY also return a specific Document access error code
      * using the "document-access-error" operation attribute (see
      */
-    CLIENT_ERROR_DOCUMENT_ACCESS_ERROR (0x0412),
-    
-    // B.1.5.  Server Error Status-Code Values
+    CLIENT_ERROR_DOCUMENT_ACCESS_ERROR(0x0412),  // B.1.5.  Server Error Status-Code Values
 
     /**
      * The IPP object encountered an unexpected condition that prevented it
@@ -350,15 +340,15 @@ public enum StatusCode {
      * undesirable but expected).  This error status-code indicates that
      * intervention by a knowledgeable human is probably required.
      */
-    SERVER_ERROR_INTERNAL_ERROR (0x0500),
-    
+    SERVER_ERROR_INTERNAL_ERROR(0x0500),
+
     /**
      * The IPP object does not support the functionality required to fulfill
      * the request.  This is the appropriate response when the IPP object
      * does not recognize an operation or is not capable of supporting it.
      * See Sections 4.1.6.1 and 4.1.7.
      */
-    SERVER_ERROR_OPERATION_NOT_SUPPORTED (0x0501),
+    SERVER_ERROR_OPERATION_NOT_SUPPORTED(0x0501),
 
     /**
      * The IPP object is currently unable to handle the request due to
@@ -371,7 +361,7 @@ public enum StatusCode {
      * permanent, the 'client-error-gone' or 'client-error-not-found' error
      * status-code could be used.
      */
-    SERVER_ERROR_SERVICE_UNAVAILABLE (0x0502),
+    SERVER_ERROR_SERVICE_UNAVAILABLE(0x0502),
 
     /**
      * The IPP object does not support or refuses to support the IPP version
@@ -383,7 +373,7 @@ public enum StatusCode {
      * attribute (see Section 4.1.6.2) describing why that version is not
      * supported and what other versions are supported by that IPP object.
      * See Sections 4.1.6.1, 4.1.7, and 4.1.8.
-     * <p>
+     *
      * The error response MUST identify in the "version-number" operation
      * parameter the closest version number that the IPP object does
      * support.  For example, if a Client supplies version '1.0' and an
@@ -395,9 +385,8 @@ public enum StatusCode {
      * version '1.2', the IPP/1.1 object should accept the request and
      * return version '1.1' or can reject the request and respond with this
      * error code and version '1.1'.  See Sections 4.1.8 and 5.3.14.
-     * </p>
      */
-    SERVER_ERROR_VERSION_NOT_SUPPORTED (0x0503),
+    SERVER_ERROR_VERSION_NOT_SUPPORTED(0x0503),
 
     /**
      * A Printer error, such as a paper jam, occurs while the IPP object
@@ -416,8 +405,7 @@ public enum StatusCode {
      * a case, the Client would look at the returned Job object attributes
      * or later query the Printer to determine its state and state reasons.
      */
-    SERVER_ERROR_DEVICE_ERROR (0x0504),
-
+    SERVER_ERROR_DEVICE_ERROR(0x0504),
 
     /**
      * A temporary error such as a buffer-full write error, a memory
@@ -429,7 +417,7 @@ public enum StatusCode {
      * implementation option, a Printer MAY delay the response until the
      * temporary condition is cleared so that no error is returned.
      */
-   SERVER_ERROR_TEMPORARY_ERROR (0x0505),
+    SERVER_ERROR_TEMPORARY_ERROR(0x0505),
 
     /**
      * This is a temporary error indicating that the Printer is not
@@ -437,7 +425,7 @@ public enum StatusCode {
      * of the Printer's "printer-is-accepting-jobs" attribute to 'false' (by
      * means outside the scope of this IPP/1.1 document).
      */
-    SERVER_ERROR_NOT_ACCEPTING_JOBS (0x0506),
+    SERVER_ERROR_NOT_ACCEPTING_JOBS(0x0506),
 
     /**
      * This is a temporary error indicating that the Printer is too busy
@@ -445,7 +433,7 @@ public enum StatusCode {
      * unmodified request again at some later point in time with an
      * expectation that the temporary busy condition will have been cleared.
      */
-    SERVER_ERROR_BUSY (0x0507),
+    SERVER_ERROR_BUSY(0x0507),
 
     /**
      * This is an error indicating that the Job has been canceled by an
@@ -455,40 +443,31 @@ public enum StatusCode {
      * Send-Document, or Send-URI response as usual; otherwise, no "job-id"
      * and "job-uri" attributes are returned in the response.
      */
-    SERVER_ERROR_JOB_CANCELED (0x0508),
+    SERVER_ERROR_JOB_CANCELED(0x0508),
 
     /**
      * The IPP object does not support multiple Documents per Job, and a
      * Client attempted to supply Document data with a second Send-Document
      * or Send-URI operation.
      */
-    SERVER_ERROR_MULTIPLE_DOCUMENT_JOBS_NOT_SUPPORTED (0x0509);
-
-    private final short code;
-
-    StatusCode(int value) {
-        this.code = (short) value;
-    }
+    SERVER_ERROR_MULTIPLE_DOCUMENT_JOBS_NOT_SUPPORTED(0x0509);
 
     /**
      * Gets the value of the statuscode.
      *
      * @return 2-byte code from 0x0000 to 0x7fff
      */
-    public short getCode() {
-        return code;
-    }
+    val code: Short
 
     /**
      * For the constants which represents an succesful state this method
      * returns true.
-     * 
+     *
      * @return true for the SUCCESFUL_xxx constants, otherwise false
      * @since 0.5
      */
-    public boolean isSuccessful() {
-        return toString().startsWith("successful");
-    }
+    val isSuccessful: Boolean
+        get() = toString().startsWith("successful")
 
     /**
      * This implementation generates the same representation as described in
@@ -496,24 +475,30 @@ public enum StatusCode {
      *
      * @return e.g. "successful-ok"
      */
-    @Override
-    public String toString() {
-        return super.toString().toLowerCase().replaceAll("_", "-");
+    override fun toString(): String {
+        return super.toString().toLowerCase().replace("_".toRegex(), "-")
     }
 
-    /**
-     * Allows you to map a value to the corresponding statuscode
-     *
-     * @param id e.g. 0x0000
-     * @return status code, e.g. SUCCESSFUL_OK
-     */
-    public static StatusCode of(int id) {
-        for (StatusCode op : StatusCode.values()) {
-            if (id == op.getCode()) {
-                return op;
+    companion object {
+        /**
+         * Allows you to map a value to the corresponding statuscode
+         *
+         * @param id e.g. 0x0000
+         * @return status code, e.g. SUCCESSFUL_OK
+         */
+        @JvmStatic
+        fun of(id: Int): StatusCode {
+            for (op in values()) {
+                if (id == op.code.toInt()) {
+                    return op
+                }
             }
+            throw IllegalArgumentException(String.format("invalid id: %d (0x%04x)", id, id))
         }
-        throw new IllegalArgumentException(String.format("invalid id: %d (0x%04x)", id, id));
+    }
+
+    init {
+        code = value.toShort()
     }
 
 }
