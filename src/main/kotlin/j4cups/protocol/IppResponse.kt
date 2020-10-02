@@ -15,133 +15,112 @@
  *
  * (c)reated 09.02.2018 by oboehm (ob@oasd.de)
  */
-package j4cups.protocol;
+package j4cups.protocol
 
-import j4cups.protocol.attr.Attribute;
-import j4cups.protocol.attr.AttributeGroup;
-import j4cups.protocol.tags.ValueTags;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
+import j4cups.protocol.StatusCode
+import j4cups.protocol.StatusCode.Companion.of
+import j4cups.protocol.attr.Attribute
+import j4cups.protocol.attr.AttributeGroup
+import j4cups.protocol.tags.ValueTags
+import org.slf4j.LoggerFactory
+import java.util.*
 
 /**
  * The IppResponse represents an IPP response as is defined in RFC-2910.
  * <pre>
- *  -----------------------------------------------
- *  |                  version-number             |   2 bytes  - required
- *  -----------------------------------------------
- *  |               operation-id (request)        |
- *  |                      or                     |   2 bytes  - required
- *  |               status-code (response)        |
- *  -----------------------------------------------
- *  |                   request-id                |   4 bytes  - required
- *  -----------------------------------------------
- *  |                 attribute-group             |   n bytes - 0 or more
- *  -----------------------------------------------
- *  |              end-of-attributes-tag          |   1 byte   - required
- *  -----------------------------------------------
- *  |                     data                    |   q bytes  - optional
- *  -----------------------------------------------
+ * -----------------------------------------------
+ * |                  version-number             |   2 bytes  - required
+ * -----------------------------------------------
+ * |               operation-id (request)        |
+ * |                      or                     |   2 bytes  - required
+ * |               status-code (response)        |
+ * -----------------------------------------------
+ * |                   request-id                |   4 bytes  - required
+ * -----------------------------------------------
+ * |                 attribute-group             |   n bytes - 0 or more
+ * -----------------------------------------------
+ * |              end-of-attributes-tag          |   1 byte   - required
+ * -----------------------------------------------
+ * |                     data                    |   q bytes  - optional
+ * -----------------------------------------------
  * </pre>
  *
  * @author oboehm
  * @since 0.0.1 (09.02.2018)
  */
-public class IppResponse extends AbstractIpp {
-    
-    private static final Logger LOG = LoggerFactory.getLogger(IppResponse.class);
+class IppResponse : AbstractIpp {
 
     /**
-     * This constructor is needed for the {@link java.io.Externalizable}
+     * This constructor is needed for the [java.io.Externalizable]
      * interface.
      */
-    public IppResponse() {
-        super();
-    }
+    constructor() : super() {}
 
     /**
      * Instantiates a new IPP response from the given bytes.
      *
      * @param bytes the bytes of the IPP request
      */
-    public IppResponse(byte[] bytes) {
-        super(bytes);
-    }
+    constructor(bytes: ByteArray) : super(bytes) {}
 
     /**
      * The IppResponse is the response to a IppRequest. So you need the id
      * of the IppRequest to create a response.
-     * 
+     *
      * @param request the request for this response
      */
-    public IppResponse(IppRequest request) {
-        super(DEFAULT_VERSION, StatusCode.SUCCESSFUL_OK.getCode(), request.getRequestId(), fillAttributesGroupsFor(request));
-    }
-    
-    private static List<AttributeGroup> fillAttributesGroupsFor(IppRequest request) {
-        List<AttributeGroup> groups = new ArrayList<>();
-        for (AttributeGroup g : request.getAttributeGroups()) {
-            groups.add(new AttributeGroup(g));
-        }
-        return groups;
-    }
-
-    /**
-     * Set the 2nd part (byte 2-3) with the new status-code.
-     * 
-     * @param code the new status code
-     */
-    public void setStatusCode(StatusCode code) {
-        setOpCode(code.getCode());
-    }
+    constructor(request: IppRequest) : super(DEFAULT_VERSION, StatusCode.SUCCESSFUL_OK.code, request.requestId, fillAttributesGroupsFor(request)) {}
 
     /**
      * Returns the 2nd part (byte 2-3) with the status-code.
      *
-     * @return e.g. {@link StatusCode#SUCCESSFUL_OK}
+     * @return e.g. [StatusCode.SUCCESSFUL_OK]
      */
-    public StatusCode getStatusCode() {
-        return StatusCode.of(getOpCode());
-    }
-
-    /**
-     * In case of a bad request or other error status you can set the
-     * message for this status with this function.
-     *
-     * @param message the status message
-     * @since 0.5
-     */
-    public void setStatusMessage(String message) {
-        Attribute attr = Attribute.of(ValueTags.TEXT_WITHOUT_LANGUAGE, "status-message", message);
-        setOperationAttribute(attr);
-    }
-
-    /**
-     * Gets the content of the attribute 'status-message'.
-     *
-     * @return string with the status message
-     * @since 0.5
-     */
-    public String getStatusMessage() {
-        String name = "status-message";
-        if (hasAttribute(name)) {
-            return getAttribute(name).getStringValue();
-        } else {
-            LOG.info("{} has no attribute '{}'.", this, name);
-            return "unknown";
+    var statusCode: StatusCode
+        get() = of(opCode.toInt())
+        set(code) {
+            opCode = code.code
         }
-    }
+
+    /**
+     * In case of a bad request or other error status you can set or get the
+     * content of the attribute 'status-message'.
+     *
+     * @since 0.5
+     */
+    var statusMessage: String
+        get() {
+            val name = "status-message"
+            return if (hasAttribute(name)) {
+                getAttribute(name).stringValue
+            } else {
+                LOG.info("{} has no attribute '{}'.", this, name)
+                "unknown"
+            }
+        }
+        set(message) {
+            val attr = Attribute.of(ValueTags.TEXT_WITHOUT_LANGUAGE, "status-message", message)
+            setOperationAttribute(attr)
+        }
 
     /**
      * Returns the 2nd part (byte 2-3) with the status-code as string.
      *
      * @return e.g. "successful-ok"
      */
-    @Override
-    protected String getOpCodeAsString() {
-        return getStatusCode().toString();
+    override fun getOpCodeAsString(): String {
+        return statusCode.toString()
+    }
+
+    companion object {
+        private val LOG = LoggerFactory.getLogger(IppResponse::class.java)
+        private fun fillAttributesGroupsFor(request: IppRequest): List<AttributeGroup> {
+            val groups: MutableList<AttributeGroup> = ArrayList()
+            for (g in request.attributeGroups) {
+                groups.add(AttributeGroup(g))
+            }
+            return groups
+        }
     }
 
 }
