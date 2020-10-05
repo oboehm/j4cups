@@ -109,6 +109,9 @@ class IppResponse : AbstractIpp {
      * @return e.g. "successful-ok"
      */
     override fun getOpCodeAsString(): String {
+        if (IppOperations.of(opCode.toInt()) == IppOperations.RESERVED_FOR_VENDOR_EXTENSIONS) {
+            return String.format("0x%4d", opCode)
+        }
         return statusCode.toString()
     }
 

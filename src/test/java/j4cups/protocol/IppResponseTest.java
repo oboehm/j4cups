@@ -175,4 +175,12 @@ public final class IppResponseTest extends AbstractIppTest {
         assertEquals("unknown", empty.getStatusMessage());
     }
 
+    @Test
+    public void testGetOpVendorExtension() {
+        IppResponse response = new IppResponse();
+        response.setOpCode(IppOperations.RESERVED_FOR_VENDOR_EXTENSIONS.getCode());
+        String opcode = response.getOpCodeAsString();
+        assertThat(opcode, startsWith("0x"));
+    }
+
 }
