@@ -92,6 +92,13 @@ public final class IppRequestTest extends AbstractIppTest {
     }
 
     @Test
+    public void getOpCodeAsString() {
+        request.setOpCode(IppOperations.RESERVED_FOR_VENDOR_EXTENSIONS.getCode());
+        String s = request.getOpCodeAsString();
+        assertThat(s, startsWith("0x"));
+    }
+
+    @Test
     @DisplayName("request-id")
     public void getRequestId() {
         assertEquals(1, request.getRequestId());

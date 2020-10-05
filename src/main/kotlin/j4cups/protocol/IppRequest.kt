@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 by Oliver Boehm
+ * Copyright (c) 2018-2020 by Oliver Boehm
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,81 +15,70 @@
  *
  * (c)reated 09.02.2018 by oboehm (ob@oasd.de)
  */
-package j4cups.protocol;
+package j4cups.protocol
 
-import java.nio.ByteBuffer;
+import java.nio.ByteBuffer
 
 /**
  * The IppRequest represents an IPP request as is defined in RFC-2910.
  * <pre>
- *  -----------------------------------------------
- *  |                  version-number             |   2 bytes  - required
- *  -----------------------------------------------
- *  |               operation-id (request)        |   2 bytes  - required
- *  -----------------------------------------------
- *  |                   request-id                |   4 bytes  - required
- *  -----------------------------------------------
- *  |                 attribute-group             |   n bytes - 0 or more
- *  -----------------------------------------------
- *  |              end-of-attributes-tag          |   1 byte   - required
- *  -----------------------------------------------
- *  |                     data                    |   q bytes  - optional
- *  -----------------------------------------------
+ * -----------------------------------------------
+ * |                  version-number             |   2 bytes  - required
+ * -----------------------------------------------
+ * |               operation-id (request)        |   2 bytes  - required
+ * -----------------------------------------------
+ * |                   request-id                |   4 bytes  - required
+ * -----------------------------------------------
+ * |                 attribute-group             |   n bytes - 0 or more
+ * -----------------------------------------------
+ * |              end-of-attributes-tag          |   1 byte   - required
+ * -----------------------------------------------
+ * |                     data                    |   q bytes  - optional
+ * -----------------------------------------------
  * </pre>
  *
  * @author oboehm
  * @since 0.0.1 (09.02.2018)
  */
-public class IppRequest extends AbstractIpp {
+class IppRequest : AbstractIpp {
 
     /**
-     * This constructor is needed for the {@link java.io.Externalizable} 
+     * This constructor is needed for the [java.io.Externalizable]
      * interface.
      */
-    public IppRequest() {
-        super();
-    }
+    constructor() : super() {}
 
     /**
      * Instantiates a new IPP request from the given bytes.
      *
      * @param bytes the bytes of the IPP request
      */
-    public IppRequest(byte[] bytes) {
-        this(ByteBuffer.wrap(bytes));
-    }
+    constructor(bytes: ByteArray) : this(ByteBuffer.wrap(bytes)) {}
 
     /**
      * Instantiates a new IPP request from the given bytes.
      *
      * @param bytes the bytes of the IPP request
      */
-    public IppRequest(ByteBuffer bytes) {
-        super(bytes);
-    }
-    
+    constructor(bytes: ByteBuffer) : super(bytes) {}
+
     /**
      * Returns the 2nd part (byte 2-3) with the operation-id.
      *
-     * @return e.g. {@link IppOperations#CREATE_JOB}
+     * @return e.g. [IppOperations.CREATE_JOB]
      */
-    public IppOperations getOperation() {
-        return IppOperations.of(super.getOpCode());
-    }
+    val operation: IppOperations
+        get() = IppOperations.of(super.getOpCode().toInt())
 
     /**
      * Returns the 2nd part (byte 2-3) with the operation-id as string.
      *
      * @return e.g. "Create-Job"
      */
-    @Override
-    protected String getOpCodeAsString() {
-        switch (getOperation()) {
-            case ADDITIONAL_REGISTERED_OPERATIONS:
-            case RESERVED_FOR_VENDOR_EXTENSIONS:
-                return String.format("0x%04x", getOpCode());
-            default:
-                return getOperation().toString();
+    public override fun getOpCodeAsString(): String {
+        return when (operation) {
+            IppOperations.ADDITIONAL_REGISTERED_OPERATIONS, IppOperations.RESERVED_FOR_VENDOR_EXTENSIONS -> String.format("0x%04x", opCode)
+            else -> operation.toString()
         }
     }
 
