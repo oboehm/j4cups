@@ -17,6 +17,8 @@
  */
 package j4cups.protocol;
 
+import j4cups.protocol.enums.JobState;
+import j4cups.protocol.enums.JobStateReasons;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -129,6 +131,26 @@ public abstract class AbstractIppTest {
         ippPackage.setAttribute("hello", world);
         assertEquals("world", ippPackage.getAttribute("hello").getStringValue());
     }
+
+    @Test
+    public void testGetJobState() {
+        JobState state = JobState.ABORTED;
+        ippPackage.setJobState(state);
+        assertEquals(state, ippPackage.getJobState());
+    }
+
+    @Test
+    public void testGetJobStateReasons() {
+        JobStateReasons reasons = JobStateReasons.JOB_INCOMING;
+        ippPackage.setJobStateReasons(reasons);
+        assertEquals(reasons, ippPackage.getJobStateReasons());
+    }
+
+    @Test
+    public void testGetJobStateMessage() {
+        ippPackage.setJobStateMessage("hello");
+        assertEquals("hello", ippPackage.getJobStateMessage());
+    }
     
     @Test
     public void testSerializable() throws NotSerializableException {
@@ -140,6 +162,15 @@ public abstract class AbstractIppTest {
         AbstractIpp one = getIppPackage();
         AbstractIpp anotherOne = getIppPackage();
         ObjectTester.assertEquals(one, anotherOne);
+    }
+
+    @Test
+    public void testVersion() {
+        AbstractIpp one = getIppPackage();
+        AbstractIpp.Version v1 = new AbstractIpp.Version((byte) 1, (byte) 0);
+        AbstractIpp.Version v10 = new AbstractIpp.Version((byte) 1, (byte) 0);
+        ObjectTester.assertEquals(v1, v10);
+        ObjectTester.assertNotEquals(one, v1);
     }
 
     /**
