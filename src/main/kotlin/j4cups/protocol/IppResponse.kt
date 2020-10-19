@@ -108,16 +108,19 @@ class IppResponse : AbstractIpp {
      *
      * @return e.g. "successful-ok"
      */
-    override fun getOpCodeAsString(): String {
-        if (IppOperations.of(opCode.toInt()) == IppOperations.RESERVED_FOR_VENDOR_EXTENSIONS) {
-            return String.format("0x%4d", opCode)
-        }
-        return statusCode.toString()
-    }
+    override val opCodeAsString: String
+        get() =
+            if (IppOperations.of(opCode.toInt()) == IppOperations.RESERVED_FOR_VENDOR_EXTENSIONS) {
+                String.format("0x%4d", opCode)
+            } else {
+                statusCode.toString()
+            }
+
+
 
     companion object {
         private val LOG = LoggerFactory.getLogger(IppResponse::class.java)
-        private fun fillAttributesGroupsFor(request: IppRequest): List<AttributeGroup> {
+        private fun fillAttributesGroupsFor(request: IppRequest): MutableList<AttributeGroup> {
             val groups: MutableList<AttributeGroup> = ArrayList()
             for (g in request.attributeGroups) {
                 groups.add(AttributeGroup(g))

@@ -68,18 +68,17 @@ class IppRequest : AbstractIpp {
      * @return e.g. [IppOperations.CREATE_JOB]
      */
     val operation: IppOperations
-        get() = IppOperations.of(super.getOpCode().toInt())
+        get() = IppOperations.of(super.opCode.toInt())
 
     /**
      * Returns the 2nd part (byte 2-3) with the operation-id as string.
      *
      * @return e.g. "Create-Job"
      */
-    public override fun getOpCodeAsString(): String {
-        return when (operation) {
+    override val opCodeAsString: String
+        get() = when (operation) {
             IppOperations.ADDITIONAL_REGISTERED_OPERATIONS, IppOperations.RESERVED_FOR_VENDOR_EXTENSIONS -> String.format("0x%04x", opCode)
             else -> operation.toString()
         }
-    }
 
 }
