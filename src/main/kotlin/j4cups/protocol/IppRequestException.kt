@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 by Oliver Boehm
+ * Copyright (c) 2018-2020 by Oliver Boehm
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,30 +15,34 @@
  *
  * (c)reated 30.05.2018 by oboehm (ob@oasd.de)
  */
-package j4cups.protocol;
+package j4cups.protocol
 
 /**
  * The class IppRequestException can be thrown if there is a problem with
- * an {@link IppRequest}.
+ * an [IppRequest].
  *
  * @author oboehm
  * @since 0.5 (30.05.2018)
  */
-public class IppRequestException extends RuntimeException {
+class IppRequestException : RuntimeException {
 
-    private final IppResponse response;
+    /**
+     * Gets the error response of the request
+     *
+     * @return the IPP response
+     */
+    val response: IppResponse
 
     /**
      * Constructs a new runtime exception with the specified IPP response.
      * The cause is not initialized, and may subsequently be initialized by a
-     * call to {@link #initCause}.
+     * call to [.initCause].
      *
      * @param ippResponse the response which was received with a problematic
-     *                    {@link IppRequest}
+     * [IppRequest]
      */
-    public IppRequestException(IppResponse ippResponse) {
-        super(asString(ippResponse));
-        this.response = ippResponse;
+    constructor(ippResponse: IppResponse) : super(asString(ippResponse)) {
+        response = ippResponse
     }
 
     /**
@@ -46,27 +50,20 @@ public class IppRequestException extends RuntimeException {
      * and cause.
      *
      * @param ippResponse the response which was received with a problematic
-     *                    {@link IppRequest}
+     * [IppRequest]
      * @param cause   the cause (which is saved for later retrieval by the
-     *                {@link #getCause()} method).  (A null value is
-     *                permitted, and indicates that the cause is nonexistent or
-     *                unknown.)
+     * [.getCause] method). (A null value is
+     * permitted, and indicates that the cause is nonexistent or
+     * unknown.)
      */
-    public IppRequestException(IppResponse ippResponse, Throwable cause) {
-        super(asString(ippResponse), cause);
-        this.response = ippResponse;
-    }
-    
-    private static String asString(IppResponse response) {
-        return response.getStatusCode() + " - " + response.getStatusMessage();
+    constructor(ippResponse: IppResponse, cause: Throwable?) : super(asString(ippResponse), cause) {
+        response = ippResponse
     }
 
-    /**
-     * Gets the error response of the request
-     *
-     * @return the IPP response
-     */
-    public IppResponse getResponse() {
-        return this.response;
+    companion object {
+        private fun asString(response: IppResponse): String {
+            return response.statusCode.toString() + " - " + response.statusMessage
+        }
     }
+
 }
