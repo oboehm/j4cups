@@ -584,7 +584,7 @@ abstract class AbstractIpp @JvmOverloads constructor(
 
     private fun validateAttributes() {
         for (attr in attributes) {
-            val value = attr.value
+            val value = attr.value!!
             if (value.size == 0) {
                 throw ValidationException("empty value: $attr")
             }
