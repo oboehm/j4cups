@@ -244,7 +244,7 @@ abstract class AbstractIpp @JvmOverloads constructor(
         get() {
             val attributes: MutableList<Attribute> = ArrayList()
             for (group in attributeGroups) {
-                attributes.addAll(group.attributes)
+                attributes.addAll(group.getAttributes())
             }
             return attributes
         }
@@ -275,7 +275,7 @@ abstract class AbstractIpp @JvmOverloads constructor(
      * @param attr the attribute
      * @param groupTag defines the attribute-group where the attribute is inserted
      */
-    fun setAttribute(attr: Attribute?, groupTag: DelimiterTags) {
+    fun setAttribute(attr: Attribute, groupTag: DelimiterTags) {
         val group = getAttributeGroup(groupTag)
         group.addAttribute(attr)
     }
@@ -339,7 +339,7 @@ abstract class AbstractIpp @JvmOverloads constructor(
      * @since 0.5
      */
     val operationAttributes: List<Attribute>
-        get() = getAttributeGroup(DelimiterTags.OPERATION_ATTRIBUTES_TAG).attributes
+        get() = getAttributeGroup(DelimiterTags.OPERATION_ATTRIBUTES_TAG).getAttributes()
 
     /**
      * Sets or gets the printer-uri attribute. If it is already set it will be
@@ -445,7 +445,7 @@ abstract class AbstractIpp @JvmOverloads constructor(
     fun toLongString(): String {
         val attrs = StringBuilder()
         for (group in attributeGroups) {
-            if (!group.attributes.isEmpty()) {
+            if (!group.getAttributes().isEmpty()) {
                 attrs.append('|').append(group.toLongString())
             }
         }
@@ -507,7 +507,7 @@ abstract class AbstractIpp @JvmOverloads constructor(
             dos.writeShort(opCode.toInt())
             dos.writeInt(requestId)
             for (group in getAttributeGroups()) {
-                if (!group.attributes.isEmpty()) {
+                if (!group.getAttributes().isEmpty()) {
                     dos.write(group.toByteArray())
                 }
             }
@@ -584,7 +584,7 @@ abstract class AbstractIpp @JvmOverloads constructor(
 
     private fun validateAttributes() {
         for (attr in attributes) {
-            val value = attr.value!!
+            val value = attr.value
             if (value.size == 0) {
                 throw ValidationException("empty value: $attr")
             }
