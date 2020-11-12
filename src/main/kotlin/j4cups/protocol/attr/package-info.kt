@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 by Oliver Boehm
+ * Copyright (c) 2018-2020 by Oliver Boehm
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 
 /**
  * In this package are the building blocks for attribute and attribute-groups.
- * 
+ *
  * @since 0.0.2
  */
-package j4cups.protocol.attr;
+package j4cups.protocol.attr

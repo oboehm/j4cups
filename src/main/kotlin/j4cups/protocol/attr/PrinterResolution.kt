@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 by Oliver Boehm
+ * Copyright (c) 2018-2020 by Oliver Boehm
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,10 @@
  *
  * (c)reated 09.05.2018 by oboehm (ob@oasd.de)
  */
-package j4cups.protocol.attr;
+package j4cups.protocol.attr
 
-import j4cups.protocol.enums.PrintQuality;
-
-import java.nio.ByteBuffer;
+import j4cups.protocol.enums.PrintQuality
+import java.nio.ByteBuffer
 
 /**
  * This RECOMMENDED attribute identifies the output resolution that the
@@ -27,63 +26,10 @@ import java.nio.ByteBuffer;
  *
  * @since 0.5
  */
-public class PrinterResolution {
-    
-    private final int crossFeedDirection;
-    private final int feedDirection;
-    private final PrintQuality printQuality;
-
-    /**
-     * Instantiates a new Printer resolution.
-     *
-     * @param crossFeedDirection the cross feed direction
-     * @param feedDirection      the feed direction
-     * @param printQuality       the print quality
-     */
-    public PrinterResolution(int crossFeedDirection, int feedDirection, PrintQuality printQuality) {
-        this.crossFeedDirection = crossFeedDirection;
-        this.feedDirection = feedDirection;
-        this.printQuality = printQuality;
-    }
-
-    /**
-     * Returns a {@link PrinterResolution} with the given value
-     *
-     * @param crossFeed the cross feed direction
-     * @param feed      the feed direction
-     * @param quality   the printer quality
-     * @return the printer resolution
-     */
-    public static PrinterResolution of(int crossFeed, int feed, PrintQuality quality) {
-        return new PrinterResolution(crossFeed, feed, quality);
-    }
-
-    /**
-     * Gets cross feed direction.
-     *
-     * @return the cross feed direction
-     */
-    public int getCrossFeedDirection() {
-        return crossFeedDirection;
-    }
-
-    /**
-     * Gets feed direction.
-     *
-     * @return the feed direction
-     */
-    public int getFeedDirection() {
-        return feedDirection;
-    }
-
-    /**
-     * Gets print quality.
-     *
-     * @return the print quality
-     */
-    public PrintQuality getPrintQuality() {
-        return printQuality;
-    }
+class PrinterResolution(
+        val crossFeedDirection: Int,
+        val feedDirection: Int,
+        val printQuality: PrintQuality) {
 
     /**
      * Creates a byte array of 9 bytes with the resolutions and quality as
@@ -97,18 +43,36 @@ public class PrinterResolution {
      *
      * @return the byte [ ]
      */
-    public byte[] toByteArray() {
-        byte[] octets = new byte[9];
-        ByteBuffer buf = ByteBuffer.wrap(octets);
-        buf.putInt(getCrossFeedDirection());
-        buf.putInt(getFeedDirection());
-        buf.put(getPrintQuality().getValue());
-        return octets;
+    fun toByteArray(): ByteArray {
+        val octets = ByteArray(9)
+        val buf = ByteBuffer.wrap(octets)
+        buf.putInt(crossFeedDirection)
+        buf.putInt(feedDirection)
+        buf.put(printQuality.value)
+        return octets
     }
 
-    @Override
-    public String toString() {
-        return getCrossFeedDirection() + "x" + getFeedDirection() + " (" + getPrintQuality() + ")";
+    override fun toString(): String {
+        return crossFeedDirection.toString() + "x" + feedDirection + " (" + printQuality + ")"
+    }
+
+
+
+    companion object {
+
+        /**
+         * Returns a [PrinterResolution] with the given value
+         *
+         * @param crossFeed the cross feed direction
+         * @param feed      the feed direction
+         * @param quality   the printer quality
+         * @return the printer resolution
+         */
+        @JvmStatic
+        fun of(crossFeed: Int, feed: Int, quality: PrintQuality): PrinterResolution {
+            return PrinterResolution(crossFeed, feed, quality)
+        }
+
     }
 
 }
